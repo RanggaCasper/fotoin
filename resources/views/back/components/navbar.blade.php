@@ -68,10 +68,13 @@
               <div class="dropdown-divider"></div>
             </li>
             <li>
-              <a class="dropdown-item" href="#">
-                <i class="ti ti-logout me-2 ti-sm"></i>
-                <span class="align-middle">Log Out</span>
-              </a>
+              <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button class="dropdown-item" type="submit">
+                  <i class="ti ti-logout me-2 ti-sm"></i>
+                  <span class="align-middle">Log Out</span>
+                </button>
+              </form>
             </li>
           </ul>
         </li>

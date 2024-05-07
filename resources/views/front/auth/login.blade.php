@@ -47,34 +47,51 @@
             <div class="col-lg-6">
                 <div class="login-wrapper">
                     <div class="login-content">
-                        <form action="https://dreamgigs.dreamstechnologies.com/html/template/index.html">
+                        <form method="POST">
+                            @csrf
                             <div class="login-userset">
                                 <div class="login-logo">
                                     <img src="{{ asset('asset/img/logo.svg') }}" alt="img">
                                 </div>
                                 <div class="login-card">
-                                    <div class="login-heading">
-                                        <h3>Hi, Welcome Back!</h3>
-                                        <p>Fill the fields to get into your account</p>
+                                    <div class="login-heading mb-2">
+                                        <h3>Hi, Selamat Datang!</h3>
+                                        <p>Isi semua kolom untuk login ke akun anda.</p>
                                     </div>
+                                    @if ($errors->any())
+                                        <div class="alert alert-danger" role="alert">
+                                            <ul class="ms-3" style="list-style-type: disc;">
+                                                @foreach($errors->all() as $error)
+                                                    <li class="small">{{ $error }}</li>
+                                                @endforeach
+                                            </ul>
+                                        </div>
+                                    @endif
+
+                                    @if(session('error'))
+                                        <div class="alert alert-danger small">
+                                            {{ session('error') }}
+                                        </div>
+                                    @endif
+
                                     <div class="form-wrap form-focus">
                                         <span class="form-icon">
                                             <i class="feather-mail"></i>
                                         </span>
-                                        <input type="email" class="form-control floating">
+                                        <input type="email" name="email" value="{{ old('email') }}" class="form-control floating @error('email') is-invalid @enderror">
                                         <label class="focus-label">Email</label>
                                     </div>
                                     <div class="form-wrap form-focus pass-group">
                                         <span class="form-icon">
                                             <i class="toggle-password feather-eye-off"></i>
                                         </span>
-                                        <input type="password" class="pass-input form-control  floating">
+                                        <input type="password" name="password" class="pass-input form-control floating @error('email') is-invalid @enderror">
                                         <label class="focus-label">Password</label>
                                     </div>
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-wrap">
-                                                <label class="custom_check mb-0">Remember Me
+                                                <label class="custom_check mb-0">Ingat Saya
                                                     <input type="checkbox" name="remeber">
                                                     <span class="checkmark"></span>
                                                 </label>
@@ -82,32 +99,15 @@
                                         </div>
                                         <div class="col-md-6">
                                             <div class="form-wrap text-md-end">
-                                                <a href="forgot-password.html" class="forgot-link">Forgot Password?</a>
+                                                <a href="forgot-password.html" class="forgot-link">Lupa Password?</a>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-wrap mantadory-info d-none">
-                                        <p><i class="feather-alert-triangle"></i>Fill all the fields to submit</p>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Sign In</button>
-                                    <div class="login-or">
-                                        <span class="span-or">or sign up with</span>
-                                    </div>
-                                    <ul class="login-social-link">
-                                        <li>
-                                            <a href="javascript:void(0);">
-                                                <img src="{{ asset('asset/img/icons/google-icon.svg') }}" alt="Facebook"> Google
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:void(0);">
-                                                <img src="{{ asset('asset/img/icons/fb.svg') }}" alt="Google"> Facebook
-                                            </a>
-                                        </li>
-                                    </ul>
+                                    
+                                    <button type="submit" class="btn btn-primary">Masuk</button>
                                 </div>
                                 <div class="acc-in">
-                                    <p>Don’t have an account? <a href="signup.html">Sign Up</a></p>
+                                    <p>Tidak memiliki akun? <a href="{{ route('register') }}">Daftar</a></p>
                                 </div>
                             </div>
                         </form>
