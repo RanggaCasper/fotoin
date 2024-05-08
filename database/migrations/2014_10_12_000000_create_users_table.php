@@ -20,12 +20,32 @@ return new class extends Migration
             $table->double('balance')->default('0');
             $table->string('password');
             $table->timestamp('email_verified_at')->nullable();
-            $table->enum('role', ['Master','Admin','User','Fotografer']);
+            $table->enum('role', ['Master', 'Admin', 'User', 'Freelance']);
             $table->string('profile_image')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
+        
+        Schema::create('freelance', function (Blueprint $table) {
+            $table->id();
+            $table->longText('about');
+            $table->string('foto_ktp');
+            $table->string('selfie_ktp');
+            $table->string('nik');
+            $table->string('alamat');
+            $table->string('kode_pos');
+            $table->string('kelurahan');
+            $table->string('kecamatan');
+            $table->string('kota');
+            $table->enum('status', ['on', 'off'])->default('off');
+            $table->string('no_rekening');
+            $table->string('jenis_rekening');
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users');
+            $table->timestamps();
+        });
     }
+
 
     /**
      * Reverse the migrations.
@@ -33,5 +53,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('users');
+        Schema::dropIfExists('freelance');
     }
 };

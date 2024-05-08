@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
-    <title>Fotoin - Register</title>
+    <title>Fotoin - Verify Email</title>
 
     @include('front.components.styles')
 </head>
@@ -56,7 +56,7 @@
                                 <div class="login-card">
                                     <div class="login-heading mb-2">
                                         <h3>Hi, Selamat Datang!</h3>
-                                        <p>Isi semua kolom untuk daftar akun.</p>
+                                        <p>Silahkan masukan token yang telah dikirim di email, untuk memverifikasikan akun anda.</p>
                                     </div>
                                     @if ($errors->any())
                                         <div class="alert alert-danger" role="alert">
@@ -73,53 +73,22 @@
                                             {{ session('error') }}
                                         </div>
                                     @endif
+
+                                    <div class="form-wrap form-focus">
+                                        <span class="form-icon">
+                                            <i class="feather-lock"></i>
+                                        </span>
+                                        <input type="text" name="token" value="{{ old('token') }}" class="form-control floating @error('token') is-invalid @enderror">
+                                        <label class="focus-label">Token</label>
+                                    </div>
                                     
-                                    <div class="form-wrap form-focus">
-                                        <span class="form-icon">
-                                            <i class="feather-user"></i>
-                                        </span>
-                                        <input type="username" name="username" value="{{ old('username') }}" class="form-control floating @error('username') is-invalid @enderror">
-                                        <label class="focus-label">Username</label>
-                                    </div>
-                                    <div class="form-wrap form-focus">
-                                        <span class="form-icon">
-                                            <i class="feather-user"></i>
-                                        </span>
-                                        <input type="fullname" name="fullname" value="{{ old('fullname') }}" class="form-control floating @error('fullname') is-invalid @enderror">
-                                        <label class="focus-label">Nama Lengkap</label>
-                                    </div>
-                                    <div class="form-wrap form-focus">
-                                        <span class="form-icon">
-                                            <i class="feather-phone"></i>
-                                        </span>
-                                        <input type="no_telp" name="no_telp" value="{{ old('no_telp') }}" class="form-control floating @error('no_telp') is-invalid @enderror">
-                                        <label class="focus-label">Nomor Handphone</label>
-                                    </div>
-                                    <div class="form-wrap form-focus">
-                                        <span class="form-icon">
-                                            <i class="feather-mail"></i>
-                                        </span>
-                                        <input type="email" name="email" value="{{ old('email') }}" class="form-control floating @error('email') is-invalid @enderror">
-                                        <label class="focus-label">Email</label>
-                                    </div>
-                                    <div class="form-wrap form-focus pass-group">
-                                        <span class="form-icon">
-                                            <i class="toggle-password feather-eye-off"></i>
-                                        </span>
-                                        <input type="password" name="password" class="pass-input form-control floating @error('password') is-invalid @enderror">
-                                        <label class="focus-label">Password</label>
-                                    </div>
-                                    <div class="form-wrap form-focus pass-group">
-                                        <span class="form-icon">
-                                            <i class="toggle-password feather-eye-off"></i>
-                                        </span>
-                                        <input type="password" name="confirm_password" class="pass-input form-control floating @error('confirm_password') is-invalid @enderror">
-                                        <label class="focus-label">Konfirmasi Password</label>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Daftar</button>
+                                    <button type="submit" class="btn btn-primary">Verifikasi</button>
                                 </div>
                                 <div class="acc-in">
-                                    <p>Sudah memiliki akun? <a href="{{ route('login') }}">Masuk</a></p>
+                                    <form id="logout" action="{{ route('logout') }}">
+                                        @csrf
+                                    </form>
+                                    <p>Ganti akun? <a href="#" onclick="event.preventDefault(); document.getElementById('logout').submit();">Ganti</a></p>
                                 </div>
                             </div>
                         </form>

@@ -2,9 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\TokenEmail;
+use Carbon\Carbon;
+use App\Models\User;
+use App\Models\EmailToken;
+use App\Models\Freelance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Auth\Notifications\VerifyEmail;
 
 class AuthController extends Controller
 {
@@ -46,11 +53,10 @@ class AuthController extends Controller
     public function proses_register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'username' => 'required|unique',
+            'username' => 'required|unique:users',
             'fullname' => 'required',
             'no_telp' => 'required',
-            'otp' => 'required',
-            'email' => 'required|email',
+            'email' => 'required|email|unique:users',
             'password' => 'required',
             'confirm_password' => 'required|same:password',
         ], [
@@ -58,9 +64,9 @@ class AuthController extends Controller
             'username.unique' => 'Username sudah terdaftar.',
             'fullname.required' => 'Kolom nama lengkap harus diisi.',
             'no_telp.required' => 'Nomor handphone harus diisi',
-            'otp.required' => 'Kolom otp harus diisi',
             'email.required' => 'Kolom email harus diisi.',
             'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Email sudah terdaftar.',
             'password.required' => 'Kolom password harus diisi.',
             'confirm_password.required' => 'Kolom konfirmasi password harus diisi.',
             'confirm_password.same' => 'Konfirmasi password harus cocok dengan password.',
@@ -70,16 +76,143 @@ class AuthController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        $credentials = $request->only('email', 'password');
+        $user = User::create([
+            'username' => $request->username,
+            'fullname' => $request->fullname,
+            'no_telp' => $request->no_telp,
+            'email' => $request->email,
+            'password' => bcrypt($request->password),
+            'role' => 'User',
+        ]);
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-            return redirect()->intended('/');
+        if($user){
+            $email = EmailToken::create([
+                'email' => $request->email,
+                'token' => (new EmailToken())->generateToken(),
+                'expired_at' => now()->addHours(1),
+            ]);
+            if($email){
+                Mail::to($request->email)->send(new TokenEmail($email));
+                toastr()->success('Pendaftaran berhasil silahkan login.');
+                return redirect()->route('login');
+            }
         }
 
-        return redirect()->back()->with('error', 'Email atau password salah. Silakan coba lagi.');
+        toastr()->error('Pendaftaran gagal silahkan kontak admin.');
+        return redirect()->back();
     }
 
+    public function register_freelance()
+    {
+        return view('front.auth.freelance.register');
+    }
+
+    public function proses_register_freelance(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'nik' => 'required|unique:freelance',
+            'about' => 'required',
+            'alamat' => 'required',
+            'kelurahan' => 'required',
+            'kecamatan' => 'required',
+            'kode_pos' => 'required',
+            'kota' => 'required',
+            'foto_ktp' => 'required|image',
+            'selfie_ktp' => 'required|image',
+            'no_rekening' => 'required',
+            'jenis_rekening' => 'required',
+        ], [
+            'nik.required' => 'Kolom nik harus diisi.',
+            'nik.unique' => 'Nik sudah terdaftar.',
+            'about.required' => 'Kolom tentang saya harus diisi.',
+            'alamat.required' => 'Kolom alamat harus diisi.',
+            'kelurahan.required' => 'Kolom kelurahan harus diisi.',
+            'kecamatan.required' => 'Kolom kecamatan harus diisi.',
+            'kode_pos.required' => 'Kolom kode pos harus diisi.',
+            'kota.required' => 'Kolom kota harus diisi.',
+            'foto_ktp.required' => 'Kolom foto ktp harus diisi.',
+            'foto_ktp.image' => 'Kolom foto ktp harus berisi gambar.',
+            'selfie_ktp.required' => 'Kolom foto selfie harus diisi.',
+            'selfie_ktp.image' => 'Kolom foto selfie harus berisi gambar.',
+            'no_rekening.required' => 'Kolom no rekening harus diisi.',
+            'jenis_rekening.required' => 'Kolom jenis rekening harus diisi.',
+        ]);
+        
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        $check_freelance = Freelance::where('user_id', auth()->user()->id)->first();
+
+        if ($check_freelance) {
+            toastr()->error('Anda sudah memiliki entri freelance.');
+            return redirect()->back();
+        }
+
+        $fotoKTP = $request->file('foto_ktp')->store('foto_ktp', 'public');
+
+        $selfieKTP = $request->file('selfie_ktp')->store('selfie_ktp', 'public');
+
+        $freelance = Freelance::create([
+            'nik' => $request->nik,
+            'about' => $request->about,
+            'alamat' => $request->alamat,
+            'kelurahan' => $request->kelurahan,
+            'kecamatan' => $request->kecamatan,
+            'kode_pos' => $request->kode_pos,
+            'kota' => $request->kota,
+            'foto_ktp' => $fotoKTP,
+            'selfie_ktp' => $selfieKTP,
+            'no_rekening' => $request->no_rekening,
+            'jenis_rekening' => $request->jenis_rekening,
+            'user_id' => auth()->user()->id,
+        ]);
+
+        if($freelance){
+            toastr()->success('Proses pengajuan pendaftaran freelance sedang di proses.');
+            return redirect()->back();
+        }
+
+        toastr()->error('Proses pengajuan pendaftaran freelance gagal di proses.');
+        return redirect()->back();
+    }
+
+    public function verify_email()
+    {
+        return view('front.auth.verify_email');
+    }
+
+    public function verify(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'token' => 'required',
+        ], [
+            'token.required' => 'Kolom token harus diisi.',
+        ]);
+        
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        if(auth()->check()){
+            $data = EmailToken::where('email',auth()->user()->email)->first();
+            $user = User::where('id',auth()->user()->id)->first();
+            if($data->token === $request->token){
+                if($data->expired_at > Carbon::now()->format('H:i:s')){
+                    $user->email_verified_at = now();
+                    $user->save();
+                    $data->delete();
+                    
+                    toastr()->success('Email berhasil di verifikasi.');
+                    return redirect()->route('login');
+                }
+                toastr()->error('Token telah kadaluarsa.');
+                return redirect()->back();
+            }
+            toastr()->error('Token tidak valid.');
+            return redirect()->back();
+        }
+    }
 
     public function logout(Request $request)
     {
