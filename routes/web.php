@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminMasterController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
@@ -37,14 +38,24 @@ Route::controller(AuthController::class)->middleware('auth','unverified')->group
 
 Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::controller(AdminMasterController::class)->prefix('master')->middleware('auth','verified')->group(function(){
-    Route::get('/dashboard', 'dashboard')->name('dashboard-master');
+Route::controller(AdminMasterController::class)->prefix('master')->middleware('check:Master','auth','verified')->group(function(){
+    Route::get('', 'dashboard')->name('dashboard-master');
 
-    Route::get('/admin', 'view_admin')->name('view-admin');
-    Route::post('/admin', 'create_admin')->name('create-admin');
-    Route::put('/admin/{id}', 'update_admin')->name('update-admin');
-    Route::delete('/admin/{id}', 'delete_admin')->name('delete-admin');
-    Route::get('/get-admin', 'get_admin')->name('get-admin');
-    Route::get('/get-admin/{id}', 'get_admin_id')->name('get-admin-id');
+    Route::get('admin', 'view_admin')->name('view-admin');
+    Route::post('admin', 'create_admin')->name('create-admin');
+    Route::put('admin/{id}', 'update_admin')->name('update-admin');
+    Route::delete('admin/{id}', 'delete_admin')->name('delete-admin');
+    Route::get('get-admin', 'get_admin')->name('get-admin');
+    Route::get('get-admin/{id}', 'get_admin_id')->name('get-admin-id');
 });
 
+Route::controller(AdminController::class)->prefix('admin')->middleware('check:Admin','auth','verified')->group(function(){
+    Route::get('', 'dashboard')->name('dashboard-admin');
+
+    Route::prefix('validasi')->group(function(){
+        Route::get('freelance', 'view_validasi_freelance')->name('view-validasi-freelance');
+        Route::get('get-freelance', 'get_validasi_freelance')->name('get-validasi-freelance');
+        Route::get('get-freelance/{id}', 'get_freelance_id')->name('get-validasi-freelance-id');
+        Route::put('freelance/{id}', 'update_validasi_freelance')->name('update-validasi-freelance');
+    });
+});

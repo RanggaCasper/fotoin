@@ -78,21 +78,21 @@
                                         <span class="form-icon">
                                             <i class="feather-user"></i>
                                         </span>
-                                        <input type="username" name="username" value="{{ old('username') }}" class="form-control floating @error('username') is-invalid @enderror">
+                                        <input type="text" name="username" value="{{ old('username') }}" class="form-control floating @error('username') is-invalid @enderror">
                                         <label class="focus-label">Username</label>
                                     </div>
                                     <div class="form-wrap form-focus">
                                         <span class="form-icon">
                                             <i class="feather-user"></i>
                                         </span>
-                                        <input type="fullname" name="fullname" value="{{ old('fullname') }}" class="form-control floating @error('fullname') is-invalid @enderror">
+                                        <input type="text" name="fullname" value="{{ old('fullname') }}" class="form-control floating @error('fullname') is-invalid @enderror">
                                         <label class="focus-label">Nama Lengkap</label>
                                     </div>
                                     <div class="form-wrap form-focus">
                                         <span class="form-icon">
                                             <i class="feather-phone"></i>
                                         </span>
-                                        <input type="no_telp" name="no_telp" value="{{ old('no_telp') }}" class="form-control floating @error('no_telp') is-invalid @enderror">
+                                        <input type="number" name="no_telp" value="{{ old('no_telp') }}" class="form-control floating @error('no_telp') is-invalid @enderror">
                                         <label class="focus-label">Nomor Handphone</label>
                                     </div>
                                     <div class="form-wrap form-focus">

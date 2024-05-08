@@ -37,6 +37,25 @@
             <div>Kelola Admin</div>
           </a>
         </li>
+      @elseif (auth()->user()->role == "Admin")
+      <li class="menu-item">
+        <a href="{{ route('dashboard-admin') }}" class="menu-link">
+          <i class="menu-icon tf-icons ti ti-smart-home"></i>
+          <div>Dashboard</div>
+        </a>
+      </li>
+      <li class="menu-item">
+        <a href="{{ route('view-validasi-freelance') }}" class="menu-link">
+          <i class="menu-icon tf-icons ti ti-user"></i>
+          <div>Kelola Fotografer</div>
+        </a>
+      </li>
+      <li class="menu-item">
+        <a href="{{ route('view-validasi-freelance') }}" class="menu-link">
+          <i class="menu-icon tf-icons ti ti-user"></i>
+          <div>Validasi Freelance</div>
+        </a>
+      </li>
       @endif
     </ul>
   </aside>
