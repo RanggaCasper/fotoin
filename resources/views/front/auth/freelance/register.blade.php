@@ -76,7 +76,7 @@
                                     
                                     <div class="form-wrap">
                                         <label class="col-form-label" for="nik">Nomor KTP (NIK)</label>
-                                        <input type="text" name="nik" id="nik" value="{{ old('nik') }}" class="form-control @error('nik') is-invalid @enderror"></input>
+                                        <input type="text" name="nik" id="nik" value="{{ old('nik') }}" class="form-control @error('nik') is-invalid @enderror" autofocus></input>
                                     </div>
                                     <div class="form-wrap">
                                         <label class="col-form-label" for="about">Tentang Saya</label>
@@ -84,10 +84,12 @@
                                     </div>
                                     <div class="form-wrap">
                                         <label class="col-form-label" for="provinsi">Provinsi</label>
-                                        <select class="form-control" name="provinsi" id="provinsi" required>
-                                            <option>-- Pilih Salah Satu --</option>
+                                        <select class="form-control @error('provinsi') is-invalid @enderror" name="provinsi" id="provinsi" required>
+                                            <option selected disabled>-- Pilih Salah Satu --</option>
                                             @foreach ($provinsi as $item)
-                                                <option value="{{ $item->code ?? '' }}">{{ $item->name ?? '' }}</option>
+                                                <option value="{{ $item->code ?? '' }}" {{ old('provinsi') == ($item->code ?? '') ? 'selected' : '' }}>
+                                                    {{ $item->name ?? '' }}
+                                                </option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -95,16 +97,16 @@
                                         <div class="col-6">
                                             <div class="form-wrap">
                                                 <label class="col-form-label" for="kota">Kabupaten / Kota</label>
-                                                <select class="form-control" name="kota" id="kota" required>
-                                                    <option>-- Pilih Salah Satu --</option>
+                                                <select class="form-control @error('kota') is-invalid @enderror" name="kota" id="kota" required>
+                                                    <option selected disabled>-- Pilih Salah Satu --</option>
                                                 </select>
                                             </div>
                                         </div>
                                         <div class="col-6">
                                             <div class="form-warp">
                                                 <label class="col-form-label" for="kecamatan">Kecamatan</label>
-                                                <select class="form-control" name="kecamatan" id="kecamatan" required>
-                                                    <option>-- Pilih Salah Satu --</option>
+                                                <select class="form-control @error('kecamatan') is-invalid @enderror" name="kecamatan" id="kecamatan" required>
+                                                    <option selected disabled>-- Pilih Salah Satu --</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -112,9 +114,9 @@
                                     <div class="row">
                                         <div class="col-6">
                                             <div class="form-warp">
-                                                <label class="col-form-label" for="kelurahan">Kelurahan</label>
-                                                <select class="form-control" name="kelurahan" id="kelurahan" required>
-                                                    <option>-- Pilih Salah Satu --</option>
+                                                <label class="col-form-label" for="desa">Desa</label>
+                                                <select class="form-control @error('desa') is-invalid @enderror" accpet="image" name="desa" id="desa" required>
+                                                    <option selected disabled>-- Pilih Salah Satu --</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -132,20 +134,16 @@
                                     <div class="form-wrap">
                                         <label class="col-form-label" for="foto_ktp">Foto KTP</label>
                                         <span class="col-form-label text-primary" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#modal_foto_ktp">(?)</span>
-                                        <input type="file" name="foto_ktp" id="foto_ktp" value="{{ old('foto_ktp') }}" class="form-control @error('foto_ktp') is-invalid @enderror"></input>
+                                        <input type="file" name="foto_ktp" id="foto_ktp" value="{{ old('foto_ktp') }}" accept="image/*" class="form-control @error('foto_ktp') is-invalid @enderror"></input>
                                     </div>
                                     <div class="form-wrap">
                                         <label class="col-form-label" for="selfie_ktp">Foto Selfi</label>
                                         <span class="col-form-label text-primary" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#modal_foto_selfie">(?)</span>
-                                        <input type="file" name="selfie_ktp" id="selfie_ktp" value="{{ old('selfie_ktp') }}" class="form-control @error('selfie_ktp') is-invalid @enderror"></input>
+                                        <input type="file" name="selfie_ktp" id="selfie_ktp" value="{{ old('selfie_ktp') }}" accept="image/*" class="form-control @error('selfie_ktp') is-invalid @enderror"></input>
                                     </div>
                                     <div class="form-wrap">
-                                        <label class="col-form-label" for="no_rekening">No Rekening</label>
-                                        <input type="number" name="no_rekening" id="no_rekening" value="{{ old('no_rekening') }}" class="form-control @error('no_rekening') is-invalid @enderror"></input>
-                                    </div>
-                                    <div class="form-wrap">
-                                        <label class="col-form-label" for="jenis_rekening">Jenis Rekening</label>
-                                        <input type="text" name="jenis_rekening" id="jenis_rekening" value="{{ old('jenis_rekening') }}" class="form-control @error('jenis_rekening') is-invalid @enderror"></input>
+                                        <label class="col-form-label" for="portofolio">Portofolio</label>
+                                        <input type="file" name="portofolio" id="portofolio" value="{{ old('portofolio') }}" accept="image/*" class="form-control @error('portofolio') is-invalid @enderror"></input>
                                     </div>
                                     <button type="submit" class="btn btn-primary">Daftar</button>
                                 </div>
@@ -166,7 +164,7 @@
                         <button type="button" class="close-btn" data-bs-dismiss="modal"><span>×</span></button>
                     </div>
                     <div class="modal-body service-modal">
-                        <img class="img-fluid" src="https://seller.fastwork.id/apply-seller/national-card/image-card-id.jpg" alt="Foto KTP">
+                        <img src="https://seller.fastwork.id/apply-seller/national-card/image-with-card-id.jpg" alt="Foto KTP" class="img-fluid">
                     </div>
                 </div>
             </div>
@@ -180,7 +178,7 @@
                         <button type="button" class="close-btn" data-bs-dismiss="modal"><span>×</span></button>
                     </div>
                     <div class="modal-body service-modal">
-                        <img class="img-fluid" src="https://seller.fastwork.id/apply-seller/national-card/image-with-card-th.jpg" alt="Foto Selfie">
+                        <img src="https://seller.fastwork.id/apply-seller/national-card/image-card-id.jpg" alt="Foto KTP" class="img-fluid">
                     </div>
                 </div>
             </div>
@@ -195,9 +193,34 @@
 
     <script>
         $(document).ready(function () {
+            var oldProvinsi = '{{ old('provinsi') }}';
+            var oldKota = '{{ old('kota') }}';
+            var oldKecamatan = '{{ old('kecamatan') }}';
+            var oldDesa = '{{ old('desa') }}';
+
+            if (oldProvinsi) {
+                $('#provinsi').val(oldProvinsi).trigger('change');
+                onChangeSelect('{{ route("wilayah-kota", ["id" => ":id"]) }}'.replace(':id', oldProvinsi), 'kota');
+            }
+
+            if (oldKota) {
+                var provinsiId = oldProvinsi;
+                if (provinsiId) {
+                    onChangeSelect('{{ route("wilayah-kota", ["id" => ":id"]) }}'.replace(':id', provinsiId), 'kota', oldKota, function() {
+                        if (oldKecamatan) {
+                            onChangeSelect('{{ route("wilayah-kecamatan", ["id" => ":id"]) }}'.replace(':id', oldKota), 'kecamatan', oldKecamatan, function() {
+                                if (oldDesa) {
+                                    onChangeSelect('{{ route("wilayah-desa", ["id" => ":id"]) }}'.replace(':id', oldKecamatan), 'desa', oldDesa);
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+
             $('#provinsi').on('change', function () {
                 var id = $(this).val();
-                resetDropdowns(['kota', 'kecamatan', 'kelurahan']);
+                resetDropdowns(['kota', 'kecamatan', 'desa']);
                 if (id) {
                     onChangeSelect('{{ route("wilayah-kota", ["id" => ":id"]) }}'.replace(':id', id), 'kota');
                 }
@@ -205,7 +228,7 @@
 
             $('#kota').on('change', function () {
                 var id = $(this).val();
-                resetDropdowns(['kecamatan', 'kelurahan']);
+                resetDropdowns(['kecamatan', 'desa']);
                 if (id) {
                     onChangeSelect('{{ route("wilayah-kecamatan", ["id" => ":id"]) }}'.replace(':id', id), 'kecamatan');
                 }
@@ -213,34 +236,41 @@
 
             $('#kecamatan').on('change', function () {
                 var id = $(this).val();
-                resetDropdowns(['kelurahan']);
+                resetDropdowns(['desa']);
                 if (id) {
-                    onChangeSelect('{{ route("wilayah-kelurahan", ["id" => ":id"]) }}'.replace(':id', id), 'kelurahan');
+                    onChangeSelect('{{ route("wilayah-desa", ["id" => ":id"]) }}'.replace(':id', id), 'desa');
                 }
             });
         });
 
-        function onChangeSelect(url, targetId) {
+        function onChangeSelect(url, targetId, oldValue, callback) {
             $.ajax({
                 url: url,
                 type: 'GET',
                 success: function (data) {
-                    $('#' + targetId).empty();
-                    $('#' + targetId).append('<option>-- Pilih Salah Satu --</option>');
+                    var target = $('#' + targetId);
+                    target.empty();
+                    target.append('<option selected disabled>-- Pilih Salah Satu --</option>');
                     $.each(data, function (key, value) {
-                        $('#' + targetId).append('<option value="' + key + '">' + value + '</option>');
+                        target.append('<option value="' + key + '">' + value + '</option>');
                     });
+                    if (oldValue) {
+                        target.val(oldValue).trigger('change');
+                    }
+                    if (callback) {
+                        callback();
+                    }
                 },
                 error: function (xhr, status, error) {
                     console.error('Error:', error);
-                    $('#' + targetId).empty().append('<option>-- Error --</option>');
+                    $('#' + targetId).empty().append('<option selected disabled>-- Error --</option>');
                 }
             });
         }
 
         function resetDropdowns(ids) {
             ids.forEach(function(id) {
-                $('#' + id).empty().append('<option>-- Pilih Salah Satu --</option>');
+                $('#' + id).empty().append('<option selected disabled>-- Pilih Salah Satu --</option>');
             });
         }
 

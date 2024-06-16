@@ -2,17 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\TokenEmail;
 use Carbon\Carbon;
 use App\Models\User;
-use App\Models\EmailToken;
+use App\Mail\TokenEmail;
 use App\Models\Freelance;
+use App\Models\EmailToken;
 use Illuminate\Http\Request;
+use Laravolt\Indonesia\Models\City;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Laravolt\Indonesia\Models\Village;
+use Laravolt\Indonesia\Models\District;
+use Laravolt\Indonesia\Models\Province;
+use Laravolt\Indonesia\Models\Provinsi;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Auth\Notifications\VerifyEmail;
-use Laravolt\Indonesia\Models\Provinsi;
 
 class AuthController extends Controller
 {
@@ -115,20 +119,21 @@ class AuthController extends Controller
             'nik' => 'required|unique:freelance',
             'about' => 'required',
             'alamat' => 'required',
-            'kelurahan' => 'required',
+            'provinsi' => 'required',
+            'desa' => 'required',
             'kecamatan' => 'required',
             'kode_pos' => 'required',
             'kota' => 'required',
             'foto_ktp' => 'required|image',
             'selfie_ktp' => 'required|image',
-            'no_rekening' => 'required',
-            'jenis_rekening' => 'required',
+            'portofolio' => 'required|image',
         ], [
             'nik.required' => 'Kolom nik harus diisi.',
             'nik.unique' => 'Nik sudah terdaftar.',
             'about.required' => 'Kolom tentang saya harus diisi.',
             'alamat.required' => 'Kolom alamat harus diisi.',
-            'kelurahan.required' => 'Kolom kelurahan harus diisi.',
+            'provinsi.required' => 'Kolom provinsi harus diisi.',
+            'desa.required' => 'Kolom desa harus diisi.',
             'kecamatan.required' => 'Kolom kecamatan harus diisi.',
             'kode_pos.required' => 'Kolom kode pos harus diisi.',
             'kota.required' => 'Kolom kota harus diisi.',
@@ -136,8 +141,7 @@ class AuthController extends Controller
             'foto_ktp.image' => 'Kolom foto ktp harus berisi gambar.',
             'selfie_ktp.required' => 'Kolom foto selfie harus diisi.',
             'selfie_ktp.image' => 'Kolom foto selfie harus berisi gambar.',
-            'no_rekening.required' => 'Kolom no rekening harus diisi.',
-            'jenis_rekening.required' => 'Kolom jenis rekening harus diisi.',
+            'portofolio.required' => 'Kolom portofolio harus diisi.',
         ]);
         
         if ($validator->fails()) {
@@ -155,20 +159,33 @@ class AuthController extends Controller
 
         $selfieKTP = $request->file('selfie_ktp')->store('selfie_ktp', 'public');
 
-        $freelance = Freelance::create([
+        $portofolio = $request->file('portofolio')->store('portofolio_pendaftaran', 'public');
+
+        $freelance = new Freelance([
             'nik' => $request->nik,
             'about' => $request->about,
             'alamat' => $request->alamat,
-            'kelurahan' => $request->kelurahan,
-            'kecamatan' => $request->kecamatan,
             'kode_pos' => $request->kode_pos,
-            'kota' => $request->kota,
             'foto_ktp' => $fotoKTP,
             'selfie_ktp' => $selfieKTP,
-            'no_rekening' => $request->no_rekening,
-            'jenis_rekening' => $request->jenis_rekening,
+            'portofolio' => $portofolio,
             'user_id' => auth()->user()->id,
         ]);
+        
+        function wilayah($model, $field, $code) {
+            $data = $model::where('code', $code)->first();
+            if ($data) {
+                return $data->name;
+            }
+            return null;
+        }
+        
+        $freelance->provinsi = wilayah(Province::class, 'provinsi', $request->provinsi);
+        $freelance->kota = wilayah(City::class, 'kota', $request->kota);
+        $freelance->kecamatan = wilayah(District::class, 'kecamatan', $request->kecamatan);
+        $freelance->desa = wilayah(Village::class, 'desa', $request->desa);
+        
+        $freelance->save();
 
         if($freelance){
             toastr()->success('Proses pengajuan pendaftaran freelance sedang di proses.');

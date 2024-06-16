@@ -11,7 +11,7 @@ class Freelance extends Model
 
     protected $table = 'freelance';
 
-    protected $fillable = ['about','foto_ktp','selfie_ktp','nik','alamat','kode_pos','kelurahan','kecamatan','kota','status','no_rekening','jenis_rekening','user_id',];
+    protected $fillable = ['about','foto_ktp','selfie_ktp','nik','alamat','kode_pos','provinsi','desa','kecamatan','kota','status','no_rekening','jenis_rekening','portofolio','user_id',];
 
     public function user()
     {

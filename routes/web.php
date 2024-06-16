@@ -88,5 +88,5 @@ Route::controller(WilayahController::class)->prefix('wilayah')->group(function()
     Route::get('provinsi', 'provinces')->name('wilayah-provinsi');
     Route::get('kota/{id}', 'cities')->name('wilayah-kota');
     Route::get('kecamatan/{id}', 'districts')->name('wilayah-kecamatan');
-    Route::get('kelurahan/{id}', 'villages')->name('wilayah-kelurahan');
+    Route::get('desa/{id}', 'villages')->name('wilayah-desa');
 });

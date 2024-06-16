@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\WebsiteConf;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
 class WebConfServiceProvider extends ServiceProvider
@@ -20,7 +21,9 @@ class WebConfServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $webConf = WebsiteConf::get();
-        $this->app->instance('web_conf', $webConf);
+        if (Schema::hasTable('website_conf')) {
+            $webConf = WebsiteConf::get();
+            $this->app->instance('web_conf', $webConf);
+        }
     }
 }

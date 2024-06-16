@@ -28,14 +28,14 @@
                     $('#modal_fullname').text(data.user.fullname);
                     $('#modal_nik').text(data.nik);
                     $('#modal_alamat').text(data.alamat);
-                    $('#modal_kelurahan').text(data.kelurahan);
+                    $('#modal_provinsi').text(data.provinsi);
+                    $('#modal_desa').text(data.desa);
                     $('#modal_kecamatan').text(data.kecamatan);
                     $('#modal_kota').text(data.kota);
                     $('#modal_kode_pos').text(data.kode_pos);
-                    $('#modal_no_rekening').text(data.no_rekening);
-                    $('#modal_jenis_rekening').text(data.jenis_rekening);
                     $('#modal_foto_ktp').attr('src', '{{ url('') }}/storage/'+data.foto_ktp);
                     $('#modal_foto_selfie').attr('src', '{{ url('') }}/storage/'+data.selfie_ktp);
+                    $('#modal_portofolio').attr('src', '{{ url('') }}/storage/'+data.selfie_ktp);
                 },
                 error: function(error) {
                     
@@ -113,10 +113,18 @@
                       </tr>
                       <tr>
                         <td class="text-nowrap fw-semibold">
-                          Kelurahan
+                          Provinsi
                         </td>
                         <td>
-                          <span id="modal_kelurahan">?</span>
+                          <span id="modal_provinsi">?</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="text-nowrap fw-semibold">
+                          Kabupaten / Kota
+                        </td>
+                        <td>
+                          <span id="modal_kota">?</span>
                         </td>
                       </tr>
                       <tr>
@@ -129,10 +137,10 @@
                       </tr>
                       <tr>
                         <td class="text-nowrap fw-semibold">
-                          Kota
+                          Desa
                         </td>
                         <td>
-                          <span id="modal_kota">?</span>
+                          <span id="modal_desa">?</span>
                         </td>
                       </tr>
                       <tr>
@@ -141,22 +149,6 @@
                         </td>
                         <td>
                           <span id="modal_kode_pos">?</span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td class="text-nowrap fw-semibold">
-                          No Rekening
-                        </td>
-                        <td>
-                          <span id="modal_no_rekening">?</span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td class="text-nowrap fw-semibold">
-                          Jenis Rekening
-                        </td>
-                        <td>
-                          <span id="modal_jenis_rekening">?</span>
                         </td>
                       </tr>
                       <tr>
@@ -173,6 +165,14 @@
                         </td>
                         <td>
                           <img id="modal_foto_selfie" class="img-fluid" alt="">
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="text-nowrap fw-semibold">
+                          Portofolio Pendaftaran
+                        </td>
+                        <td>
+                          <img id="modal_portofolio" class="img-fluid" alt="">
                         </td>
                       </tr>
                     </tbody>
