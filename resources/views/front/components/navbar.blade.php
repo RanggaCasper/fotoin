@@ -10,16 +10,16 @@
                     </span>
                 </a>
                 <a href="index.html" class="navbar-brand logo">
-                    <img src="assets/img/logo.svg" class="img-fluid" alt="Logo">
+                    <img src="{{ optional(app('web_conf')->where('conf_key', 'web_logo')->first())->conf_value }}" class="img-fluid" alt="Logo">
                 </a>
                 <a href="index.html" class="navbar-brand logo-small">
-                    <img src="assets/img/logo.svg" class="img-fluid" alt="Logo">
+                    <img src="{{ optional(app('web_conf')->where('conf_key', 'web_logo')->first())->conf_value }}" class="img-fluid" alt="Logo">
                 </a>
             </div>
             <div class="main-menu-wrapper">
                 <div class="menu-header">
                     <a href="index.html" class="menu-logo">
-                        <img src="assets/img/logo.svg" class="img-fluid" alt="Logo">
+                        <img src="{{ optional(app('web_conf')->where('conf_key', 'web_logo')->first())->conf_value }}" class="img-fluid" alt="Logo">
                     </a>
                     <a id="menu_close" class="menu-close" href="#"> <i class="fas fa-times"></i></a>
                 </div>

@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\WebsiteConf;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Yajra\DataTables\DataTables;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class AdminMasterController extends Controller
@@ -130,5 +131,30 @@ class AdminMasterController extends Controller
     public function get_admin_id($id)
     {
         return response()->json(User::select('id','username','fullname','email','no_telp')->where('role','Admin')->find($id));
+    }
+
+    public function view_website_conf()
+    {
+        return view('back.master.website.configuration');
+    }
+
+    public function update_website_conf(Request $request)
+    {
+        $data = [
+            'web_title' => $request->web_title,
+            'web_description' => $request->web_description,
+            'web_author' => $request->web_author,
+            'web_keywords' => $request->web_keywords,
+            'web_icon' => $request->web_icon,
+            'web_logo' => $request->web_logo,
+            'web_footer' => $request->web_footer,
+        ];
+        
+        foreach ($data as $confKey => $confValue) {
+            WebsiteConf::where('conf_key', $confKey)->update(['conf_value' => $confValue]);
+        }
+
+        toastr()->success('Konfigurasi Website berhasil diupdate.', 'Success!');
+        return redirect()->back();
     }
 }

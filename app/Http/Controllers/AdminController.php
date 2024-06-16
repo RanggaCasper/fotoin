@@ -70,4 +70,37 @@ class AdminController extends Controller
         }
 
     }
+
+    public function view_kelola_freelance()
+    {
+        return view('back.admin.freelance.kelola_freelance');
+    }
+
+    public function get_kelola_freelance(Request $request)
+    {
+        if ($request->ajax()) {
+            $query = Freelance::whereHas('user', function ($query) {
+                $query->where('role', 'User');
+            });
+
+            return DataTables::of($query)
+                ->addColumn('no', function ($row) {
+                    static $counter = 0;
+                    return ++$counter;
+                })
+                ->addColumn('username', function ($row) {
+                    return $row->user->username;
+                })
+                ->addColumn('fullname', function ($row) {
+                    return $row->user->fullname;
+                })
+                ->addColumn('aksi', function ($row) {
+                    return '<button class="btn btn-primary btn-sm detail" data-id="'.$row->id.'" data-bs-toggle="modal" data-bs-target="#detail-modal"><i class="ti ti-eye"></i></button>';
+                })
+                ->rawColumns(['aksi'])
+                ->toJson();
+        }
+
+        abort(404);
+    }
 }

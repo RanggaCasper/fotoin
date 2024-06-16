@@ -6,10 +6,11 @@
 <link rel="stylesheet" href="{{ asset('asset/plugins/fontawesome/css/all.min.css') }}">
 
 <link rel="stylesheet" href="{{ asset('asset/css/owl.carousel.min.css') }}">
+<link rel="stylesheet" href="{{ asset('asset/plugins/select2/css/select2.min.css') }}">
 
 <link rel="stylesheet" href="{{ asset('asset/css/feather.css') }}">
+<link rel="stylesheet" href="{{ asset('asset/plugins/aos/aos.css') }}">
 
 <link rel="stylesheet" href="{{ asset('asset/css/style.css') }}">
-
 
 @stack('styles')

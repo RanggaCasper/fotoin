@@ -27,7 +27,7 @@ class TokenEmail extends Mailable
      */
     public function build()
     {
-        return $this->subject('Token Email')
+        return $this->subject('Verifikasi Email')
                     ->markdown('mail.token-email')
                     ->with(['result' => $this->result]);
     }

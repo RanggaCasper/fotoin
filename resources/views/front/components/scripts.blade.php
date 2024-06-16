@@ -6,8 +6,17 @@
 
 <script src="{{ asset('asset/js/feather.min.js') }}"></script>
 <script src="{{ asset('asset/js/owl.carousel.min.js') }}"></script>
+<script src="{{ asset('asset/plugins/aos/aos.js') }}"></script>
+<script src="{{ asset('asset/js/jquery.waypoints.js') }}"></script>
+<script src="{{ asset('asset/js/jquery.counterup.min.js') }}"></script>
+<script src="{{ asset('asset/plugins/select2/js/select2.min.js') }}"></script>
+
+<script src="{{ asset('asset/plugins/apexchart/apexcharts.min.js') }}"></script>
+<script src="{{ asset('asset/plugins/apexchart/chart-data.js') }}"></script>
 
 <script src="{{ asset('asset/js/script.js') }}"></script>
 
-<script src="{{ asset('asset/js/rocket-loader.js') }}"></script>
+<script src="{{ asset('asset/js/rocket-loader.min.js') }}"></script>
+
+@stack('scripts')
 

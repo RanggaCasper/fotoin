@@ -20,7 +20,7 @@
         $('#datatable').on('click', '.detail', function() {
             var id = $(this).data('id');
             $.ajax({
-                url: '{{ route("get-validasi-freelance-id", ["id" => ":id"]) }}'.replace(':id', id),
+                url: '{{ route("get-freelance-id", ["id" => ":id"]) }}'.replace(':id', id),
                 type: 'GET',
                 success: function(data) {
                     $('#form-update').attr('action', '{{ route("update-validasi-freelance", ["id" => ":id"]) }}'.replace(':id', id));

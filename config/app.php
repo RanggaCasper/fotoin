@@ -185,6 +185,7 @@ return [
         /*
          * Package Service Providers...
          */
+        App\Providers\WebConfServiceProvider::class,
 
         /*
          * Application Service Providers...

@@ -51,7 +51,7 @@
                             @csrf
                             <div class="login-userset">
                                 <div class="login-logo">
-                                    <img src="{{ asset('asset/img/logo.svg') }}" alt="img">
+                                    <img src="{{ optional(app('web_conf')->where('conf_key', 'web_logo')->first())->conf_value }}" width="100" alt="img">
                                 </div>
                                 <div class="login-card">
                                     <div class="login-heading mb-2">

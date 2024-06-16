@@ -804,29 +804,7 @@
         $(this).closest(".sign-cont").remove();
         return false;
     });
-    $(document).on("click", ".amount-add", function () {
-        var signcontent =
-            '<div class="row sign-cont">' +
-            '<div class="col-md-4">' +
-            '<div class="form-wrap">' +
-            '<input type="text" class="form-control" placeholder="I Can">' +
-            "</div>" +
-            "</div>" +
-            '<div class="col-md-4">' +
-            '<div class="form-wrap">' +
-            '<input type="text" class="form-control" placeholder="For ($)">' +
-            "</div>" +
-            "</div>" +
-            '<div class="col-md-4">' +
-            '<div class="form-wrap d-flex align-items-center">' +
-            '<input type="text" class="form-control" placeholder="In (Day)">' +
-            '<a href="javascript:void(0);" class="trash-sign ms-2 text-danger"><i class="feather-trash-2"></i></a>' +
-            "</div>" +
-            "</div>" +
-            "</div>";
-        $(".add-content").append(signcontent);
-        return false;
-    });
+
     if ($(".datatable").length > 0) {
         $(".datatable").DataTable({
             bFilter: true,

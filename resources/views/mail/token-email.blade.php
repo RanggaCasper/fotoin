@@ -121,12 +121,12 @@
                         <tr>
                             <td class="sm-py-32 sm-px-24"
                                 style="mso-line-height-rule: exactly; padding: 24px; text-align: center; font-family: Montserrat, -apple-system, 'Segoe UI', sans-serif;">
-                                {{-- <a href="{{ route('home') }}"
+                                <a href="{{ route('login') }}"
                                     style="font-family: 'Montserrat', sans-serif; mso-line-height-rule: exactly;">
                                     <img src="{{ optional(app('web_conf')->where('conf_key', 'web_logo')->first())->conf_value }}" width="50" alt="{{ optional(app('web_conf')->where('conf_key', 'web_title')->first())->conf_value }}"
                                         style="max-width: 100%; vertical-align: middle; line-height: 100%; border: 0;">
                                         
-                                </a> --}}
+                                </a>
                             </td>
                         </tr>
                         <tr>
@@ -140,17 +140,23 @@
                                                 style="font-family: 'Montserrat', sans-serif; mso-line-height-rule: exactly; margin-bottom: 0; font-size: 16px; font-weight: 600;">
                                                 Hai,</p>
                                             <p
-                                                style="font-family: 'Montserrat', sans-serif; mso-line-height-rule: exactly; margin-top: 0; font-size: 18px; font-weight: 700; color: #0099ff;">
+                                                style="font-family: 'Montserrat', sans-serif; mso-line-height-rule: exactly; margin-top: 0; font-size: 16px; font-weight: 700; color: #0099ff;">
                                                 {{ $result['email'] }}</p>
                                             <p
                                                 style="font-family: 'Montserrat', sans-serif; font-size: 12px; mso-line-height-rule: exactly; margin: 0; margin-bottom: 8px;">
-                                                Silakan verifikasi token Anda dengan menyalin   di bawah ini sebelum pukul {{ $result['expired_at'] }} WIB. Jangan bagikan kode ini kepada siapa pun, termasuk pihak kami.
+                                                Silahkan lakukan verifikasi kode unik dibawah ini untuk melanjutkan proses pendaftaran, berlaku hingga {{ $result['expired_at'] }} WIB.
+                                            </p>
+                                            <hr style="border-top:dashed 1px">
+                                            <b
+                                                style="text-align: center; font-family: 'Montserrat', sans-serif; font-size: 16px; mso-line-height-rule: exactly; margin: 0;">
+                                                {{ $result['token'] }}
+                                            </b>
+                                            <hr style="border-top:dashed 1px">
+                                            <p
+                                                style="font-family: 'Montserrat', sans-serif; font-size: 12px; mso-line-height-rule: exactly; margin: 0; margin-bottom: 8px;">
+                                                Terima kasih atas kepercayaan yang Anda berikan kepada kami. Jika Anda tidak melakukan pendaftaran ini, mohon abaikan email ini.
                                             </p>
                                             <p
-                                                style="font-family: 'Montserrat', sans-serif; font-size: 18px; mso-line-height-rule: exactly; margin: 0; margin-bottom: 8px;">
-                                                {{ $result['token'] }}
-                                            </p>
-                                            {{-- <p
                                                 style="font-family: 'Montserrat', sans-serif; font-size: 12px; mso-line-height-rule: exactly; margin: 0; margin-bottom: 8px;">
                                                 Salam hangat, <br style="text-transform: uppercase;"><b>{{ optional(app('web_conf')->where('conf_key', 'web_title')->first())->conf_value }}.</b></p>
                                             <hr style="border-top:dashed 1px">
@@ -158,10 +164,10 @@
                                                 style="font-family: 'Montserrat', sans-serif; font-size: 12px; mso-line-height-rule: exactly; margin: 0; margin-bottom: 8px;">
                                                 Website : <a href="{{ url('') }}">{{ url('') }}</a>
                                                 <br> 
-                                                Email : <a href="mailto:{{ optional(app('web_conf')->where('conf_key', 'help_email')->first())->conf_value }}">{{ optional(app('web_conf')->where('conf_key', 'help_email')->first())->conf_value }}</a>
+                                                {{-- Email : <a href="mailto:{{ optional(app('web_conf')->where('conf_key', 'help_email')->first())->conf_value }}">{{ optional(app('web_conf')->where('conf_key', 'help_email')->first())->conf_value }}</a>
                                                 <br>
-                                                Whatsapp : {{ optional(app('web_conf')->where('conf_key', 'help_wa')->first())->conf_value }}
-                                            </p> --}}
+                                                Whatsapp : {{ optional(app('web_conf')->where('conf_key', 'help_wa')->first())->conf_value }} --}}
+                                            </p>
                                         </td>
                                     </tr>
                                     <tr>
@@ -169,17 +175,15 @@
                                             style="font-family: 'Montserrat', sans-serif; font-size: 12px; mso-line-height-rule: exactly; height: 8px;">
                                         </td>
                                     </tr>
-                                    {{-- <tr>
-                                        <td
-                                            style="mso-line-height-rule: exactly; font-size: 12px; font-family: Montserrat, -apple-system, 'Segoe UI', sans-serif; font-size: 12px; color: #eceff1;">
+                                    <tr>
+                                        <td style="mso-line-height-rule: exactly; font-size: 12px; font-family: Montserrat, -apple-system, 'Segoe UI', sans-serif; font-size: 12px; color: #eceff1;">
                                             <p class="sm-px-24"
                                                 style="font-family: 'Montserrat', sans-serif; font-size: 12px; mso-line-height-rule: exactly; color: #263238;">
                                                 Penggunaan layanan dan situs web kami tunduk pada
-                                                <a href="{{ route('terms-and-condition') }}" class="hover-underline"
-                                                    style="font-family: 'Montserrat', sans-serif; mso-line-height-rule: exactly; color: #0099ff; text-decoration: none;">Syarat & Ketentuan</a>. Terima kasih.
+                                                <a href="{{ url('') }}" class="hover-underline" style="font-family: 'Montserrat', sans-serif; mso-line-height-rule: exactly; color: #0099ff; text-decoration: none;">Syarat & Ketentuan</a>. Terima kasih.
                                             </p>
                                         </td>
-                                    </tr> --}}
+                                    </tr>
                                     <tr>
                                         <td
                                             style="font-family: 'Montserrat', sans-serif; mso-line-height-rule: exactly; height: 16px;">
