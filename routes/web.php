@@ -5,6 +5,7 @@ use App\Http\Controllers\AdminMasterController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\FreelanceController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\WilayahController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -81,4 +82,11 @@ Route::controller(FreelanceController::class)->prefix('freelance')->middleware('
         Route::get('/tambah', 'view_katalog')->name('view-tambah-katalog-freelance');
         Route::post('/tambah', 'create_katalog')->name('tambah-katalog-freelance');
     });
+});
+
+Route::controller(WilayahController::class)->prefix('wilayah')->group(function(){
+    Route::get('provinsi', 'provinces')->name('wilayah-provinsi');
+    Route::get('kota/{id}', 'cities')->name('wilayah-kota');
+    Route::get('kecamatan/{id}', 'districts')->name('wilayah-kecamatan');
+    Route::get('kelurahan/{id}', 'villages')->name('wilayah-kelurahan');
 });

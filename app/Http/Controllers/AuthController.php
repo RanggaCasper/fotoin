@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Auth\Notifications\VerifyEmail;
+use Laravolt\Indonesia\Models\Provinsi;
 
 class AuthController extends Controller
 {
@@ -104,7 +105,8 @@ class AuthController extends Controller
 
     public function register_freelance()
     {
-        return view('front.auth.freelance.register');
+        $provinsi = Provinsi::get();
+        return view('front.auth.freelance.register', compact('provinsi'));
     }
 
     public function proses_register_freelance(Request $request)

@@ -83,36 +83,51 @@
                                         <textarea name="about" id="about" class="form-control @error('about') is-invalid @enderror" rows="6" placeholder="Deskripsikan tentang profesi anda">{{ old('about') }}</textarea>
                                     </div>
                                     <div class="form-wrap">
-                                        <label class="col-form-label" for="alamat">Alamat Lengkap</label>
-                                        <input type="text" name="alamat" id="alamat" value="{{ old('alamat') }}" class="form-control @error('alamat') is-invalid @enderror"></input>
+                                        <label class="col-form-label" for="provinsi">Provinsi</label>
+                                        <select class="form-control" name="provinsi" id="provinsi" required>
+                                            <option>-- Pilih Salah Satu --</option>
+                                            @foreach ($provinsi as $item)
+                                                <option value="{{ $item->code ?? '' }}">{{ $item->name ?? '' }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                     <div class="row">
                                         <div class="col-6">
                                             <div class="form-wrap">
-                                                <label class="col-form-label" for="kelurahan">Kelurahan</label>
-                                                <input type="text" name="kelurahan" id="kelurahan" value="{{ old('kelurahan') }}" class="form-control @error('kelurahan') is-invalid @enderror"></input>
+                                                <label class="col-form-label" for="kota">Kabupaten / Kota</label>
+                                                <select class="form-control" name="kota" id="kota" required>
+                                                    <option>-- Pilih Salah Satu --</option>
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="col-6">
-                                            <div class="form-wrap">
+                                            <div class="form-warp">
                                                 <label class="col-form-label" for="kecamatan">Kecamatan</label>
-                                                <input type="text" name="kecamatan" id="kecamatan" value="{{ old('kecamatan') }}" class="form-control @error('kecamatan') is-invalid @enderror"></input>
+                                                <select class="form-control" name="kecamatan" id="kecamatan" required>
+                                                    <option>-- Pilih Salah Satu --</option>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="row">
+                                        <div class="col-6">
+                                            <div class="form-warp">
+                                                <label class="col-form-label" for="kelurahan">Kelurahan</label>
+                                                <select class="form-control" name="kelurahan" id="kelurahan" required>
+                                                    <option>-- Pilih Salah Satu --</option>
+                                                </select>
+                                            </div>
+                                        </div>
                                         <div class="col-6">
                                             <div class="form-wrap">
                                                 <label class="col-form-label" for="kode_pos">Kode Pos</label>
                                                 <input type="number" name="kode_pos" id="kode_pos" value="{{ old('kode_pos') }}" class="form-control @error('kode_pos') is-invalid @enderror"></input>
                                             </div>
                                         </div>
-                                        <div class="col-6">
-                                            <div class="form-wrap">
-                                                <label class="col-form-label" for="kota">Kota</label>
-                                                <input type="text" name="kota" id="kota" value="{{ old('kota') }}" class="form-control @error('kota') is-invalid @enderror"></input>
-                                            </div>
-                                        </div>
+                                    </div>
+                                    <div class="form-wrap">
+                                        <label class="col-form-label" for="alamat">Alamat Lengkap</label>
+                                        <input type="text" name="alamat" id="alamat" value="{{ old('alamat') }}" class="form-control @error('alamat') is-invalid @enderror"></input>
                                     </div>
                                     <div class="form-wrap">
                                         <label class="col-form-label" for="foto_ktp">Foto KTP</label>
@@ -177,6 +192,59 @@
     </div>
 
     @include('front.components.scripts')
+
+    <script>
+        $(document).ready(function () {
+            $('#provinsi').on('change', function () {
+                var id = $(this).val();
+                resetDropdowns(['kota', 'kecamatan', 'kelurahan']);
+                if (id) {
+                    onChangeSelect('{{ route("wilayah-kota", ["id" => ":id"]) }}'.replace(':id', id), 'kota');
+                }
+            });
+
+            $('#kota').on('change', function () {
+                var id = $(this).val();
+                resetDropdowns(['kecamatan', 'kelurahan']);
+                if (id) {
+                    onChangeSelect('{{ route("wilayah-kecamatan", ["id" => ":id"]) }}'.replace(':id', id), 'kecamatan');
+                }
+            });
+
+            $('#kecamatan').on('change', function () {
+                var id = $(this).val();
+                resetDropdowns(['kelurahan']);
+                if (id) {
+                    onChangeSelect('{{ route("wilayah-kelurahan", ["id" => ":id"]) }}'.replace(':id', id), 'kelurahan');
+                }
+            });
+        });
+
+        function onChangeSelect(url, targetId) {
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function (data) {
+                    $('#' + targetId).empty();
+                    $('#' + targetId).append('<option>-- Pilih Salah Satu --</option>');
+                    $.each(data, function (key, value) {
+                        $('#' + targetId).append('<option value="' + key + '">' + value + '</option>');
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', error);
+                    $('#' + targetId).empty().append('<option>-- Error --</option>');
+                }
+            });
+        }
+
+        function resetDropdowns(ids) {
+            ids.forEach(function(id) {
+                $('#' + id).empty().append('<option>-- Pilih Salah Satu --</option>');
+            });
+        }
+
+    </script>
 
 </body>
 
