@@ -9,14 +9,14 @@ class Category extends Model
 {
     use HasFactory;
 
-    protected $table = 'category_catalogs';
+    protected $table = 'categorys';
 
-    protected $fillable = ['category'];
+    protected $fillable = ['name','icon','images'];
 
-    // public function catalog()
-    // {
-    //     return $this->belongsTo(User::class);
-    // }
+    public function catalogs()
+    {
+        return $this->hasMany(Catalog::class);
+    }
 
     public $timestamps = true; 
 }

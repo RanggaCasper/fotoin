@@ -105,14 +105,6 @@
                       </tr>
                       <tr>
                         <td class="text-nowrap fw-semibold">
-                          Alamat Lengkap
-                        </td>
-                        <td>
-                          <span id="modal_alamat">?</span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td class="text-nowrap fw-semibold">
                           Provinsi
                         </td>
                         <td>
@@ -141,6 +133,14 @@
                         </td>
                         <td>
                           <span id="modal_desa">?</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="text-nowrap fw-semibold">
+                          Alamat Lengkap
+                        </td>
+                        <td>
+                          <span id="modal_alamat">?</span>
                         </td>
                       </tr>
                       <tr>

@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('category_catalogs', function (Blueprint $table) {
+        Schema::create('categorys', function (Blueprint $table) {
             $table->id();
-            $table->string('category');
+            $table->string('name');
+            $table->longText('icon');
+            $table->longText('image');
             $table->timestamps();
         });
 
@@ -22,7 +24,7 @@ return new class extends Migration
             $table->string('title_name');
             $table->longText('description');
             $table->unsignedBigInteger('category_id');
-            $table->foreign('category_id')->references('id')->on('category_catalogs');
+            $table->foreign('category_id')->references('id')->on('categorys');
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();

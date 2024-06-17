@@ -77,10 +77,10 @@ Route::controller(HomeController::class)->group(function(){
 Route::controller(FreelanceController::class)->prefix('freelance')->middleware('check:Freelance','auth','verified')->group(function(){
     Route::get('/', 'dashboard')->name('dashboard-freelance');
 
-    Route::prefix('/katalog')->group(function(){
-        Route::get('/', 'katalog')->name('katalog-freelance');
-        Route::get('/tambah', 'view_katalog')->name('view-tambah-katalog-freelance');
-        Route::post('/tambah', 'create_katalog')->name('tambah-katalog-freelance');
+    Route::prefix('/catalog')->group(function(){
+        Route::get('/', 'catalog')->name('catalog-freelance');
+        Route::get('/create', 'view_catalog')->name('view-create-catalog-freelance');
+        Route::post('/create', 'create_catalog')->name('create-catalog-freelance');
     });
 });
 

@@ -11,7 +11,7 @@ class Catalog extends Model
 
     protected $table = 'catalogs';
 
-    protected $fillable = ['title_name','description','category_id'];
+    protected $fillable = ['title_name','description','category_id','user_id'];
 
     public function category()
     {

@@ -18,25 +18,23 @@ class FreelanceController extends Controller
         return view('front.freelance.dashboard.dashboard');
     }
 
-    public function katalog()
+    public function catalog()
     {
-        return view('front.freelance.katalog.katalog');
+        return view('front.freelance.catalog.catalog');
     }
 
-    public function view_katalog()
+    public function view_catalog()
     {
         $categorys = Category::get();
-        // dd($categorys);
-        return view('front.freelance.katalog.tambah', compact('categorys'));
+        return view('front.freelance.catalog.create', compact('categorys'));
     }
 
-    public function create_katalog(Request $request){
-        // dd($request->all());
-
+    public function create_catalog(Request $request){
         $catalog = Catalog::create([
             'title_name' => $request->title_name,
             'description' => $request->description,
-            'category_id' => $request->category
+            'category_id' => $request->category,
+            'user_id' => auth()->user()->id
         ]);
 
         if($catalog){

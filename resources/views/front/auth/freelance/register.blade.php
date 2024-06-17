@@ -164,7 +164,7 @@
                         <button type="button" class="close-btn" data-bs-dismiss="modal"><span>×</span></button>
                     </div>
                     <div class="modal-body service-modal">
-                        <img src="https://seller.fastwork.id/apply-seller/national-card/image-with-card-id.jpg" alt="Foto KTP" class="img-fluid">
+                        <img src="https://seller.fastwork.id/apply-seller/national-card/image-card-id.jpg" alt="Foto KTP" class="img-fluid">
                     </div>
                 </div>
             </div>
@@ -178,7 +178,7 @@
                         <button type="button" class="close-btn" data-bs-dismiss="modal"><span>×</span></button>
                     </div>
                     <div class="modal-body service-modal">
-                        <img src="https://seller.fastwork.id/apply-seller/national-card/image-card-id.jpg" alt="Foto KTP" class="img-fluid">
+                        <img src="https://seller.fastwork.id/apply-seller/national-card/image-with-card-id.jpg" alt="Foto Selfie" class="img-fluid">
                     </div>
                 </div>
             </div>

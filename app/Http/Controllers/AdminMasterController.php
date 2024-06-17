@@ -27,7 +27,7 @@ class AdminMasterController extends Controller
             'username' => 'required|unique:users',
             'fullname' => 'required',
             'no_telp' => 'required',
-            'email' => 'required|email:dns|unique:users',
+            'email' => 'required|email|unique:users',
             'password' => 'required',
         ], [
             'username.required' => 'Kolom username harus diisi.',
