@@ -23,6 +23,8 @@ return new class extends Migration
             $table->id();
             $table->string('title_name');
             $table->longText('description');
+            $table->longText('slug');
+            $table->unsignedBigInteger('count_views')->default(0);
             $table->unsignedBigInteger('category_id');
             $table->foreign('category_id')->references('id')->on('categorys');
             $table->unsignedBigInteger('user_id');
@@ -54,6 +56,8 @@ return new class extends Migration
             $table->string('feedback')->nullable();
             $table->unsignedBigInteger('catalog_id');
             $table->foreign('catalog_id')->references('id')->on('catalogs');
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();
         });
 

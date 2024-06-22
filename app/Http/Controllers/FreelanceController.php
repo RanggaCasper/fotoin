@@ -33,6 +33,7 @@ class FreelanceController extends Controller
         $catalog = Catalog::create([
             'title_name' => $request->title_name,
             'description' => $request->description,
+            'slug' => Str::slug($request->title_name),
             'category_id' => $request->category,
             'user_id' => auth()->user()->id
         ]);

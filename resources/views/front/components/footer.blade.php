@@ -1,7 +1,7 @@
 <footer class="footer">
     <div class="section-bg">
-        <img src="assets/img/bg/footer-bg-01.png" class="footer-bg-one" alt="img">
-        <img src="assets/img/bg/footer-bg-02.png" class="footer-bg-two" alt="img">
+        <img src="asset/img/bg/footer-bg-01.png" class="footer-bg-one" alt="img">
+        <img src="asset/img/bg/footer-bg-02.png" class="footer-bg-two" alt="img">
     </div>
     <div class="container">
         <div class="footer-top">
@@ -9,7 +9,7 @@
                 <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
                     <div class="footer-widget">
                         <a href="index.html">
-                            <img src="assets/img/white-logo.svg" alt="logo">
+                            <img src="asset/img/white-logo.svg" alt="logo">
                         </a>
                         <p>Our mission is to lead the way in digital transformation and automation. We aim to
                             enabling them to navigate the evolving digital landscape with confidence.</p>
@@ -108,10 +108,10 @@
                     <div class="col-xl-3 text-xl-end">
                         <div class="paypal-icons">
                             <a href="javascript:void(0);">
-                                <img src="assets/img/icons/stripe-icon.svg" alt="icon">
+                                <img src="asset/img/icons/stripe-icon.svg" alt="icon">
                             </a>
                             <a href="javascript:void(0);">
-                                <img src="assets/img/icons/paypal-icon.svg" alt="icon">
+                                <img src="asset/img/icons/paypal-icon.svg" alt="icon">
                             </a>
                         </div>
                     </div>

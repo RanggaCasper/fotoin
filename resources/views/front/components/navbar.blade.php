@@ -25,7 +25,6 @@
                 </div>
                 <ul class="main-nav navbar-nav">
                     <li class="nav-item"><a href="{{ route('home') }}" class="nav-link">Beranda</a></li>
-                    <li class="nav-item"><a href="index.html" class="nav-link">Cari Freelancer</a></li>
                     <li class="has-submenu">
                         <a href="javascript:void(0);">Kategori <i class="fas fa-chevron-down"></i></a>
                         <ul class="submenu">
@@ -46,7 +45,7 @@
                         </form>
                         <li class="nav-item responsive-link"><a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Keluar</a></li>
                     @else
-                        <li class="nav-item"><a href="{{ route('register-freelance') }}" class="nav-link">Daftar Freelancer</a></li>
+                        <li class="nav-item responsive-link"><a href="{{ route('register-freelance') }}" class="nav-link">Daftar Freelancer</a></li>
                         <li class="nav-item responsive-link"><a href="{{ route('login') }}" class="nav-link">Masuk</a></li>
                     @endauth
                 </ul>

@@ -72,6 +72,19 @@ Route::controller(AdminController::class)->prefix('admin')->middleware('check:Ad
 
 Route::controller(HomeController::class)->group(function(){
     Route::get('/', 'home')->name('home');
+
+    Route::prefix('catalog')->group(function(){
+        Route::get('category/{category}', 'search_category')->name('search-category');
+        Route::get('search/{search}', 'search_catalog')->name('search-catalog');
+        
+        Route::prefix('wishlist')->middleware('auth','verified')->group(function(){
+            Route::get('/', 'view_wishlist')->name('view-wishlist');
+            Route::post('add', 'add_wishlist')->name('add-wishlist');
+            Route::post('remove', 'remove_wishlist')->name('remove-wishlist');
+        });
+    
+        Route::get('{username}/{slug}', 'view_catalog')->name('view-catalog');
+    });
 });
 
 Route::controller(FreelanceController::class)->prefix('freelance')->middleware('check:Freelance','auth','verified')->group(function(){

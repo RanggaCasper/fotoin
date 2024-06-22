@@ -33,7 +33,7 @@
 
         <div class="back-to-top">
             <a class="back-to-top-icon align-items-center justify-content-center d-flex" href="#top">
-                <img src="assets/img/icons/arrow-badge-up.svg" alt="img">
+                <img src="{{ asset('asset/img/icons/arrow-badge-up.svg') }}" alt="img">
             </a>
         </div>
 

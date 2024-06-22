@@ -11,16 +11,44 @@ class Catalog extends Model
 
     protected $table = 'catalogs';
 
-    protected $fillable = ['title_name','description','category_id','user_id'];
+    protected $fillable = ['title_name','description','slug','category_id','user_id'];
 
     public function category()
     {
         return $this->belongsTo(Category::class);
     }
     
-    public function portfolios()
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function portofolios()
     {
         return $this->hasMany(Portofolio::class);
+    }
+
+    public function feedback()
+    {
+        return $this->hasMany(Feedback::class);
+    }
+
+    public function packages()
+    {
+        return $this->hasMany(Package::class);
+    }
+
+    public function wishlists()
+    {
+        return $this->hasMany(Wishlist::class);
+    }
+
+    public function isInWishlist()
+    {
+        if (auth()->check()) {
+            return $this->wishlists()->where('user_id', auth()->user()->id)->exists();
+        }
+        return false;
     }
 
     public $timestamps = true; 

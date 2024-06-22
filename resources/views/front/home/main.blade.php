@@ -35,11 +35,11 @@
                                 <p>Kualitas foto profesional untuk setiap momen spesial Anda. Pesan sekarang! 📸</p>
                             </div>
                             <div class="banner-form">
-                                <form action="https://dreamgigs.dreamstechnologies.com/html/template/service.html">
+                                <form id="searchForm">
                                     <div class="banner-search-list">
                                         <div class="input-block border-0">
-                                            <label>Cari Freelance</label>
-                                            <input type="text" class="form-control" placeholder="Butuh seorang fotografer">
+                                            <label for="search">Cari Freelance</label>
+                                            <input type="text" id="search" name="search" class="form-control" placeholder="Butuh seorang fotografer">
                                         </div>
                                     </div>
                                     <div class="input-block-btn">
@@ -99,7 +99,7 @@
                                     <p>{{ $category->catalogs_count }}</p>
                                 </div>
                                 <div class="category-overlay">
-                                    <a href="categories.html">
+                                    <a href="{{ route('search-category', ['category' => $category->name])  }}">
                                         <div class="category-overlay-img">
                                             <img src="{{ url($category->image) }}" class="img-fluid" alt="Service">
                                             <div class="category-overlay-content">
@@ -586,5 +586,16 @@
 
 
     @include('front.components.scripts')
+    <script>
+        document.getElementById('searchForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var searchQuery = document.getElementById('search').value;
+            if (searchQuery) {
+                var url = '{{ route("search-catalog", ["search" => "SEARCH_PLACEHOLDER"]) }}';
+                url = url.replace('SEARCH_PLACEHOLDER', encodeURIComponent(searchQuery));
+                window.location.href = url;
+            }
+        });
+    </script>
 </body>
 </html>

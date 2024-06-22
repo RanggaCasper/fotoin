@@ -174,7 +174,7 @@
                                     <select class="select" name="category">
                                         <option disabled selected>-- Pilih Kategori --</option>
                                         @foreach ($categorys as $category)
-                                            <option value="{{ $category->id }}">{{ $category->category }}</option>
+                                            <option value="{{ $category->id }}">{{ $category->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>

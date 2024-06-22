@@ -3,9 +3,10 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Support\Carbon;
 use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -26,7 +27,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'balance',
         'password',
         'role',
-        'profile_image'
+        'profile_image',
+        'last_seen'
     ];
 
     /**
@@ -46,4 +48,24 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function catalogs()
+    {
+        return $this->hasMany(Catalog::class);
+    }
+
+    public function isOnline()
+    {
+        return $this->last_seen > Carbon::now()->subMinutes(5);
+    }
+
+    public function freelance()
+    {
+        return $this->hasOne(Freelance::class);
+    }
+
+    public function wishlist()
+    {
+        return $this->hasMany(Wishlist::class);
+    }
 }

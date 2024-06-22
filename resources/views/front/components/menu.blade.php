@@ -19,66 +19,66 @@
             <ul>
                 <li>
                     <a href="user-dashboard.html" class="active">
-                        <img src="asset/img/icons/dashboard-icon-01.svg" class="img-fluid"
+                        <img src="{{ asset('asset/img/icons/dashboard-icon-01.svg') }}" class="img-fluid"
                             alt="img">Dashboard
                     </a>
                 </li>
                 <li>
                     <a href="{{ route('catalog-freelance') }}">
-                        <img src="asset/img/icons/dashboard-icon-02.svg" class="img-fluid" alt="img">Manajemen Katalog
+                        <img src="{{ asset('asset/img/icons/dashboard-icon-02.svg') }}" class="img-fluid" alt="img">Manajemen Katalog
                     </a>
                 </li>
                 <li>
                     <a href="user-purchase.html">
-                        <img src="asset/img/icons/dashboard-icon-03.svg" class="img-fluid"
+                        <img src="{{ asset('asset/img/icons/dashboard-icon-03.svg') }}" class="img-fluid"
                             alt="img">Purchase
                     </a>
                 </li>
                 <li>
                     <a href="user-sales.html">
-                        <img src="asset/img/icons/dashboard-icon-04.svg" class="img-fluid"
+                        <img src="{{ asset('asset/img/icons/dashboard-icon-04.svg') }}" class="img-fluid"
                             alt="img">Sales
                     </a>
                 </li>
                 <li>
                     <a href="user-files.html">
-                        <img src="asset/img/icons/dashboard-icon-05.svg" class="img-fluid"
+                        <img src="{{ asset('asset/img/icons/dashboard-icon-05.svg') }}" class="img-fluid"
                             alt="img">Files
                     </a>
                 </li>
                 <li>
                     <a href="user-reviews.html">
-                        <img src="asset/img/icons/dashboard-icon-06.svg" class="img-fluid"
+                        <img src="{{ asset('asset/img/icons/dashboard-icon-06.svg') }}" class="img-fluid"
                             alt="img">My Reviews
                     </a>
                 </li>
                 <li>
                     <a href="user-wishlist.html">
-                        <img src="asset/img/icons/dashboard-icon-07.svg" class="img-fluid"
+                        <img src="{{ asset('asset/img/icons/dashboard-icon-07.svg') }}" class="img-fluid"
                             alt="img">Wishlist
                     </a>
                 </li>
                 <li>
                     <a href="user-message.html">
-                        <img src="asset/img/icons/dashboard-icon-08.svg" class="img-fluid"
+                        <img src="{{ asset('asset/img/icons/dashboard-icon-08.svg') }}" class="img-fluid"
                             alt="img">Messages
                     </a>
                 </li>
                 <li>
                     <a href="user-wallet.html">
-                        <img src="asset/img/icons/dashboard-icon-09.svg" class="img-fluid"
+                        <img src="{{ asset('asset/img/icons/dashboard-icon-09.svg') }}" class="img-fluid"
                             alt="img">Wallet
                     </a>
                 </li>
                 <li>
                     <a href="user-payments.html">
-                        <img src="asset/img/icons/dashboard-icon-10.svg" class="img-fluid"
+                        <img src="{{ asset('asset/img/icons/dashboard-icon-10.svg') }}" class="img-fluid"
                             alt="img">Payments
                     </a>
                 </li>
                 <li>
                     <a href="user-settings.html">
-                        <img src="asset/img/icons/dashboard-icon-11.svg" class="img-fluid"
+                        <img src="{{ asset('asset/img/icons/dashboard-icon-11.svg') }}" class="img-fluid"
                             alt="img">Settings
                     </a>
                 </li>
