@@ -24,7 +24,7 @@ class HomeController extends Controller
             return redirect()->route('home');
         }
 
-        $catalogs = Catalog::with('user.freelance','category', 'packages', 'portofolios')->where('title_name', 'like', '%' . $search . '%')->get();
+        $catalogs = Catalog::with('user.freelance','category', 'feedback', 'packages', 'portofolios')->where('title_name', 'like', '%' . $search . '%')->get();
         $categorys = Category::withCount('catalogs')->get();
         return view('front.home.catalog.search-catalog', compact('catalogs','search','categorys'));
     }
@@ -33,7 +33,7 @@ class HomeController extends Controller
     {
         $data = Category::where('name', $search)->first();
         if($data){
-            $catalogs = Catalog::with('user.freelance','category', 'packages', 'portofolios')->where('category_id', $data->id)->get();
+            $catalogs = Catalog::with('user.freelance', 'feedback','category', 'packages', 'portofolios')->where('category_id', $data->id)->get();
             // dd($catalogs);
             $categorys = Category::withCount('catalogs')->get();
             return view('front.home.catalog.search-catalog', compact('catalogs','search','categorys'));

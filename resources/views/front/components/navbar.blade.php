@@ -33,7 +33,7 @@
                                 $categorys = Category::get();
                             @endphp
                             @foreach ($categorys as $category)
-                                <li><a href="user-dashboard.html">{{ $category->name }}</a></li>
+                                <li><a href="{{ route('search-category', ['category' => $category->name])  }}">{{ $category->name }}</a></li>
                             @endforeach
                         </ul>
                     </li>
