@@ -18,68 +18,23 @@
         <div class="user-body">
             <ul>
                 <li>
-                    <a href="user-dashboard.html" class="active">
-                        <img src="{{ asset('asset/img/icons/dashboard-icon-01.svg') }}" class="img-fluid"
-                            alt="img">Dashboard
+                    <a href="{{ route('dashboard-freelance') }}" @class(['active' => request()->routeIs('dashboard-freelance')])>
+                        <i class="ti ti-home me-1"></i>Dashboard
                     </a>
                 </li>
                 <li>
-                    <a href="{{ route('catalog-freelance') }}">
-                        <img src="{{ asset('asset/img/icons/dashboard-icon-02.svg') }}" class="img-fluid" alt="img">Manajemen Katalog
+                    <a href="{{ route('catalog-freelance') }}" @class(['active' => request()->routeIs('catalog-freelance')])>
+                        <i class="ti ti-category-2 me-1"></i> Manajemen Katalog
                     </a>
                 </li>
                 <li>
-                    <a href="user-purchase.html">
-                        <img src="{{ asset('asset/img/icons/dashboard-icon-03.svg') }}" class="img-fluid"
-                            alt="img">Purchase
+                    <a href="{{ route('view_message') }}">
+                        <i class="ti ti-message me-1"></i>Message
                     </a>
                 </li>
                 <li>
-                    <a href="user-sales.html">
-                        <img src="{{ asset('asset/img/icons/dashboard-icon-04.svg') }}" class="img-fluid"
-                            alt="img">Sales
-                    </a>
-                </li>
-                <li>
-                    <a href="user-files.html">
-                        <img src="{{ asset('asset/img/icons/dashboard-icon-05.svg') }}" class="img-fluid"
-                            alt="img">Files
-                    </a>
-                </li>
-                <li>
-                    <a href="user-reviews.html">
-                        <img src="{{ asset('asset/img/icons/dashboard-icon-06.svg') }}" class="img-fluid"
-                            alt="img">My Reviews
-                    </a>
-                </li>
-                <li>
-                    <a href="user-wishlist.html">
-                        <img src="{{ asset('asset/img/icons/dashboard-icon-07.svg') }}" class="img-fluid"
-                            alt="img">Wishlist
-                    </a>
-                </li>
-                <li>
-                    <a href="user-message.html">
-                        <img src="{{ asset('asset/img/icons/dashboard-icon-08.svg') }}" class="img-fluid"
-                            alt="img">Messages
-                    </a>
-                </li>
-                <li>
-                    <a href="user-wallet.html">
-                        <img src="{{ asset('asset/img/icons/dashboard-icon-09.svg') }}" class="img-fluid"
-                            alt="img">Wallet
-                    </a>
-                </li>
-                <li>
-                    <a href="user-payments.html">
-                        <img src="{{ asset('asset/img/icons/dashboard-icon-10.svg') }}" class="img-fluid"
-                            alt="img">Payments
-                    </a>
-                </li>
-                <li>
-                    <a href="user-settings.html">
-                        <img src="{{ asset('asset/img/icons/dashboard-icon-11.svg') }}" class="img-fluid"
-                            alt="img">Settings
+                    <a href="{{ route('freelance-calendar') }}" @class(['active' => request()->routeIs('freelance-calendar')])>
+                        <i class="ti ti-calendar-month me-1"></i>Manajemen Kalender
                     </a>
                 </li>
             </ul>

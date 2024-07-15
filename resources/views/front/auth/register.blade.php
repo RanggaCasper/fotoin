@@ -88,6 +88,13 @@
                                         <input type="text" name="fullname" value="{{ old('fullname') }}" class="form-control floating @error('fullname') is-invalid @enderror">
                                         <label class="focus-label">Nama Lengkap</label>
                                     </div>
+                                    <div class="form-wrap">
+                                        <select name="gender" class="form-control @error('gender') is-invalid @enderror" id="gender">
+                                            <option selected disabled>-- Pilih Jenis Kelamin --</option>
+                                            <option value="Laki - Laki" {{ old('gender') == 'Laki - Laki' ? 'selected' : '' }}>Laki - Laki</option>
+                                            <option value="Perempuan" {{ old('gender') == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
+                                        </select>
+                                    </div>                                    
                                     <div class="form-wrap form-focus">
                                         <span class="form-icon">
                                             <i class="feather-phone"></i>

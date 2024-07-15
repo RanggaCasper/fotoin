@@ -80,38 +80,6 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     }
 
-    // Event Guests (select2)
-    if (eventGuests.length) {
-      function renderGuestAvatar(option) {
-        if (!option.id) {
-          return option.text;
-        }
-        var $avatar =
-          "<div class='d-flex flex-wrap align-items-center'>" +
-          "<div class='avatar avatar-xs me-2'>" +
-          "<img src='" +
-          assetsPath +
-          'img/avatars/' +
-          $(option.element).data('avatar') +
-          "' alt='avatar' class='rounded-circle' />" +
-          '</div>' +
-          option.text +
-          '</div>';
-
-        return $avatar;
-      }
-      eventGuests.wrap('<div class="position-relative"></div>').select2({
-        placeholder: 'Select value',
-        dropdownParent: eventGuests.parent(),
-        closeOnSelect: false,
-        templateResult: renderGuestAvatar,
-        templateSelection: renderGuestAvatar,
-        escapeMarkup: function (es) {
-          return es;
-        }
-      });
-    }
-
     // Event start (flatpicker)
     if (eventStartDate) {
       var start = eventStartDate.flatpickr({

@@ -12,7 +12,7 @@ class HomeController extends Controller
 {
     public function home()
     {
-        $catalogs = Catalog::with('category', 'portofolios')->get();
+        $catalogs = Catalog::with('user.freelance','category', 'feedback', 'packages', 'portofolios')->get();
         $categorys = Category::withCount('catalogs')->get();
         return view('front.home.main', compact('catalogs','categorys'));
     }
@@ -34,7 +34,7 @@ class HomeController extends Controller
         $data = Category::where('name', $search)->first();
         if($data){
             $catalogs = Catalog::with('user.freelance', 'feedback','category', 'packages', 'portofolios')->where('category_id', $data->id)->get();
-            // dd($catalogs);
+            
             $categorys = Category::withCount('catalogs')->get();
             return view('front.home.catalog.search-catalog', compact('catalogs','search','categorys'));
         }
@@ -48,7 +48,6 @@ class HomeController extends Controller
         $catalog = Catalog::with('user.freelance', 'feedback.user' ,'category', 'packages', 'portofolios')->whereHas('user', function($query) use ($username) {
             $query->where('username', $username);
         })->where('slug', $slug)->first();
-        // dd($catalog);
 
         if (!$catalog) {
             toastr()->error('Katalog tidak ditemukan.');
@@ -56,7 +55,6 @@ class HomeController extends Controller
         }
 
         $session_view = $request->session()->get('viewed_catalogs', []);
-        // $request->session()->forget('viewed_catalogs');
 
         if (!in_array($catalog->id, $session_view)) {
             $catalog->increment('count_views');

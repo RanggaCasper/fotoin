@@ -165,30 +165,39 @@
                             <div class="col-md-12">
                                 <div class="form-wrap">
                                     <label class="col-form-label">Judul Katalog *</label>
-                                    <input type="text" name="title_name" class="form-control">
+                                    <input type="text" name="title_name" class="form-control @error('title_name') is-invalid @enderror" value="{{ old('title_name') }}">
+                                    @error('title_name')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                             <div class="col-md-12">
                                 <div class="form-wrap">
-                                    <label class="col-form-label">Pilih Kategory</label>
-                                    <select class="select" name="category">
+                                    <label class="col-form-label">Pilih Kategori</label>
+                                    <select class="select form-control @error('category') is-invalid @enderror" name="category">
                                         <option disabled selected>-- Pilih Kategori --</option>
                                         @foreach ($categorys as $category)
-                                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                            <option value="{{ $category->id }}" {{ old('category') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
                                         @endforeach
                                     </select>
+                                    @error('category')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                             <div class="col-md-12">
                                 <div class="form-wrap">
                                     <label class="col-form-label">Deskripsi</label>
-                                    <textarea class="form-control" rows="6" name="description" placeholder="Masukan deskripsi tentang katalog anda. *"></textarea>
+                                    <textarea class="form-control @error('description') is-invalid @enderror" rows="6" name="description" placeholder="Masukan deskripsi tentang katalog anda. *">{{ old('description') }}</textarea>
+                                    @error('description')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-    
+
                 <div class="col-lg-4">
                     <div class="property-info">
                         <h4>Paket</h4>
@@ -202,29 +211,36 @@
                                 <div class="col-md-6">
                                     <div class="form-wrap">
                                         <label class="col-form-label">Nama Paket</label>
-                                        <input type="text" name="packages[0][package_name]" class="form-control">
+                                        <input type="text" name="packages[0][package_name]" class="form-control @error('packages.0.package_name') is-invalid @enderror" value="{{ old('packages.0.package_name') }}">
+                                        @error('packages.0.package_name')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-wrap">
                                         <label class="col-form-label">Harga</label>
-                                        <input type="text" name="packages[0][price]" class="form-control">
+                                        <input type="text" name="packages[0][price]" class="form-control @error('packages.0.price') is-invalid @enderror" value="{{ old('packages.0.price') }}">
+                                        @error('packages.0.price')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
                                 </div>
                                 <div class="form-wrap">
-                                    <label class="col-form-label">Description</label>
-                                    <textarea class="form-control" rows="3" name="packages[0][package_description]" placeholder="Deskripsi paket anda"></textarea>
+                                    <label class="col-form-label">Deskripsi</label>
+                                    <textarea class="form-control @error('packages.0.package_description') is-invalid @enderror" rows="3" name="packages[0][package_description]" placeholder="Deskripsi paket anda">{{ old('packages.0.package_description') }}</textarea>
+                                    @error('packages.0.package_description')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
-                        <a href="javascript:void(0);" class="btn btn-secondary package-add"><i
-                                class="feather-plus-circle"></i>Tambah Paket</a>
+                        <a href="javascript:void(0);" class="btn btn-secondary package-add"><i class="feather-plus-circle"></i>Tambah Paket</a>
                         <div class="col-md-12">
                         </div>
                     </div>
                 </div>
-    
-    
+
                 <div class="col-lg-4">
                     <div class="property-info">
                         <h4>Upload</h4>
@@ -244,25 +260,16 @@
                                 <div class="tab-content">
                                     <div class="tab-pane show active" id="upload-media">
                                         <div class="drag-upload form-wrap">
-                                            <input type="file" name="path_image[0][]" accept="image/*,video/*" id="data_media">
+                                            <input type="file" name="path_image[0][]" accept="image/*,video/*" id="data_media" class="form-control @error('path_image.0.0') is-invalid @enderror">
                                             <div class="img-upload">
                                                 <p><i class="feather-upload-cloud"></i>Drag or Upload Image/Video</p>
                                             </div>
+                                            @error('path_image.0.0')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
                                         </div>
                                         <div id="upload-wrap">
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="confirm-content">
-                                    <div class="form-wrap">
-                                        <label class="custom_check">
-                                            <input type="checkbox">
-                                            <span class="checkmark"></span> I confirm that I am able to deliver this
-                                            service to Buyers within the delivery time specified.I will update or
-                                            pause my Gig if I can no longer meet this delivery time.I understand
-                                            that late delivery will adversely affect my rankings on DreamGigs And
-                                            will entitle the buyer to a refund. See Terms & Conditions
-                                        </label>
                                     </div>
                                 </div>
                             </div>
@@ -276,4 +283,5 @@
         </form>
     </div>
 </div>
+
 @endsection

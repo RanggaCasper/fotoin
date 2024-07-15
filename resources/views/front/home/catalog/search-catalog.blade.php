@@ -554,7 +554,7 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="row">
-                        @foreach ($catalogs as $catalog)
+                        @foreach ($catalogs->shuffle() as $catalog)
                             <div class="col-lg-3 col-md-4">
                                 <div class="gigs-grid">
                                     <div class="gigs-img">

@@ -13,10 +13,14 @@
 
 <script src="{{ asset('asset/plugins/apexchart/apexcharts.min.js') }}"></script>
 <script src="{{ asset('asset/plugins/apexchart/chart-data.js') }}"></script>
+<script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
 <script src="{{ asset('asset/js/script.js') }}"></script>
 
 <script src="{{ asset('asset/js/rocket-loader.min.js') }}"></script>
+<script src="{{ asset('asset/plugins/theia-sticky-sidebar/ResizeSensor.js') }}"></script>
+<script src="{{ asset('asset/plugins/theia-sticky-sidebar/theia-sticky-sidebar.js') }}"></script>
 
 @stack('scripts')
 

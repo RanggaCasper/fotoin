@@ -8,11 +8,10 @@
             <div class="row">
                 <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
                     <div class="footer-widget">
-                        <a href="index.html">
-                            <img src="asset/img/white-logo.svg" alt="logo">
+                        <a href="{{ route('home') }}">
+                            <img src="{{ optional(app('web_conf')->where('conf_key', 'web_logo')->first())->conf_value }}" height="50" alt="logo">
                         </a>
-                        <p>Our mission is to lead the way in digital transformation and automation. We aim to
-                            enabling them to navigate the evolving digital landscape with confidence.</p>
+                        <p>{{ optional(app('web_conf')->where('conf_key', 'web_footer')->first())->conf_value }}</p>
                         <div class="social-links">
                             <ul>
                                 <li><a href="javascript:void(0);"><i class="fa-brands fa-facebook"></i></a></li>
@@ -72,47 +71,6 @@
                                     <li><a href="categories.html">Consulting</a></li>
                                 </ul>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="contact-widget">
-                <div class="row align-items-center">
-                    <div class="col-xl-9">
-                        <ul class="location-list">
-                            <li>
-                                <span><i class="feather-map-pin"></i></span>
-                                <div class="location-info">
-                                    <h6>Address</h6>
-                                    <p>367 Hillcrest Lane, Irvine, California,USA</p>
-                                </div>
-                            </li>
-                            <li>
-                                <span><i class="feather-phone"></i></span>
-                                <div class="location-info">
-                                    <h6>Phone</h6>
-                                    <p>310-437-2766</p>
-                                </div>
-                            </li>
-                            <li>
-                                <span><i class="feather-mail"></i></span>
-                                <div class="location-info">
-                                    <h6>Email</h6>
-                                    <p><a href="../../cdn-cgi/l/email-protection.html" class="__cf_email__"
-                                            data-cfemail="e881868e87a88d90898598848dc68b8785">[email&#160;protected]</a>
-                                    </p>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="col-xl-3 text-xl-end">
-                        <div class="paypal-icons">
-                            <a href="javascript:void(0);">
-                                <img src="asset/img/icons/stripe-icon.svg" alt="icon">
-                            </a>
-                            <a href="javascript:void(0);">
-                                <img src="asset/img/icons/paypal-icon.svg" alt="icon">
-                            </a>
                         </div>
                     </div>
                 </div>

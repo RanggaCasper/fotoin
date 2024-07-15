@@ -63,6 +63,7 @@ class AuthController extends Controller
             'no_telp' => 'required',
             'email' => 'required|email|unique:users',
             'password' => 'required',
+            'gender' => 'required',
             'confirm_password' => 'required|same:password',
         ], [
             'username.required' => 'Kolom username harus diisi.',
@@ -73,6 +74,7 @@ class AuthController extends Controller
             'email.email' => 'Format email tidak valid.',
             'email.unique' => 'Email sudah terdaftar.',
             'password.required' => 'Kolom password harus diisi.',
+            'gender.required' => 'Opsi Jenis kelamin harus diisi.',
             'confirm_password.required' => 'Kolom konfirmasi password harus diisi.',
             'confirm_password.same' => 'Konfirmasi password harus cocok dengan password.',
         ]);

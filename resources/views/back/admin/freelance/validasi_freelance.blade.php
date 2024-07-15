@@ -44,6 +44,58 @@
         });
         
     </script>
+    <script src="{{ asset('asset/js/nik_parse.min.js') }}"></script>
+    <script>
+        $('#datatable').on('click', '.detail', function() {
+            var id = $(this).data('id');
+            $.ajax({
+                url: '{{ route("get-freelance-id", ["id" => ":id"]) }}'.replace(':id', id),
+                type: 'GET',
+                success: function(data) {
+                    $('#form-update').attr('action', '{{ route("update-validasi-freelance", ["id" => ":id"]) }}'.replace(':id', id));
+                    $('#modal_username').text(data.user.username);
+                    $('#modal_fullname').text(data.user.fullname);
+                    $('#modal_nik').text(data.nik);
+                    $('#modal_alamat').text(data.alamat);
+                    $('#modal_provinsi').text(data.provinsi);
+                    $('#modal_desa').text(data.desa);
+                    $('#modal_kecamatan').text(data.kecamatan);
+                    $('#modal_kota').text(data.kota);
+                    $('#modal_kode_pos').text(data.kode_pos);
+                    $('#modal_foto_ktp').attr('src', '{{ url('') }}/storage/'+data.foto_ktp);
+                    $('#modal_foto_selfie').attr('src', '{{ url('') }}/storage/'+data.selfie_ktp);
+                    $('#modal_portofolio').attr('src', '{{ url('') }}/storage/'+data.selfie_ktp);
+                    
+                    cekNik(data, function(result) {
+                        fetch_data(result, data);
+                    });
+                },
+                error: function(error) {
+                    // Handle error
+                }
+            });
+        });
+
+        function cekNik(data, callback) {
+            nikParse(data.nik, function(result) {
+                callback(result);
+                console.log(result);
+            });
+        }
+
+        function fetch_data(result, data) {
+            var fields = ['nik', 'kecamatan', 'provinsi', 'kota'];
+
+            fields.forEach(function(field) {
+                var element = $('#modal_' + field);
+                if (data[field] === result.data[field]) {
+                    element.addClass('text-success').removeClass('text-danger');
+                } else {
+                    element.removeClass('text-success').addClass('text-danger');
+                }
+            });
+        }
+    </script>
 @endpush
 
 @section('content')

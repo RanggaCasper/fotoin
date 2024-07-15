@@ -7,6 +7,41 @@
     <title>DreamGigs</title>
 
     @include('front.components.styles')
+    <style>
+        @media (min-width: 767px) {
+            .uniform-size {
+                width: 100%;
+                height: 175px; 
+                object-fit: cover; 
+            }
+
+            .slide-images {
+                width: 100%;
+                height: 175px; 
+                overflow: hidden;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .uniform-size {
+                width: 100%;
+                height: 200px; 
+                object-fit: cover; 
+            }
+
+            .slide-images {
+                width: 100%;
+                height: 200px; 
+                overflow: hidden;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -66,6 +101,101 @@
                             </div>
                             <img src="asset/img/bg/banner-small-bg-01.svg" class="banner-small-bg-one" alt="img">
                             <img src="asset/img/bg/banner-small-bg-02.png" class="banner-small-bg-two" alt="img">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="explore-gigs-section">
+            <div class="container">
+                <div class="section-head d-flex">
+                    <div class="section-header aos" data-aos="fade-up">
+                        <h2><span>Jelajahi</span> Katalog Kami.</h2>
+                    </div>
+                    {{-- <div class="section-tab">
+                        <ul class="nav nav-pills inner-tab aos" id="pills-tab" role="tablist" data-aos="fade-up">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="pills-popular-tab" data-bs-toggle="pill"
+                                    data-bs-target="#pills-popular" type="button" role="tab"
+                                    aria-controls="pills-popular" aria-selected="false">Popular</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="pills-latest-tab" data-bs-toggle="pill"
+                                    data-bs-target="#pills-latest" type="button" role="tab" aria-controls="pills-latest"
+                                    aria-selected="true">Latest</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="pills-rating-tab" data-bs-toggle="pill"
+                                    data-bs-target="#pills-rating" type="button" role="tab" aria-controls="pills-rating"
+                                    aria-selected="false">Top Ratings</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="pills-trend-tab" data-bs-toggle="pill"
+                                    data-bs-target="#pills-trend" type="button" role="tab" aria-controls="pills-trend"
+                                    aria-selected="false">Trending </button>
+                            </li>
+                        </ul>
+                    </div> --}}
+                </div>
+                <div class="tab-content dashboard-tab">
+                    <div class="tab-pane fade show active" id="pills-popular" role="tabpanel"
+                        aria-labelledby="pills-popular-tab">
+                        <div class="row aos" data-aos="fade-up" data-aos-delay="500">
+                            <div class="col-md-12">
+                                <div class="gigs-card-slider owl-carousel">
+                                    @foreach ($catalogs->shuffle()->take(10) as $catalog)
+                                        <div class="gigs-grid">
+                                            <div class="gigs-img">
+                                                <div class="img-slider owl-carousel">
+                                                    @foreach ($catalog->portofolios as $portofolio)
+                                                        <div class="slide-images">
+                                                            <a href="{{ route('view-catalog', ['username' => $catalog->user->username, 'slug' => $catalog->slug]) }}">
+                                                                @php
+                                                                    $fileExtension = pathinfo($portofolio->path_image, PATHINFO_EXTENSION);
+                                                                @endphp
+                                                                @if (in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif']))
+                                                                    <img src="{{ asset('storage/' . $portofolio->path_image) }}" class="img-fluid" alt="img">
+                                                                @elseif (in_array($fileExtension, ['mp4', 'webm', 'ogg']))
+                                                                    <video controls class="img-fluid">
+                                                                        <source src="{{ asset('storage/' . $portofolio->path_image) }}" type="video/{{ $fileExtension }}">
+                                                                        Your browser does not support the video tag.
+                                                                    </video>
+                                                                @endif
+                                                            </a>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                                <div class="fav-selection">
+                                                    <a href="javascript:void(0);" data-id="{{ $catalog->id }}" onclick="toggleWishlist({{ $catalog->id }})" class="fav-icon @if($catalog->isInWishlist()) favourite @else @endif"><i class="feather-heart"></i></a>
+                                                </div>
+                                            </div>
+                                            <div class="gigs-content">
+                                                <div class="gigs-title">
+                                                    <h3>
+                                                        <a href="{{ route('view-catalog', ['username' => $catalog->user->username, 'slug' => $catalog->slug]) }}">{{ $catalog->title_name }}</a>
+                                                    </h3>
+                                                </div>
+                                                <div class="d-flex justify-content-between">
+                                                    <div>
+                                                        <h6 class="d-block m-0 small">0 Terjual</h6>
+                                                        <div class="star-rate">
+                                                            <span><i class="fa-solid fa-star"></i>{{ number_format($catalog->feedback->avg('rate') ?? 0, 1) }} ({{ $catalog->feedback->count() }})</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="text-right">
+                                                        <span class="d-block small">Mulai</span>
+                                                        <h6 class="m-0 text-primary">Rp {{ number_format($catalog->packages->min('price'),0,',','.') }}</h6>
+                                                    </div>
+                                                </div>
+                                                <div class="gigs-card-footer">
+                                                    <p class="m-0 small"><i class="feather-map-pin me-1"></i>{{ $catalog->user->freelance->provinsi.', '.$catalog->user->freelance->kota }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -429,147 +559,7 @@
         </section>
 
 
-        <footer class="footer">
-            <div class="section-bg">
-                <img src="asset/img/bg/footer-bg-01.png" class="footer-bg-one" alt="img">
-                <img src="asset/img/bg/footer-bg-02.png" class="footer-bg-two" alt="img">
-            </div>
-            <div class="container">
-                <div class="footer-top">
-                    <div class="row">
-                        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12" data-aos="fade-up" data-aos-delay="500">
-                            <div class="footer-widget">
-                                <a href="index.html">
-                                    <img src="asset/img/white-logo.svg" alt="logo">
-                                </a>
-                                <p>Our mission is to lead the way in digital transformation and automation. We aim to
-                                    enabling them to navigate the evolving digital landscape with confidence.</p>
-                                <div class="social-links">
-                                    <ul>
-                                        <li><a href="javascript:void(0);"><i class="fa-brands fa-facebook"></i></a></li>
-                                        <li><a href="javascript:void(0);"><i class="fa-brands fa-x-twitter"></i></a>
-                                        </li>
-                                        <li><a href="javascript:void(0);"><i class="fa-brands fa-instagram"></i></a>
-                                        </li>
-                                        <li><a href="javascript:void(0);"><i class="fa-brands fa-google"></i></a></li>
-                                        <li><a href="javascript:void(0);"><i class="fa-brands fa-youtube"></i></a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6" data-aos="fade-up" data-aos-delay="600">
-                            <div class="footer-widget">
-                                <h3>Our Company</h3>
-                                <ul class="menu-items">
-                                    <li><a href="about-us.html">About Us</a></li>
-                                    <li><a href="categories-2.html">Categories</a></li>
-                                    <li><a href="add-gigs.html">Create Gigs</a></li>
-                                    <li><a href="pricing.html">Pricing</a></li>
-                                    <li><a href="faq.html">FAQ</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6" data-aos="fade-up" data-aos-delay="800">
-                            <div class="footer-widget">
-                                <h3>Dashboard</h3>
-                                <ul class="menu-items">
-                                    <li><a href="user-purchase.html">Purchase</a></li>
-                                    <li><a href="user-sales.html">Sales</a></li>
-                                    <li><a href="user-payments.html">Payments</a></li>
-                                    <li><a href="user-files.html">Files</a></li>
-                                    <li><a href="user-wishlist.html">Wishlist</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6" data-aos="fade-up" data-aos-delay="700">
-                            <div class="footer-widget">
-                                <h3>Featured Categories</h3>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <ul class="menu-items">
-                                            <li><a href="categories.html">Programming & Tech</a></li>
-                                            <li><a href="categories.html">Music & Audio</a></li>
-                                            <li><a href="categories.html">Lifestyle</a></li>
-                                            <li><a href="categories.html">Photography</a></li>
-                                            <li><a href="categories.html">Business</a></li>
-                                        </ul>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <ul class="menu-items extra-menu">
-                                            <li><a href="categories.html">eBook Publishing</a></li>
-                                            <li><a href="categories.html">AI Artists</a></li>
-                                            <li><a href="categories.html">AI Services</a></li>
-                                            <li><a href="categories.html">Data</a></li>
-                                            <li><a href="categories.html">Consulting</a></li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="contact-widget">
-                        <div class="row align-items-center">
-                            <div class="col-xl-9">
-                                <ul class="location-list">
-                                    <li>
-                                        <span><i class="feather-map-pin"></i></span>
-                                        <div class="location-info">
-                                            <h6>Address</h6>
-                                            <p>367 Hillcrest Lane, Irvine, California,USA</p>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <span><i class="feather-phone"></i></span>
-                                        <div class="location-info">
-                                            <h6>Phone</h6>
-                                            <p>310-437-2766</p>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <span><i class="feather-mail"></i></span>
-                                        <div class="location-info">
-                                            <h6>Email</h6>
-                                            <p><a href="../../cdn-cgi/l/email-protection.html" class="__cf_email__"
-                                                    data-cfemail="543d3a323b14312c35392438317a373b39">[email&#160;protected]</a>
-                                            </p>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="col-xl-3 text-xl-end">
-                                <div class="paypal-icons">
-                                    <a href="javascript:void(0);">
-                                        <img src="asset/img/icons/stripe-icon.svg" alt="icon">
-                                    </a>
-                                    <a href="javascript:void(0);">
-                                        <img src="asset/img/icons/paypal-icon.svg" alt="icon">
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <div class="copy-right">
-                                <p>Copyright © 2024 DreamGigs. All rights reserved.</p>
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="footer-bottom-links">
-                                <ul>
-                                    <li><a href="privacy-policy.html">Privacy Policy</a></li>
-                                    <li><a href="terms-condition.html">Terms & Conditions</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </footer>
+        @include('front.components.footer')
 
 
         <div class="mouse-cursor cursor-outer"></div>
@@ -596,6 +586,39 @@
                 window.location.href = url;
             }
         });
+
+        function toggleWishlist(catalogId) {
+            var $icon = $('a.fav-icon[data-id="' + catalogId + '"]');
+            var isFavourite = $icon.hasClass('favourite');
+            var url = isFavourite ? '{{ route("remove-wishlist") }}' : '{{ route("add-wishlist") }}';
+
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    id: catalogId
+                },
+                success: function(response) {
+                    if (response.success) {
+                        if (isFavourite) {
+                            $icon.removeClass('favourite');
+                        } else {
+                            $icon.addClass('favourite');
+                        }
+                    } else {
+                        alert('Gagal ' + (isFavourite ? 'menghapus' : 'menambahkan') + ' wishlist');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    if (xhr.status === 401) {
+                        window.location.href = '{{ route("login") }}';
+                    } else {
+                        alert('Terjadi kesalahan saat ' + (isFavourite ? 'menghapus' : 'menambahkan') + ' wishlist');
+                    }
+                }
+            });
+        }
     </script>
 </body>
 </html>

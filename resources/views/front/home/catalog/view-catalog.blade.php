@@ -38,9 +38,6 @@
 @endpush
 
 @push('scripts')
-<script src="{{ asset('asset/plugins/theia-sticky-sidebar/ResizeSensor.js') }}"></script>
-<script src="{{ asset('asset/plugins/theia-sticky-sidebar/theia-sticky-sidebar.js') }}"></script>
-
 <script>
     function toggleWishlist(catalogId, $span) {
         var fav = $span.hasClass('fav');
@@ -389,7 +386,7 @@
                         <h6>Tentang Saya</h6>
                         <p>{{ $catalog->user->freelance->about }}</p>
                     </div>
-                    <a href="#" data-bs-toggle="modal" data-bs-target="#contact_me"
+                    <a href="{{ route('view_message') }}?id={{ $catalog->user->id }}&text=Hallo Saya Tertarik Dengan : {{ $catalog->title_name   }}"
                         class="btn btn-primary mb-0 w-100">Contact Me</a>
                 </div>
             </div>

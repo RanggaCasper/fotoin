@@ -3,8 +3,10 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminMasterController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\FreelanceController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\MessageController;
 use App\Http\Controllers\WilayahController;
 use Illuminate\Support\Facades\Route;
 
@@ -92,9 +94,29 @@ Route::controller(FreelanceController::class)->prefix('freelance')->middleware('
 
     Route::prefix('/catalog')->group(function(){
         Route::get('/', 'catalog')->name('catalog-freelance');
-        Route::get('/create', 'view_catalog')->name('view-create-catalog-freelance');
-        Route::post('/create', 'create_catalog')->name('create-catalog-freelance');
+        Route::get('create', 'view_catalog')->name('view-create-catalog-freelance');
+        Route::post('create', 'create_catalog')->name('create-catalog-freelance');
+
+        Route::get('{id}/update','edit_catalog')->name('edit-catalog');
     });
+    
+    Route::get('calendar', 'calendar')->name('freelance-calendar');
+    Route::get('calendar/get', 'get_calendar')->name('get-calendar');
+    Route::get('calendar/get/{id}', 'get_calendar_id')->name('get-calendar-id');
+    Route::post('calendar', 'create_calendar')->name('freelance-create-calendar');
+    Route::put('calendar/{id}', 'update_calendar')->name('freelance-update-calendar');
+    Route::delete('calendar/{id}', 'delete_calendar')->name('freelance-delete-calendar');
+});
+
+Route::controller(MessageController::class)->prefix('message')->middleware('auth','verified')->group(function(){
+    Route::get('/', 'view_message')->name('view_message');
+    Route::get('{user}', 'message_user')->name('message_user');
+    Route::post('send', 'message_send')->name('message_send');
+});
+
+Route::controller(CalendarController::class)->prefix('calendar')->group(function(){
+    Route::get('{user}', 'view_calendar')->name('view_calendar');
+    Route::get('get/{user}', 'get_calendar_by_id')->name('get_calendar_by_id');
 });
 
 Route::controller(WilayahController::class)->prefix('wilayah')->group(function(){
