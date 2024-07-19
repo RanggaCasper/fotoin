@@ -15,6 +15,7 @@
 <script src="{{ asset('asset/plugins/apexchart/chart-data.js') }}"></script>
 <script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
 <script src="{{ asset('asset/js/script.js') }}"></script>
 

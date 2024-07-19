@@ -14,4 +14,9 @@ class Package extends Model
     protected $fillable = ['package_name','price','description','catalog_id'];
 
     public $timestamps = true; 
+
+    public function catalog()
+    {
+        return $this->belongsTo(Catalog::class);
+    }
 }

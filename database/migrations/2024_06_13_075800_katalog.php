@@ -35,7 +35,7 @@ return new class extends Migration
         Schema::create('packages', function (Blueprint $table) {
             $table->id();
             $table->string('package_name');
-            $table->string('price');
+            $table->double('price');
             $table->longText('description');
             $table->unsignedBigInteger('catalog_id');
             $table->foreign('catalog_id')->references('id')->on('catalogs');
@@ -52,7 +52,7 @@ return new class extends Migration
 
         Schema::create('feedback_catalogs', function (Blueprint $table) {
             $table->id();
-            $table->string('rate', 1);
+            $table->double('rate', 1);
             $table->string('feedback')->nullable();
             $table->unsignedBigInteger('catalog_id');
             $table->foreign('catalog_id')->references('id')->on('catalogs');

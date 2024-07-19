@@ -115,6 +115,39 @@
             var index = $(this).index();
             serviceSlider.trigger('to.owl.carousel', [index, 2000, true]);
         });
+
+        $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (event) {
+            const targetId = $(event.target).data('bs-target').substring(1); // Remove the leading #
+            $('#inp-paket').val(targetId);
+        });
+
+        $('#submit-btn').on('click', function() {
+            $('#submit-btn').prop('disabled', true);
+            $('#submit-btn').html('<span id="loadingSpinner" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Loading...');
+
+            $.ajax({
+                url: '{{ route("create_transaction") }}',
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    package_id: $('#inp-paket').val()
+                },
+                success: function(response) {
+                    if (response.success) {
+                        toastr.success(response.message, 'Success!');
+                        window.location.href = response.redirect_url;
+                    } else {
+                        toastr.error(response.message,'Oops!');
+                    }
+                },
+                error: function(xhr) {
+                    toastr.error('Gagal membuat transaksi.','Oops!');
+                },
+                complete: function() {
+                    $('#submit-btn').prop('disabled', false).html('<i class="feather-shopping-cart"></i> Pesan Sekarang!');
+                }
+            });
+        });
     });
 
     if ($(window).width() > 767) {
@@ -327,9 +360,10 @@
                             @endforeach
                         </div>
                     </div>                    
+                    
+                    <input type="number" id="inp-paket" value="{{ $catalog->packages->sortBy('price')->first()->id }}" hidden>
+                    <button type="button" id="submit-btn" class="btn btn-primary w-100"><i class="feather-shopping-cart"></i> Pesan Sekarang!</button>
 
-                    <a href="#" data-bs-toggle="modal" data-bs-target="#order_details"
-                        class="btn btn-primary w-100"><i class="feather-shopping-cart"></i> Pesan Sekarang!</a>
                     <ul class="buy-items">
                         <li>
                             <div class="buy-box">

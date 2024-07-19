@@ -38,6 +38,18 @@ class DatabaseSeeder extends Seeder
         ]);
 
         User::create([
+            'username' => 'RaCas',
+            'fullname' => 'M. Irfan Rangganata',
+            'email' => 'hyfanutama@gmail.com',
+            'no_telp' => '083189944777',
+            'Role' => 'User',
+            'gender' => 'Laki - Laki',
+            'email_verified_at' => now(),
+            'password' => bcrypt('user'),
+            'remember_token' => Str::random(10),
+        ]);
+
+        User::create([
             'username' => 'Master',
             'fullname' => 'M. Irfan Rangganata',
             'email' => 'master@gmail.com',
@@ -136,6 +148,8 @@ class DatabaseSeeder extends Seeder
             ['conf_key' => 'web_icon'],
             ['conf_key' => 'web_logo'],
             ['conf_key' => 'web_footer'],
+            ['conf_key' => 'tokopay_api'],
+            ['conf_key' => 'tokopay_secret'],
         ]);
 
         $this->call([

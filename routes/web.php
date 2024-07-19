@@ -7,6 +7,7 @@ use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\FreelanceController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\WilayahController;
 use Illuminate\Support\Facades\Route;
 
@@ -106,6 +107,16 @@ Route::controller(FreelanceController::class)->prefix('freelance')->middleware('
     Route::post('calendar', 'create_calendar')->name('freelance-create-calendar');
     Route::put('calendar/{id}', 'update_calendar')->name('freelance-update-calendar');
     Route::delete('calendar/{id}', 'delete_calendar')->name('freelance-delete-calendar');
+});
+
+Route::controller(TransactionController::class)->prefix('transaction')->middleware('auth','verified')->group(function(){
+    Route::get('/invoice/{invoice}', 'view_transaction')->name('view_transaction');
+    Route::post('/create', 'create_transaction')->name('create_transaction');
+
+    Route::post('/create/payment', 'create_payment')->name('create_payment');
+
+    Route::get('/payment/detail/{invoice}', 'payment_detail')->name('payment_detail');
+    Route::get('/transaction/detail/{invoice}', 'transaction_detail')->name('transaction_detail');
 });
 
 Route::controller(MessageController::class)->prefix('message')->middleware('auth','verified')->group(function(){
