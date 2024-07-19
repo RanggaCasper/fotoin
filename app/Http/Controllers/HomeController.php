@@ -12,7 +12,7 @@ class HomeController extends Controller
 {
     public function home()
     {
-        $catalogs = Catalog::with('user.freelance','category', 'feedback', 'packages', 'portofolios')->get();
+        $catalogs = Catalog::with('user.freelance','category', 'feedback', 'packages', 'portofolios','transactions')->get();
         $categorys = Category::withCount('catalogs')->get();
         return view('front.home.main', compact('catalogs','categorys'));
     }
@@ -33,7 +33,7 @@ class HomeController extends Controller
     {
         $data = Category::where('name', $search)->first();
         if($data){
-            $catalogs = Catalog::with('user.freelance', 'feedback','category', 'packages', 'portofolios')->where('category_id', $data->id)->get();
+            $catalogs = Catalog::with('user.freelance', 'feedback','category', 'packages', 'portofolios', 'transactions')->where('category_id', $data->id)->get();
             
             $categorys = Category::withCount('catalogs')->get();
             return view('front.home.catalog.search-catalog', compact('catalogs','search','categorys'));
@@ -45,7 +45,7 @@ class HomeController extends Controller
 
     public function view_catalog(Request $request,$username,$slug)
     {
-        $catalog = Catalog::with('user.freelance', 'feedback.user' ,'category', 'packages', 'portofolios')->whereHas('user', function($query) use ($username) {
+        $catalog = Catalog::with('user.freelance', 'feedback.user' ,'category', 'packages', 'portofolios', 'transactions')->whereHas('user', function($query) use ($username) {
             $query->where('username', $username);
         })->where('slug', $slug)->first();
 
@@ -68,7 +68,11 @@ class HomeController extends Controller
     public function view_wishlist()
     {
         $user = auth()->user();
-        $catalogs = $user->wishlist()->with('catalog', 'catalog.category', 'catalog.user', 'catalog.portofolios', 'catalog.feedback', 'catalog.packages')->get();
+        $catalogs = $user->wishlist()->with('catalog', 'catalog.category', 'catalog.user', 'catalog.portofolios', 'catalog.feedback', 'catalog.packages', 'catalog.transactions')->get();
+        // foreach ($catalogs as $wishlistItem) {
+        //     $transactions = $wishlistItem->catalog;
+        //     dd($transactions); // Debug transaksi dari katalog
+        // }
         return view('front.home.wishlist.wishlist', compact('catalogs'));
     }
 

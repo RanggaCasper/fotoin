@@ -26,7 +26,7 @@
         </tr>
         <tr>
             <td style="white-space: nowrap;">Status Persetujuan</td>
-            <td class="text-end"><span class="badge  @if($transaction->approved == 'APPROVED') bg-success @elseif($transaction->approved == 'WAITING') bg-warning @else bg-secondary @endif rounded-pill px-3">{{ $transaction->approved }}</span></td>
+            <td class="text-end"><span class="badge  @if($transaction->approved == 'APPROVED') bg-success @elseif($transaction->approved == 'WAITING') bg-warning @else bg-danger @endif rounded-pill px-3">{{ $transaction->approved }}</span></td>
         </tr>
         <tr>
             <td style="white-space: nowrap;">Catatan</td>

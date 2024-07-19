@@ -376,7 +376,7 @@
                             <div class="buy-box">
                                 <i class="feather-cloud"></i>
                                 <p>Total Terjual</p>
-                                <h6>15</h6>
+                                <h6>{{ number_format($catalog->transactions->where('status', 'COMPLETED')->count(),0,',','.') }}</h6>
                             </div>
                         </li>
                         <li>

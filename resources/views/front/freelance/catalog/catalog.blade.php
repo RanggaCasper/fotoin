@@ -68,7 +68,7 @@
                 </div>
                 <div class="d-flex justify-content-between">
                     <div>
-                        <h6 class="d-block m-0 small">0 Terjual</h6>
+                        <h6 class="d-block m-0 small">{{ number_format($catalog->transactions->where('status', 'COMPLETED')->count(),0,',','.') }} Terjual</h6>
                         <div class="star-rate">
                             <span><i class="fa-solid fa-star"></i>{{ number_format($catalog->feedback->avg('rate') ?? 0, 1) }} ({{ $catalog->feedback->count() }})</span>
                         </div>

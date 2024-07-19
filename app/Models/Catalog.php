@@ -43,6 +43,11 @@ class Catalog extends Model
         return $this->hasMany(Wishlist::class);
     }
 
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
     public function isInWishlist()
     {
         if (auth()->check()) {

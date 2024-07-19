@@ -37,6 +37,11 @@
                         <i class="ti ti-calendar-month me-1"></i>Manajemen Kalender
                     </a>
                 </li>
+                <li>
+                    <a href="{{ route('view_transaction_freelance') }}" @class(['active' => request()->routeIs('view_transaction_freelance')])>
+                        <i class="ti ti-calendar-month me-1"></i>Manajemen Transaksi
+                    </a>
+                </li>
             </ul>
         </div>
     </div>

@@ -18,20 +18,25 @@ class MessageController extends Controller
     public function message_user(Request $request, $id)
     {
         if ($request->ajax()) {
+            $user = User::find($id);
+            if (!$user) {
+                return response()->json(['status' => false, 'message' => 'User not found.'], 404);
+            }
+
             $messages = Message::with('user')
-                        ->where(function ($query) use ($id) {
-                            $query->where('from_id', auth()->user()->id)
-                                ->where('to_id', $id);
-                        })
-                        ->orWhere(function ($query) use ($id) {
-                            $query->where('from_id', $id)
-                                ->where('to_id', auth()->user()->id);
-                        })
-                        ->orderBy('created_at', 'desc')
-                        ->get()
-                        ->groupBy(function($date) {
-                            return \Carbon\Carbon::parse($date->created_at)->format('Y-m-d');
-                        });
+                ->where(function ($query) use ($id) {
+                    $query->where('from_id', auth()->user()->id)
+                        ->where('to_id', $id);
+                })
+                ->orWhere(function ($query) use ($id) {
+                    $query->where('from_id', $id)
+                        ->where('to_id', auth()->user()->id);
+                })
+                ->orderBy('created_at', 'desc')
+                ->get()
+                ->groupBy(function($date) {
+                    return \Carbon\Carbon::parse($date->created_at)->format('Y-m-d');
+                });
 
             foreach ($messages as $messageGroup) {
                 foreach ($messageGroup as $message) {
@@ -42,7 +47,6 @@ class MessageController extends Controller
                 }
             }
 
-            $user = User::find($id);
             $userData = [
                 'username' => $user->username,
                 'profile_image' => $user->profile_image ? asset($user->profile_image) : 'https://caspertopup.com/images/avatars/default.jpg',
@@ -50,6 +54,7 @@ class MessageController extends Controller
             ];
 
             return response()->json([
+                'status' => true,
                 'html' => view('front.message.chat-history', compact('messages'))->render(),
                 'userData' => $userData
             ]);
@@ -60,14 +65,27 @@ class MessageController extends Controller
 
     public function message_send(Request $request)
     {
-        Message::create([
-            'from_id' => auth()->user()->id,
-            'to_id' => $request->to_id,
-            'body' => $request->body
-        ]);
+        if ($request->ajax()) {
+            try {
+                $request->validate([
+                    'to_id' => 'required|exists:users,id|not_in:' . auth()->user()->id,
+                    'body' => 'required|string|max:1000',
+                ]);
 
-        // // Return a response if necessary (optional)
-        return response()->json(['message' => $request->all()]);
+                Message::create([
+                    'from_id' => auth()->user()->id,
+                    'to_id' => $request->to_id,
+                    'body' => $request->body,
+                ]);
+
+                return response()->json(['status' => true, 'message' => 'Message sent successfully']);
+            } catch (\Illuminate\Validation\ValidationException $e) {
+                return response()->json(['status' => false, 'message' => 'Terjadi kesalahan saat mengirim pesan.']);
+            }
+        }
+        
+        abort(404);
     }
+
 
 }

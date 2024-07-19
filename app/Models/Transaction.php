@@ -11,7 +11,7 @@ class Transaction extends Model
 
     protected $table = 'transactions';
 
-    protected $fillable = ['invoice','status','note','ip','user_agent','approved','catalog_name','catalog_image','package_name','package_price','package_description','user_id','freelance_id'];
+    protected $fillable = ['invoice','status','note','ip','user_agent','approved','catalog_name','catalog_image','package_name','package_price','package_description','catalog_id','user_id','freelance_id'];
 
     public function package()
     {
@@ -24,6 +24,11 @@ class Transaction extends Model
     }
 
     public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function freelance()
     {
         return $this->belongsTo(User::class);
     }

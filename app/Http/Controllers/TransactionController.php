@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Package;
 use App\Models\Payment;
 use App\Models\Transaction;
@@ -16,13 +17,20 @@ class TransactionController extends Controller
     public function view_transaction(Request $request, $invoice)
     {
         $payments = PaymentChannel::get();
-        $transaction = Transaction::with('package','catalog','user')->where('invoice', $invoice)->where('user_id', auth()->user()->id)->first();
-        $payment = Payment::where('transaction_id',$transaction->id)->first();
+        $transaction = Transaction::with('package', 'catalog', 'user')
+        ->where('invoice', $invoice)
+        ->where(function($query) {
+            $query->where('user_id', auth()->user()->id)
+                  ->orWhere('freelance_id', auth()->user()->id);
+        })
+        ->first();
 
         if(!$transaction){
             toastr()->error('Invoice tidak ditemukan.');
             return redirect()->back();
         }
+        
+        $payment = Payment::where('transaction_id',$transaction->id)->first();
         
         return view('front.transaction.transaction', compact('transaction','invoice','payments', 'payment'));
     }
@@ -54,6 +62,7 @@ class TransactionController extends Controller
                 'package_name' => $package->package_name,
                 'package_price' => $package->price,
                 'package_description' => $package->description,
+                'catalog_id' => $package->catalog->id,
                 'user_id' => auth()->user()->id,
                 'freelance_id' => $package->catalog->user_id
             ];
@@ -74,6 +83,38 @@ class TransactionController extends Controller
         abort(404);
     }
 
+    public function update_transaction(Request $request, $invoice)
+    {
+        $transaction = Transaction::where('invoice', $invoice)->first();
+        if (!$transaction) {
+            return response()->json(['status' => false, 'message' => 'Transaksi tidak ditemukan.'], 404);
+        }
+
+        if (auth()->user()->id !== $transaction->user_id) {
+            return response()->json(['status' => false, 'message' => 'Unauthorized.'], 403);
+        }
+
+        if ($transaction->status !== 'PROCESSING') {
+            return response()->json(['status' => false, 'message' => 'Transaksi status tidak processing.'], 400);
+        }
+
+        $note = 'Pesanan berhasil diselesaikan pada '.now().' WIB.';
+
+        $transaction->status = 'COMPLETED';
+        $transaction->note = $note;
+        if($transaction->save()){
+            Mail::to(auth()->user()->email)->send(new TransactionMail($transaction, 'transaction_success'));
+        };
+
+        $freelance = User::find($transaction->freelance_id);
+        if ($freelance) {
+            $freelance->balance += $transaction->package_price;
+            $freelance->save();
+        }
+
+        return response()->json(['status' => true, 'message' => $note]);
+    }
+
     public function create_payment(Request $request)
     {
         if($request->payment_id === null){
@@ -85,7 +126,7 @@ class TransactionController extends Controller
         }
 
         $payment_channel = PaymentChannel::where('id', $request->payment_id)->first();
-        // dd($payment_channel);
+        
         $transaction = Transaction::where('id', $request->transaction_id)->first();
 
         $fee = $payment_channel->flat_fee + ($transaction->package_price * $payment_channel->percent_fee / 100);
@@ -164,7 +205,13 @@ class TransactionController extends Controller
             $transaction = Transaction::where('invoice', $invoice)->first();
 
             if($transaction){
-                $transaction = Transaction::with('package','catalog','user')->where('invoice', $invoice)->where('user_id', auth()->user()->id)->first();
+                $transaction = Transaction::with('package', 'catalog', 'user')
+                ->where('invoice', $invoice)
+                ->where(function($query) {
+                    $query->where('user_id', auth()->user()->id)
+                          ->orWhere('freelance_id', auth()->user()->id);
+                })
+                ->first();
                 return response()->json(['status' => true, 'html' => view('front.transaction.transaction_detail', compact('transaction'))->render()]);
             }
     

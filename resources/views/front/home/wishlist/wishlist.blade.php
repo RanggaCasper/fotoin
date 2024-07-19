@@ -134,9 +134,9 @@
                     </div>
                     <div class="d-flex justify-content-between">
                         <div>
-                            <h6 class="d-block m-0 small">0 Terjual</h6>
+                            <h6 class="d-block m-0 small">{{ number_format($catalog->catalog->transactions->where('status', 'COMPLETED')->count(),0,',','.') }} Terjual</h6>
                             <div class="star-rate">
-                                <span><i class="fa-solid fa-star"></i>5.0 (28)</span>
+                                <span><i class="fa-solid fa-star"></i>{{ number_format($catalog->catalog->feedback->avg('rate') ?? 0, 1) }} ({{ $catalog->catalog->feedback->count() }})</span>
                             </div>
                         </div>
                         <div class="text-right">
@@ -145,7 +145,7 @@
                         </div>
                     </div>
                     <div class="gigs-card-footer">
-                        <p class="m-0"><i class="feather-map-pin me-1"></i>Denpasar</p>
+                        <p class="m-0"><i class="feather-map-pin me-1"></i>{{ $catalog->catalog->user->freelance->provinsi.', '.$catalog->catalog->user->freelance->kota }}</p>
                     </div>
                 </div>
             </div>

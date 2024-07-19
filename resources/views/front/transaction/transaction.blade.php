@@ -120,6 +120,41 @@
                 }
             });
         });
+
+        @if($transaction->status === "PROCESSING" && $payment->status === "PAID")
+            @if(auth()->user()->id === $transaction->user_id)
+                $('#submit-btn-selesai').click(function() {
+                    $('#submit-btn-selesai').prop('disabled', true);
+                    $('#submit-btn-selesai').html('<span id="loadingSpinner" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Loading...');
+
+                    $.ajax({
+                        type: 'PUT',
+                        url: '{{ route('update_transaction', $transaction->invoice) }}',
+                        data: {
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            if(response.status === false){
+                                toastr.error(response.message,'Oops!');
+                                $('#submit-btn-selesai').prop('disabled', false);
+                                $('#submit-btn-selesai').html('<i class="feather-shopping-cart me-2"></i>Bayar Pesanan');
+                            } else {
+                                $('#submit-btn-selesai').remove();
+                                $('#payment_id').remove();
+                                $('#transaction_id').remove();
+                                fetch_pembayaran();
+                                fetch_transaction();
+                                toastr.success(response.message,'Success!');
+                            }
+                        },
+                        error: function(response) {
+                            $('#submit-btn-selesai').prop('disabled', false);
+                            $('#submit-btn-selesai').html('<i class="feather-shopping-cart me-2"></i>Bayar Pesanan');
+                        }
+                    });
+                });
+            @endif
+        @endif
     });
 
     function method(id) {
@@ -237,8 +272,11 @@
                                 <h6 id="total">Rp. 0</h6>
                             </div>
                         @endif
-
-                        <a href="{{ route('view_message') }}?id=3&text=Hallo" class="btn btn-outline-primary w-100 mb-1"><i class="feather-message-square me-2"></i>Chat Freelance</a>
+                        @if (auth()->user()->id === $transaction->user_id)
+                            <a href="{{ route('view_message') }}?id={{ $transaction->freelance_id }}&text=Hallo {{ $transaction->freelance->username }}," class="btn btn-outline-primary w-100 mb-1"><i class="feather-message-square me-2"></i>Chat Freelance</a>
+                        @else
+                            <a href="{{ route('view_message') }}?id={{ $transaction->user_id }}&text=Hallo {{ $transaction->user->username }}," class="btn btn-outline-primary w-100 mb-1"><i class="feather-message-square me-2"></i>Chat Customer</a>
+                        @endif
                         @if ($transaction->approved === "WAITING")
                             <button class="btn btn-primary w-100">Batalkan Pesanan</button>
                         @else
@@ -246,6 +284,10 @@
                                 <input type="hidden" name="transaction_id" id="transaction_id" value="{{ $transaction->id }}">
                                 <input type="hidden" name="payment_id" id="payment_id">
                                 <button class="btn btn-primary w-100" id="submit-btn"><i class="feather-shopping-cart me-2"></i>Bayar Pesanan</button>
+                            @elseif ($transaction->status === "PROCESSING" && $payment->status === "PAID")
+                                @if(auth()->user()->id === $transaction->user_id)
+                                    <button class="btn btn-primary w-100" id="submit-btn-selesai"><i class="feather-check me-2"></i>Pesanan Selesai</button>
+                                @endif
                             @endif
                         @endif
                     </div>

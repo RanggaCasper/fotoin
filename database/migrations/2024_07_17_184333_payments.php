@@ -28,9 +28,9 @@ return new class extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
             $table->string('reference');
-            $table->string('checkout_url')->nullable(); //PULSA, EMONEY
-            $table->string('nomor_va')->nullable(); // VIRTUAL AKUN
-            $table->string('qr_link')->nullable(); // QRIS
+            $table->longText('checkout_url')->nullable(); //PULSA, EMONEY
+            $table->longText('nomor_va')->nullable(); // VIRTUAL AKUN
+            $table->longText('qr_link')->nullable(); // QRIS
             $table->timestamp('expired_at')->useCurrent();
             $table->timestamp('paid_at')->nullable();
             $table->double('price');

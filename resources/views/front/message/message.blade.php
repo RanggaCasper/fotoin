@@ -42,6 +42,7 @@
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/node-waves/node-waves.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/typeahead-js/typeahead.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/vendor/libs/toastr/toastr.css') }}" />
 
     <!-- Page CSS -->
 
@@ -848,6 +849,7 @@
 
     <!-- Vendors JS -->
     <script src="{{ asset('assets/vendor/libs/bootstrap-maxlength/bootstrap-maxlength.js') }}"></script>
+    <script src="{{ asset('assets/vendor/libs/toastr/toastr.js') }}"></script>
 
     <!-- Main JS -->
     <script src="{{ asset('assets/js/main.js') }}"></script>
@@ -866,11 +868,15 @@
                   type: 'GET',
                   dataType: 'json',
                   success: function(response) {
-                      $('#chat-history').html(response.html);
-                      updateUserInfo(response.userData);
+                      if (!response.status) {
+                        window.location.href = '{{ route('view_message') }}';
+                      } else if  (response.status) {
+                        $('#chat-history').html(response.html);
+                        updateUserInfo(response.userData);
+                      }
                   },
                   error: function(xhr, status, error) {
-                      console.error('AJAX Error: ' + status + ' ' + error);
+                    window.location.href = '{{ route('view_message') }}';
                   }
               });
           }
@@ -966,7 +972,9 @@
                   contentType: false,
                   success: function(response) {
                       $('.message-input').val('');
-                      console.log(response);
+                      if(!response.status){
+                        toastr.error(response.message,'Oops!');
+                      }
                   },
                   error: function(xhr, status, error) {
                       console.error(xhr.responseText);

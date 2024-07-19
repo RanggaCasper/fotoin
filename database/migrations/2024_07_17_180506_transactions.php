@@ -18,12 +18,14 @@ return new class extends Migration
             $table->string('note');
             $table->ipAddress('ip');
             $table->string('user_agent');
-            $table->enum('approved',['APPROVED','WAITING'])->default('WAITING');
+            $table->enum('approved',['REJECTED','APPROVED','WAITING'])->default('WAITING');
             $table->string('catalog_name');
             $table->string('catalog_image');
             $table->string('package_name');
             $table->double('package_price');
             $table->string('package_description');
+            $table->unsignedBigInteger('catalog_id');
+            $table->foreign('catalog_id')->references('id')->on('catalogs');
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
             $table->unsignedBigInteger('freelance_id');

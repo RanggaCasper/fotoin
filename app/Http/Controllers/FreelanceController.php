@@ -7,6 +7,7 @@ use App\Models\Package;
 use App\Models\Calendar;
 use App\Models\Category;
 use App\Models\Portofolio;
+use App\Models\Transaction;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
@@ -229,5 +230,100 @@ class FreelanceController extends Controller
         };
 
         return redirect()->back();
+    }
+
+    public function view_transaction()
+    {
+        return view('front.freelance.transaction.transaction');
+    }
+
+    public function get_transaction(Request $request)
+    {
+        // if ($request->ajax()) {
+            $query = Transaction::select(['id', 'invoice', 'user_id', 'catalog_name', 'package_name', 'package_price', 'status', 'approved', 'created_at'])->with('user')->where('freelance_id', auth()->user()->id);
+
+            return DataTables::of($query)
+                    ->addColumn('no', function ($row) {
+                        static $counter = 0;
+                        return ++$counter;
+                    })
+                    ->addColumn('invoice', function ($row) {
+                        return '<a class="fw-bolder" href="'.route('view_transaction', ['invoice' => $row->invoice]).'" data-toggle="tooltip" data-placement="right" title="Cek detail invoice #'.$row->invoice.'">#'.$row->invoice.'</a>';
+                    })
+                    ->addColumn('catalog_name', function ($row) {
+                        return '<a class="fw-bolder" href="'.route('view-catalog', ['username' => auth()->user()->username,'slug' => Str::slug($row->catalog_name)]).'" data-toggle="tooltip" data-placement="right" title="Cek Katalog '.$row->catalog_name.'">'.$row->catalog_name.'</a>';
+                    })
+                    ->addColumn('customer', function ($row) {
+                        return '<a class="fw-bolder" href="'.route('view_message').'?id='.$row->user_id.'&text=Hallo kak '.$row->user->username.', " data-toggle="tooltip" data-placement="right" title="Chat Customer '.$row->user->username.'">'.$row->user->username.'</a>';
+                    })
+                    ->addColumn('package_price', function ($row) {
+                        return 'Rp. '.number_format($row->package_price, 0, ',', '.');
+                    })
+                    ->addColumn('status', function ($row) {
+                        $color = '';
+                        switch ($row->status) {
+                            case 'COMPLETED':
+                                $color = 'success';
+                                break;
+                            case 'CANCELLED':
+                                $color = 'danger';
+                                break;
+                            case 'PENDING':
+                                $color = 'warning';
+                                break;
+                            case 'PROCESSING':
+                                $color = 'info';
+                                break;
+                        }
+                        return '<h6 class="text-' . $color . '">' . $row->status . '</h6>';
+                    })
+                    ->addColumn('approved', function ($row) {
+                        $color = '';
+                        switch ($row->approved) {
+                            case 'APPROVED':
+                                $color = 'success';
+                                break;
+                            case 'WAITING':
+                                $color = 'info';
+                                break;
+                        }
+                        return '<h6 class="text-' . $color . '">' . $row->approved . '</h6>';
+                    })
+                    ->addColumn('aksi', function ($row) {
+                        if($row->approved != "APPROVED"){
+                            return '<button class="btn btn-primary check" data-id="'.$row->id.'" data-toggle="tooltip" data-placement="right" title="Approve invoice #'.$row->invoice.'"><i class="ti ti-check"></i></button>';
+                        }
+                    })
+                    ->addColumn('created_at', function ($row) {
+                        return $row->created_at; 
+                    })
+                    ->rawColumns(['invoice','catalog_name','customer','status', 'approved', 'aksi'])
+                    ->toJson();
+
+        // }
+
+        // abort(404);
+    }
+
+    public function approved_transaction(Request $request)
+    {
+        $request->validate([
+            'transaction_id' => 'required|exists:transactions,id'
+        ]);
+        
+        $transaction = Transaction::where('id',$request->transaction_id)->where('freelance_id', auth()->user()->id)->first();
+
+        if ($transaction->approved === "APPROVED") {
+            return response()->json(['success' => true, 'message' => 'Status data sudah Approved.']);
+        }
+
+        if ($transaction) {
+            $transaction->approved = "APPROVED";
+            $transaction->save();
+    
+            return response()->json(['success' => true, 'message' => 'Data berhasil di update.']);
+        }
+    
+        return response()->json(['success' => false, 'message' => 'Data tidak ditemukan.'], 404);
     }
 }

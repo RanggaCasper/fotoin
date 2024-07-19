@@ -100,6 +100,13 @@ Route::controller(FreelanceController::class)->prefix('freelance')->middleware('
 
         Route::get('{id}/update','edit_catalog')->name('edit-catalog');
     });
+
+    Route::prefix('/transaction')->group(function(){
+        Route::get('/', 'view_transaction')->name('view_transaction_freelance');
+        Route::get('/get', 'get_transaction')->name('get_transaction_freelance');
+
+        Route::post('/approved', 'approved_transaction')->name('approved_transaction_freelance');
+    });
     
     Route::get('calendar', 'calendar')->name('freelance-calendar');
     Route::get('calendar/get', 'get_calendar')->name('get-calendar');
@@ -112,8 +119,10 @@ Route::controller(FreelanceController::class)->prefix('freelance')->middleware('
 Route::controller(TransactionController::class)->prefix('transaction')->middleware('auth','verified')->group(function(){
     Route::get('/invoice/{invoice}', 'view_transaction')->name('view_transaction');
     Route::post('/create', 'create_transaction')->name('create_transaction');
+    Route::put('/update/{invoice}', 'update_transaction')->name('update_transaction');
 
     Route::post('/create/payment', 'create_payment')->name('create_payment');
+
 
     Route::get('/payment/detail/{invoice}', 'payment_detail')->name('payment_detail');
     Route::get('/transaction/detail/{invoice}', 'transaction_detail')->name('transaction_detail');

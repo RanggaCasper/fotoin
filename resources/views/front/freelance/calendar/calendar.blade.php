@@ -50,33 +50,33 @@
 
         
         $('#datatable').on('click', '.delete', function() {
-                var id = $(this).data('id');
-                Swal.fire({
-                    title: 'Apakah Anda yakin?',
-                    text: "Anda tidak akan bisa mengembalikan ini!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Ya, hapus!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.ajax({
-                            url: '{{ route("freelance-delete-calendar", ["id" => ":id"]) }}'.replace(':id', id),
-                            type: 'DELETE',
-                            data: {
-                                _token: '{{ csrf_token() }}'
-                            },
-                            success: function(response) {
-                                location.reload();
-                            },
-                            error: function(error) {
-                                location.reload();
-                            }
-                        });
-                    }
-                })
-            });
+            var id = $(this).data('id');
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Anda tidak akan bisa mengembalikan ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, hapus!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '{{ route("freelance-delete-calendar", ["id" => ":id"]) }}'.replace(':id', id),
+                        type: 'DELETE',
+                        data: {
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            location.reload();
+                        },
+                        error: function(error) {
+                            location.reload();
+                        }
+                    });
+                }
+            })
+        });
     });
 </script>
 @endpush
