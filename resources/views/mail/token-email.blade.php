@@ -10,7 +10,7 @@
     <!--[if mso]>
     <xml><o:officedocumentsettings><o:pixelsperinch>96</o:pixelsperinch></o:officedocumentsettings></xml>
   <![endif]-->
-    <title>Notifikasi Verifikasi Email!</title>
+    <title>{{ $result['type'] == 'verify' ? 'Notifikasi Verifikasi Email!' : 'Reset Password' }}</title>
     <link
         href="https://fonts.googleapis.com/css?family=Montserrat:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700"
         rel="stylesheet" media="screen">
@@ -47,42 +47,46 @@
         }
 
         .table {
-        --bs-table-bg: transparent;
-        --bs-table-accent-bg: transparent;
-        --bs-table-striped-color: #6e6b7b;
-        --bs-table-striped-bg: #fafafc;
-        --bs-table-active-color: #6e6b7b;
-        --bs-table-active-bg: rgba(34, 41, 47, 0.1);
-        --bs-table-hover-color: #6e6b7b;
-        --bs-table-hover-bg: #f6f6f9;
-        width: 100%;
-        margin-bottom: 1rem;
-        color: #6e6b7b;
-        vertical-align: middle;
-        border-color: #ebe9f1;
+            --bs-table-bg: transparent;
+            --bs-table-accent-bg: transparent;
+            --bs-table-striped-color: #6e6b7b;
+            --bs-table-striped-bg: #fafafc;
+            --bs-table-active-color: #6e6b7b;
+            --bs-table-active-bg: rgba(34, 41, 47, 0.1);
+            --bs-table-hover-color: #6e6b7b;
+            --bs-table-hover-bg: #f6f6f9;
+            width: 100%;
+            margin-bottom: 1rem;
+            color: #6e6b7b;
+            vertical-align: middle;
+            border-color: #ebe9f1;
         }
+
         .table > :not(caption) > * > * {
-        padding: 0.72rem 2rem;
-        background-color: var(--bs-table-bg);
-        border-bottom-width: 1px;
-        box-shadow: inset 0 0 0 9999px var(--bs-table-accent-bg);
+            padding: 0.72rem 2rem;
+            background-color: var(--bs-table-bg);
+            border-bottom-width: 1px;
+            box-shadow: inset 0 0 0 9999px var(--bs-table-accent-bg);
         }
+
         .table > tbody {
-        vertical-align: inherit;
+            vertical-align: inherit;
         }
+
         .table > thead {
-        vertical-align: bottom;
+            vertical-align: bottom;
         }
+
         .table > :not(:first-child) {
-        border-top: 2px solid #ebe9f1;
+            border-top: 2px solid #ebe9f1;
         }
 
         .caption-top {
-        caption-side: top;
+            caption-side: top;
         }
 
         .table-sm > :not(caption) > * > * {
-        padding: 0.3rem 0.5rem;
+            padding: 0.3rem 0.5rem;
         }
 
         @media (max-width: 600px) {
@@ -109,7 +113,9 @@
 
 <body
     style="margin: 0; width: 100%; padding: 0; word-break: break-word; -webkit-font-smoothing: antialiased; background-color: #eceff1;">
-    <div style="font-family: 'Montserrat', sans-serif; mso-line-height-rule: exactly; display: none;">Notifikasi Verifikasi Email!</div>
+    <div style="font-family: 'Montserrat', sans-serif; mso-line-height-rule: exactly; display: none;">
+        {{ $result['type'] == 'verify' ? 'Notifikasi Verifikasi Email!' : 'Reset Password' }}
+    </div>
     <div role="article" aria-roledescription="email" aria-label="Notifikasi Deposit" lang="en"
         style="font-family: 'Montserrat', sans-serif; mso-line-height-rule: exactly;">
         <table style="width: 100%; font-family: Montserrat, -apple-system, 'Segoe UI', sans-serif;" cellpadding="0"
@@ -142,10 +148,17 @@
                                             <p
                                                 style="font-family: 'Montserrat', sans-serif; mso-line-height-rule: exactly; margin-top: 0; font-size: 16px; font-weight: 700; color: #0099ff;">
                                                 {{ $result['email'] }}</p>
+                                            @if($result['type'] == 'verify')
                                             <p
                                                 style="font-family: 'Montserrat', sans-serif; font-size: 12px; mso-line-height-rule: exactly; margin: 0; margin-bottom: 8px;">
                                                 Silahkan lakukan verifikasi kode unik dibawah ini untuk melanjutkan proses pendaftaran, berlaku hingga {{ $result['expired_at'] }} WIB.
                                             </p>
+                                            @else
+                                            <p
+                                                style="font-family: 'Montserrat', sans-serif; font-size: 12px; mso-line-height-rule: exactly; margin: 0; margin-bottom: 8px;">
+                                                Silahkan gunakan kode unik dibawah ini untuk reset password Anda, berlaku hingga {{ $result['expired_at'] }} WIB.
+                                            </p>
+                                            @endif
                                             <hr style="border-top:dashed 1px">
                                             <b
                                                 style="text-align: center; font-family: 'Montserrat', sans-serif; font-size: 16px; mso-line-height-rule: exactly; margin: 0;">
@@ -154,7 +167,7 @@
                                             <hr style="border-top:dashed 1px">
                                             <p
                                                 style="font-family: 'Montserrat', sans-serif; font-size: 12px; mso-line-height-rule: exactly; margin: 0; margin-bottom: 8px;">
-                                                Terima kasih atas kepercayaan yang Anda berikan kepada kami. Jika Anda tidak melakukan pendaftaran ini, mohon abaikan email ini.
+                                                Terima kasih atas kepercayaan yang Anda berikan kepada kami. Jika Anda tidak melakukan @if($result['type'] == 'verify') pendaftaran @else reset password @endif ini, mohon abaikan email ini.
                                             </p>
                                             <p
                                                 style="font-family: 'Montserrat', sans-serif; font-size: 12px; mso-line-height-rule: exactly; margin: 0; margin-bottom: 8px;">

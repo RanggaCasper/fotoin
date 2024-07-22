@@ -11,7 +11,7 @@ class EmailToken extends Model
 
     protected $table = 'email_token';
 
-    protected $fillable = ['email','token','expired_at'];
+    protected $fillable = ['email','token','type','expired_at'];
 
     public $timestamps = true; 
 

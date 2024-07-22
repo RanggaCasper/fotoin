@@ -5,7 +5,7 @@
         $(function() {
             $('#datatable').DataTable({
                 processing: true,
-                serverSide: true,
+                serverSide: false,
                 ajax: '{{ route('get-kelola-freelance') }}',
                 columns: [
                     { data: 'no', name: 'no' },

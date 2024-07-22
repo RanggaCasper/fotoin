@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('email_token', function (Blueprint $table) {
+        Schema::create('suspend_user', function (Blueprint $table) {
             $table->id();
             $table->string('email')->unique();
-            $table->string('token',16);
-            $table->enum('type', ['reset','verify']);
-            $table->timestamp('expired_at');
+            $table->longText('note');
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users');
+            $table->unsignedBigInteger('admin_id');
+            $table->foreign('admin_id')->references('id')->on('users');
             $table->timestamps();
         });
     }
@@ -26,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('email_token');
+        Schema::dropIfExists('suspend_user');
     }
 };

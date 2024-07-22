@@ -18,41 +18,53 @@
     <ul class="menu-inner py-1">
       <!-- Page -->
       @if (auth()->user()->role == "Master")  
-        <li class="menu-item">
+        <li class="menu-item {{ request()->routeIs('dashboard-master') ? 'active' : '' }}">
           <a href="{{ route('dashboard-master') }}" class="menu-link">
             <i class="menu-icon tf-icons ti ti-smart-home"></i>
             <div>Dashboard</div>
           </a>
         </li>
-        <li class="menu-item">
+        <li class="menu-item {{ request()->routeIs('view-admin') ? 'active' : '' }}">
           <a href="{{ route('view-admin') }}" class="menu-link">
             <i class="menu-icon tf-icons ti ti-user"></i>
             <div>Kelola Admin</div>
           </a>
         </li>
-        <li class="menu-item">
+        <li class="menu-item {{ request()->routeIs('view-website-conf') ? 'active' : '' }}">
           <a href="{{ route('view-website-conf') }}" class="menu-link">
             <i class="menu-icon tf-icons ti ti-settings"></i>
             <div>Konfigurasi Website</div>
           </a>
         </li>
       @elseif (auth()->user()->role == "Admin")
-      <li class="menu-item">
+      <li class="menu-item {{ request()->routeIs('dashboard-admin') ? 'active' : '' }}">
         <a href="{{ route('dashboard-admin') }}" class="menu-link">
           <i class="menu-icon tf-icons ti ti-smart-home"></i>
           <div>Dashboard</div>
         </a>
       </li>
-      <li class="menu-item">
+      <li class="menu-item {{ request()->routeIs('view-kelola-freelance') ? 'active' : '' }}">
         <a href="{{ route('view-kelola-freelance') }}" class="menu-link">
           <i class="menu-icon tf-icons ti ti-user"></i>
           <div>Kelola Freelance</div>
         </a>
       </li>
-      <li class="menu-item">
+      <li class="menu-item {{ request()->routeIs('view-validasi-freelance') ? 'active' : '' }}">
         <a href="{{ route('view-validasi-freelance') }}" class="menu-link">
-          <i class="menu-icon tf-icons ti ti-user"></i>
+          <i class="menu-icon tf-icons ti ti-user-check"></i>
           <div>Validasi Freelance</div>
+        </a>
+      </li>
+      <li class="menu-item {{ request()->routeIs('view_suspend_request') ? 'active' : '' }}">
+        <a href="{{ route('view_suspend_request') }}" class="menu-link">
+          <i class="menu-icon tf-icons ti ti-users-minus"></i>
+          <div>Laporan Penanguhan</div>
+        </a>
+      </li>
+      <li class="menu-item {{ request()->routeIs('view_suspend') ? 'active' : '' }}">
+        <a href="{{ route('view_suspend') }}" class="menu-link">
+          <i class="menu-icon tf-icons ti ti-user-cancel"></i>
+          <div>Kelola Penanguhan</div>
         </a>
       </li>
       @endif

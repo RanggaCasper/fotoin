@@ -107,7 +107,7 @@
             </div>
         </section>
 
-        <section class="explore-gigs-section">
+        <section class="explore-gigs-section" id="main">
             <div class="container">
                 <div class="section-head d-flex">
                     <div class="section-header aos" data-aos="fade-up">
@@ -264,7 +264,7 @@
                             </div>
                             <h3>Pesan Freelance</h3>
                             <p>Temukan freelancer yang tepat untuk memenuhi kebutuhan Anda sekarang juga!</p>
-                            <a href="service.html" class="btn btn-primary">Pesan<i
+                            <a href="#main" class="btn btn-primary">Pesan<i
                                     class="fa-solid fa-caret-right"></i></a>
                         </div>
                     </div>

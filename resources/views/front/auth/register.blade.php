@@ -47,7 +47,7 @@
             <div class="col-lg-6">
                 <div class="login-wrapper">
                     <div class="login-content">
-                        <form method="POST">
+                        <form id="form-register">
                             @csrf
                             <div class="login-userset">
                                 <div class="login-logo">
@@ -143,6 +143,41 @@
     </div>
 
     @include('front.components.scripts')
+    <script>
+        $('#form-register').on('submit', function(event) {
+            event.preventDefault();
+
+            var button = $(this).find('button[type="submit"]');
+            button.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Loading...');
+
+            $.ajax({
+                url: '{{ route("proses_register") }}',
+                method: 'POST',
+                data: $(this).serialize(),
+                success: function(response) {
+                    button.prop('disabled', false).text('Daftar');
+                    if (response.status) {
+                        toastr.success(response.message);
+                        window.location.href = response.redirect;
+                    } else {
+                        toastr.error(response.message);
+                    }
+                },
+                error: function(xhr) {
+                    button.prop('disabled', false).text('Daftar');
+                    var errors = xhr.responseJSON.errors;
+                    if (errors) {
+                        $.each(errors, function(key, value) {
+                            toastr.error(value,'Oops!');
+                        });
+                    } else {
+                        var errorMessage = xhr.responseJSON.message || 'Terjadi kesalahan saat pendaftaran. Silakan coba lagi.';
+                        toastr.error(errorMessage,'Oops!');
+                    }
+                }
+            });
+        });
+    </script>
 
 </body>
 

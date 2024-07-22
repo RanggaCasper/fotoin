@@ -28,23 +28,27 @@ Route::controller(AuthController::class)->group(function(){
         Route::post('login', 'proses_login')->name('proses_login');
     
         Route::get('register', 'register')->name('register');
-        Route::post('register', 'proses_register')->name('proses-register');
+        Route::post('register', 'proses_register')->name('proses_register');
+
+        Route::get('forgot', 'forgot')->name('forgot');
+        Route::post('forgot', 'reset_password')->name('reset_password');
+        Route::post('send_reset_token', 'send_reset_token')->name('send_reset_token');
     });
 
-    Route::prefix('freelance')->middleware('auth','verified')->group(function(){
+    Route::prefix('freelance')->middleware(['auth', 'checkSuspend', 'verified'])->group(function(){
         Route::get('register', 'register_freelance')->name('register-freelance');
         Route::post('register', 'proses_register_freelance')->name('proses-register-freelance');
     });
 });
 
-Route::controller(AuthController::class)->middleware('auth','unverified')->group(function(){
+Route::controller(AuthController::class)->middleware(['auth', 'checkSuspend', 'unverified'])->group(function(){
     Route::get('verify', 'verify_email')->name('verify-email');
     Route::post('verify', 'verify')->name('verify');
 });
 
 Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::controller(AdminMasterController::class)->prefix('master')->middleware('check:Master','auth','verified')->group(function(){
+Route::controller(AdminMasterController::class)->prefix('master')->middleware(['auth', 'checkSuspend', 'check:Master', 'verified'])->group(function(){
     Route::get('/', 'dashboard')->name('dashboard-master');
 
     Route::get('admin', 'view_admin')->name('view-admin');
@@ -58,7 +62,7 @@ Route::controller(AdminMasterController::class)->prefix('master')->middleware('c
     Route::put('website-conf', 'update_website_conf')->name('update-website-conf');
 });
 
-Route::controller(AdminController::class)->prefix('admin')->middleware('check:Admin','auth','verified')->group(function(){
+Route::controller(AdminController::class)->prefix('admin')->middleware(['auth', 'checkSuspend', 'check:Admin', 'verified'])->group(function(){
     Route::get('/', 'dashboard')->name('dashboard-admin');
 
     Route::prefix('freelance')->group(function(){
@@ -71,16 +75,28 @@ Route::controller(AdminController::class)->prefix('admin')->middleware('check:Ad
 
         Route::get('get-freelance/{id}', 'get_freelance_id')->name('get-freelance-id');
     });
+
+    Route::prefix('user')->group(function(){
+        Route::get('suspend', 'view_suspend')->name('view_suspend');
+        Route::get('get_suspend', 'get_suspend')->name('get_suspend');
+        Route::delete('unblock_user', 'unblock_user')->name('unblock_user');
+        Route::post('block_user', 'block_user')->name('block_user');
+
+        Route::get('suspend_request', 'view_suspend_request')->name('view_suspend_request');
+        Route::get('get_suspend_request', 'get_suspend_request')->name('get_suspend_request');
+        Route::get('get_suspend_request', 'get_suspend_request')->name('get_suspend_request');
+
+    });
 });
 
-Route::controller(HomeController::class)->group(function(){
+Route::controller(HomeController::class)->middleware('checkSuspend')->group(function(){
     Route::get('/', 'home')->name('home');
 
     Route::prefix('catalog')->group(function(){
         Route::get('category/{category}', 'search_category')->name('search-category');
         Route::get('search/{search}', 'search_catalog')->name('search-catalog');
         
-        Route::prefix('wishlist')->middleware('auth','verified')->group(function(){
+        Route::prefix('wishlist')->middleware(['auth', 'checkSuspend', 'verified'])->group(function(){
             Route::get('/', 'view_wishlist')->name('view-wishlist');
             Route::post('add', 'add_wishlist')->name('add-wishlist');
             Route::post('remove', 'remove_wishlist')->name('remove-wishlist');
@@ -90,7 +106,7 @@ Route::controller(HomeController::class)->group(function(){
     });
 });
 
-Route::controller(FreelanceController::class)->prefix('freelance')->middleware('check:Freelance','auth','verified')->group(function(){
+Route::controller(FreelanceController::class)->prefix('freelance')->middleware(['auth', 'checkSuspend', 'check:Freelance', 'verified'])->group(function(){
     Route::get('/', 'dashboard')->name('dashboard-freelance');
 
     Route::prefix('/catalog')->group(function(){
@@ -116,7 +132,7 @@ Route::controller(FreelanceController::class)->prefix('freelance')->middleware('
     Route::delete('calendar/{id}', 'delete_calendar')->name('freelance-delete-calendar');
 });
 
-Route::controller(TransactionController::class)->prefix('transaction')->middleware('auth','verified')->group(function(){
+Route::controller(TransactionController::class)->prefix('transaction')->middleware(['auth', 'checkSuspend', 'verified'])->group(function(){
     Route::get('/invoice/{invoice}', 'view_transaction')->name('view_transaction');
     Route::post('/create', 'create_transaction')->name('create_transaction');
     Route::put('/update/{invoice}', 'update_transaction')->name('update_transaction');
@@ -128,7 +144,7 @@ Route::controller(TransactionController::class)->prefix('transaction')->middlewa
     Route::get('/transaction/detail/{invoice}', 'transaction_detail')->name('transaction_detail');
 });
 
-Route::controller(MessageController::class)->prefix('message')->middleware('auth','verified')->group(function(){
+Route::controller(MessageController::class)->prefix('message')->middleware(['auth', 'checkSuspend', 'verified'])->group(function(){
     Route::get('/', 'view_message')->name('view_message');
     Route::get('{user}', 'message_user')->name('message_user');
     Route::post('send', 'message_send')->name('message_send');

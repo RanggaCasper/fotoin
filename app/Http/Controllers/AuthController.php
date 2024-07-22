@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Mail\TokenEmail;
 use App\Models\Freelance;
 use App\Models\EmailToken;
+use App\Models\SuspendUser;
 use Illuminate\Http\Request;
 use Laravolt\Indonesia\Models\City;
 use Illuminate\Support\Facades\Auth;
@@ -42,11 +43,19 @@ class AuthController extends Controller
 
         $credentials = $request->only('email', 'password');
 
+        $suspendUser = SuspendUser::where('email', $request->email)->first();
+        if ($suspendUser) {
+            $note = $suspendUser->note;
+            toastr()->error("Akun Anda telah ditangguhkan. Catatan: $note. Silakan hubungi admin untuk informasi lebih lanjut.", 'Oops!');
+            return redirect()->back()->with('error', "Akun Anda telah ditangguhkan. Catatan: $note. Silakan hubungi admin untuk informasi lebih lanjut.");
+        }
+
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
             return redirect()->intended('/');
         }
-
+        
+        toastr()->error('Email atau password salah. Silakan coba lagi.','Oops!');
         return redirect()->back()->with('error', 'Email atau password salah. Silakan coba lagi.');
     }
 
@@ -60,54 +69,175 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'username' => 'required|unique:users',
             'fullname' => 'required',
-            'no_telp' => 'required',
+            'no_telp' => 'required|unique:users',
             'email' => 'required|email|unique:users',
-            'password' => 'required',
+            'password' => 'required|min:8',
             'gender' => 'required',
             'confirm_password' => 'required|same:password',
         ], [
             'username.required' => 'Kolom username harus diisi.',
             'username.unique' => 'Username sudah terdaftar.',
             'fullname.required' => 'Kolom nama lengkap harus diisi.',
-            'no_telp.required' => 'Nomor handphone harus diisi',
+            'no_telp.required' => 'Nomor handphone harus diisi.',
+            'no_telp.unique' => 'Nomor handphone sudah terdaftar.',
             'email.required' => 'Kolom email harus diisi.',
             'email.email' => 'Format email tidak valid.',
             'email.unique' => 'Email sudah terdaftar.',
             'password.required' => 'Kolom password harus diisi.',
+            'password.min' => 'Password minimal harus 8 karakter.',
             'gender.required' => 'Opsi Jenis kelamin harus diisi.',
             'confirm_password.required' => 'Kolom konfirmasi password harus diisi.',
             'confirm_password.same' => 'Konfirmasi password harus cocok dengan password.',
         ]);
-        
+
         if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
+            return response()->json([
+                'status' => false,
+                'errors' => $validator->errors()
+            ], 422);
         }
 
-        $user = User::create([
-            'username' => $request->username,
-            'fullname' => $request->fullname,
-            'no_telp' => $request->no_telp,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-            'role' => 'User',
+        try {
+            $user = User::create([
+                'username' => $request->username,
+                'fullname' => $request->fullname,
+                'no_telp' => $request->no_telp,
+                'email' => $request->email,
+                'password' => bcrypt($request->password),
+                'role' => 'User',
+            ]);
+
+            if ($user) {
+                $emailToken = EmailToken::create([
+                    'email' => $request->email,
+                    'token' => (new EmailToken())->generateToken(),
+                    'type' => 'verify',
+                    'expired_at' => now()->addMinutes(180),
+                ]);
+
+                if ($emailToken) {
+                    Mail::to($request->email)->send(new TokenEmail($emailToken));
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Pendaftaran berhasil, silahkan cek email untuk verifikasi.',
+                        'redirect' => route('login')
+                    ], 201);
+                }
+            }
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Pendaftaran gagal, silahkan kontak admin.'
+            ], 500);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Terjadi kesalahan saat pendaftaran. Silakan coba lagi.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+    public function forgot()
+    {
+        return view('front.auth.forgot');
+    }
+
+    public function send_reset_token(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ], [
+            'email.required' => 'Kolom email harus diisi.',
+            'email.email' => 'Format email tidak valid.',
         ]);
 
-        if($user){
-            $email = EmailToken::create([
-                'email' => $request->email,
-                'token' => (new EmailToken())->generateToken(),
-                'expired_at' => now()->addHours(1),
-            ]);
-            if($email){
-                Mail::to($request->email)->send(new TokenEmail($email));
-                toastr()->success('Pendaftaran berhasil silahkan login.');
-                return redirect()->route('login');
+        try {
+            $user = User::where('email', $request->email)->first();
+            
+            if (!$user) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Email tidak terdaftar.',
+                ], 404);
             }
-        }
 
-        toastr()->error('Pendaftaran gagal silahkan kontak admin.');
-        return redirect()->back();
+            $data = EmailToken::updateOrCreate(
+                ['email' => $request->email],
+                [
+                    'token' => (new EmailToken())->generateToken(),
+                    'type' => 'reset',
+                    'expired_at' => now()->addMinutes(180),
+                ]
+            );
+
+            Mail::to($request->email)->send(new TokenEmail($data));
+
+            return response()->json([
+                'message' => 'Token reset password telah dikirim ke email Anda.',
+                'status' => true,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Terjadi kesalahan saat mengirim token reset password. Silakan coba lagi.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
+
+    public function reset_password(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'password' => 'required|min:8',
+        ], [
+            'token.required' => 'Kolom token harus diisi.',
+            'password.required' => 'Kolom Password harus diisi.',
+            'password.min' => 'Password minimal harus 8 karakter.',
+        ]);
+
+        try {
+            $emailToken = EmailToken::where('token', $request->token)
+                                    ->where('type', 'reset')
+                                    ->where('expired_at', '>', now())
+                                    ->first();
+
+            if (!$emailToken) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Token tidak valid atau telah kedaluwarsa.',
+                ], 400);
+            }
+
+            $user = User::where('email', $emailToken->email)->first();
+            if (!$user) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Pengguna tidak ditemukan.',
+                ], 404);
+            }
+
+            $user->password = bcrypt($request->password);
+            $user->save();
+
+            $emailToken->delete();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Password berhasil diubah. Silakan login.',
+                'redirect' => route('login'),
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Terjadi kesalahan saat mengubah Password. Silakan coba lagi.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
 
     public function register_freelance()
     {
@@ -216,7 +346,7 @@ class AuthController extends Controller
         }
 
         if(auth()->check()){
-            $data = EmailToken::where('email',auth()->user()->email)->first();
+            $data = EmailToken::where('email',auth()->user()->email)->where('type', 'verify')->first();
             $user = User::where('id',auth()->user()->id)->first();
             if($data->token === $request->token){
                 if($data->expired_at > Carbon::now()->format('H:i:s')){
