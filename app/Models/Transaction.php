@@ -33,6 +33,11 @@ class Transaction extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function feedbacks()
+    {
+        return $this->hasMany(Feedback::class, 'transaction_id');
+    }
+
     public static function generateInvoice()
     {
         $date = now()->format('Ymd');

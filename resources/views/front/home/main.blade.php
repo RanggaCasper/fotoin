@@ -113,38 +113,160 @@
                     <div class="section-header aos" data-aos="fade-up">
                         <h2><span>Jelajahi</span> Katalog Kami.</h2>
                     </div>
-                    {{-- <div class="section-tab">
+                    <div class="section-tab">
                         <ul class="nav nav-pills inner-tab aos" id="pills-tab" role="tablist" data-aos="fade-up">
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="pills-popular-tab" data-bs-toggle="pill"
-                                    data-bs-target="#pills-popular" type="button" role="tab"
-                                    aria-controls="pills-popular" aria-selected="false">Popular</button>
+                                <button class="nav-link active" id="pills-random-tab" data-bs-toggle="pill"
+                                    data-bs-target="#pills-random" type="button" role="tab"
+                                    aria-controls="pills-random" aria-selected="false">Random</button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="pills-latest-tab" data-bs-toggle="pill"
-                                    data-bs-target="#pills-latest" type="button" role="tab" aria-controls="pills-latest"
-                                    aria-selected="true">Latest</button>
+                                <button class="nav-link" id="pills-popular-tab" data-bs-toggle="pill"
+                                    data-bs-target="#pills-popular" type="button" role="tab"
+                                    aria-controls="pills-popular" aria-selected="false">Populer</button>
                             </li>
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link" id="pills-rating-tab" data-bs-toggle="pill"
                                     data-bs-target="#pills-rating" type="button" role="tab" aria-controls="pills-rating"
-                                    aria-selected="false">Top Ratings</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="pills-trend-tab" data-bs-toggle="pill"
-                                    data-bs-target="#pills-trend" type="button" role="tab" aria-controls="pills-trend"
-                                    aria-selected="false">Trending </button>
+                                    aria-selected="false">Rating Terbanyak</button>
                             </li>
                         </ul>
-                    </div> --}}
+                    </div>
                 </div>
                 <div class="tab-content dashboard-tab">
-                    <div class="tab-pane fade show active" id="pills-popular" role="tabpanel"
-                        aria-labelledby="pills-popular-tab">
+                    <div class="tab-pane fade show active" id="pills-random" role="tabpanel" aria-labelledby="pills-random-tab">
                         <div class="row aos" data-aos="fade-up" data-aos-delay="500">
                             <div class="col-md-12">
                                 <div class="gigs-card-slider owl-carousel">
                                     @foreach ($catalogs->shuffle()->take(10) as $catalog)
+                                        <div class="gigs-grid">
+                                            <div class="gigs-img">
+                                                <div class="img-slider owl-carousel">
+                                                    @foreach ($catalog->portofolios as $portofolio)
+                                                        <div class="slide-images">
+                                                            <a href="{{ route('view-catalog', ['username' => $catalog->user->username, 'slug' => $catalog->slug]) }}">
+                                                                @php
+                                                                    $fileExtension = pathinfo($portofolio->path_image, PATHINFO_EXTENSION);
+                                                                @endphp
+                                                                @if (in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif']))
+                                                                    <img src="{{ asset('storage/' . $portofolio->path_image) }}" class="img-fluid" alt="img">
+                                                                @elseif (in_array($fileExtension, ['mp4', 'webm', 'ogg']))
+                                                                    <video controls class="img-fluid">
+                                                                        <source src="{{ asset('storage/' . $portofolio->path_image) }}" type="video/{{ $fileExtension }}">
+                                                                        Your browser does not support the video tag.
+                                                                    </video>
+                                                                @endif
+                                                            </a>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                                <div class="fav-selection">
+                                                    <a href="javascript:void(0);" data-id="{{ $catalog->id }}" onclick="toggleWishlist({{ $catalog->id }})" class="fav-icon @if($catalog->isInWishlist()) favourite @else @endif"><i class="feather-heart"></i></a>
+                                                </div>
+                                            </div>
+                                            <div class="gigs-content">
+                                                <div class="gigs-title">
+                                                    <h3>
+                                                        <a href="{{ route('view-catalog', ['username' => $catalog->user->username, 'slug' => $catalog->slug]) }}">{{ $catalog->title_name }}</a>
+                                                    </h3>
+                                                </div>
+                                                <div class="d-flex justify-content-between">
+                                                    <div>
+                                                        <h6 class="d-block m-0 small">{{ number_format($catalog->transactions->where('status', 'COMPLETED')->count(),0,',','.') }} Terjual</h6>
+                                                        <div class="star-rate">
+                                                            <span><i class="fa-solid fa-star"></i>{{ number_format($catalog->feedback->avg('rate') ?? 0, 1) }} ({{ $catalog->feedback->count() }})</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="text-right">
+                                                        <span class="d-block small">Mulai</span>
+                                                        <h6 class="m-0 text-primary">Rp {{ number_format($catalog->packages->min('price'),0,',','.') }}</h6>
+                                                    </div>
+                                                </div>
+                                                <div class="gigs-card-footer">
+                                                    <p class="m-0 small"><i class="feather-map-pin me-1"></i>{{ $catalog->user->freelance->provinsi.', '.$catalog->user->freelance->kota }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="pills-popular" role="tabpanel" aria-labelledby="pills-popular-tab">
+                        <div class="row aos" data-aos="fade-up" data-aos-delay="500">
+                            <div class="col-md-12">
+                                <div class="gigs-card-slider owl-carousel">
+                                    @php
+                                        $popular = $catalogs->sortByDesc(function ($catalog) {
+                                            return $catalog->transactions->where('status', 'COMPLETED')->count();
+                                        })->take(10);
+                                    @endphp
+
+                                    @foreach ($popular as $catalog)
+                                        <div class="gigs-grid">
+                                            <div class="gigs-img">
+                                                <div class="img-slider owl-carousel">
+                                                    @foreach ($catalog->portofolios as $portofolio)
+                                                        <div class="slide-images">
+                                                            <a href="{{ route('view-catalog', ['username' => $catalog->user->username, 'slug' => $catalog->slug]) }}">
+                                                                @php
+                                                                    $fileExtension = pathinfo($portofolio->path_image, PATHINFO_EXTENSION);
+                                                                @endphp
+                                                                @if (in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif']))
+                                                                    <img src="{{ asset('storage/' . $portofolio->path_image) }}" class="img-fluid" alt="img">
+                                                                @elseif (in_array($fileExtension, ['mp4', 'webm', 'ogg']))
+                                                                    <video controls class="img-fluid">
+                                                                        <source src="{{ asset('storage/' . $portofolio->path_image) }}" type="video/{{ $fileExtension }}">
+                                                                        Your browser does not support the video tag.
+                                                                    </video>
+                                                                @endif
+                                                            </a>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                                <div class="fav-selection">
+                                                    <a href="javascript:void(0);" data-id="{{ $catalog->id }}" onclick="toggleWishlist({{ $catalog->id }})" class="fav-icon @if($catalog->isInWishlist()) favourite @else @endif"><i class="feather-heart"></i></a>
+                                                </div>
+                                            </div>
+                                            <div class="gigs-content">
+                                                <div class="gigs-title">
+                                                    <h3>
+                                                        <a href="{{ route('view-catalog', ['username' => $catalog->user->username, 'slug' => $catalog->slug]) }}">{{ $catalog->title_name }}</a>
+                                                    </h3>
+                                                </div>
+                                                <div class="d-flex justify-content-between">
+                                                    <div>
+                                                        <h6 class="d-block m-0 small">{{ number_format($catalog->transactions->where('status', 'COMPLETED')->count(),0,',','.') }} Terjual</h6>
+                                                        <div class="star-rate">
+                                                            <span><i class="fa-solid fa-star"></i>{{ number_format($catalog->feedback->avg('rate') ?? 0, 1) }} ({{ $catalog->feedback->count() }})</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="text-right">
+                                                        <span class="d-block small">Mulai</span>
+                                                        <h6 class="m-0 text-primary">Rp {{ number_format($catalog->packages->min('price'),0,',','.') }}</h6>
+                                                    </div>
+                                                </div>
+                                                <div class="gigs-card-footer">
+                                                    <p class="m-0 small"><i class="feather-map-pin me-1"></i>{{ $catalog->user->freelance->provinsi.', '.$catalog->user->freelance->kota }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="pills-rating" role="tabpanel" aria-labelledby="pills-rating-tab">
+                        <div class="row aos" data-aos="fade-up" data-aos-delay="500">
+                            <div class="col-md-12">
+                                <div class="gigs-card-slider owl-carousel">
+                                    @php
+                                        $popular = $catalogs->sortByDesc(function ($catalog) {
+                                            return $catalog->feedback->count();
+                                        })->take(10);
+                                    @endphp
+
+                                    @foreach ($popular as $catalog)
                                         <div class="gigs-grid">
                                             <div class="gigs-img">
                                                 <div class="img-slider owl-carousel">

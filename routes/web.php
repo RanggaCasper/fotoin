@@ -10,6 +10,8 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\WilayahController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Callback\CallbackController;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -51,15 +53,29 @@ Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 Route::controller(AdminMasterController::class)->prefix('master')->middleware(['auth', 'checkSuspend', 'check:Master', 'verified'])->group(function(){
     Route::get('/', 'dashboard')->name('dashboard-master');
 
-    Route::get('admin', 'view_admin')->name('view-admin');
-    Route::post('admin', 'create_admin')->name('create-admin');
-    Route::put('admin/{id}', 'update_admin')->name('update-admin');
-    Route::delete('admin/{id}', 'delete_admin')->name('delete-admin');
-    Route::get('get-admin', 'get_admin')->name('get-admin');
-    Route::get('get-admin/{id}', 'get_admin_id')->name('get-admin-id');
-
+    Route::get('admin', 'view_admin')->name('view_admin');
+    Route::post('admin', 'create_admin')->name('create_admin');
+    Route::put('admin/{id}', 'update_admin')->name('update_admin');
+    Route::delete('admin/{id}', 'delete_admin')->name('delete_admin');
+    Route::get('get-admin', 'get_admin')->name('get_admin');
+    Route::get('get-admin/{id}', 'get_admin_id')->name('get_admin_id');
+    
     Route::get('website-conf', 'view_website_conf')->name('view-website-conf');
-    Route::put('website-conf', 'update_website_conf')->name('update-website-conf');
+    Route::put('update_website_conf', 'update_website_conf')->name('update_website_conf');
+    Route::put('update_payment_gateway', 'update_payment_gateway')->name('update_payment_gateway');
+
+    Route::get('tokopay/get','get_tokopay')->name('get_tokopay');
+
+    Route::prefix('payment_channel')->group(function(){
+        Route::get('', 'view_payment_channel')->name('view_payment_channel');
+        Route::post('', 'create_payment_channel')->name('create_payment_channel');
+        Route::put('{id}', 'update_payment_channel')->name('update_payment_channel');
+        Route::delete('{id}', 'delete_payment_channel')->name('delete_payment_channel');
+
+        Route::get('/get', 'get_payment_channel')->name('get_payment_channel');
+        Route::get('/get/{id}', 'get_payment_channel_id')->name('get_payment_channel_id');
+    });
+
 });
 
 Route::controller(AdminController::class)->prefix('admin')->middleware(['auth', 'checkSuspend', 'check:Admin', 'verified'])->group(function(){
@@ -84,9 +100,23 @@ Route::controller(AdminController::class)->prefix('admin')->middleware(['auth', 
 
         Route::get('suspend_request', 'view_suspend_request')->name('view_suspend_request');
         Route::get('get_suspend_request', 'get_suspend_request')->name('get_suspend_request');
-        Route::get('get_suspend_request', 'get_suspend_request')->name('get_suspend_request');
-
     });
+
+    Route::prefix('category')->group(function(){
+        Route::get('', 'view_category')->name('view_category');
+        Route::post('', 'create_category')->name('create_category');
+        Route::put('{id}', 'update_category')->name('update_category');
+        Route::delete('{id}', 'delete_category')->name('delete_category');
+
+        Route::get('/get', 'get_category')->name('get_category');
+        Route::get('/get/{id}', 'get_category_id')->name('get_category_id');
+    });
+});
+
+Route::controller(UserController::class)->prefix('user')->middleware(['auth', 'checkSuspend', 'check:User', 'verified'])->group(function(){
+    Route::get('/', 'dashboard')->name('dashboard_user');
+    Route::get('transaction', 'view_transaction')->name('view_transaction_user');
+    Route::get('transaction/get', 'get_transaction')->name('get_transaction_user');
 });
 
 Route::controller(HomeController::class)->middleware('checkSuspend')->group(function(){
@@ -138,7 +168,7 @@ Route::controller(TransactionController::class)->prefix('transaction')->middlewa
     Route::put('/update/{invoice}', 'update_transaction')->name('update_transaction');
 
     Route::post('/create/payment', 'create_payment')->name('create_payment');
-
+    Route::post('/create/feedback', 'create_feedback')->name('create_feedback');
 
     Route::get('/payment/detail/{invoice}', 'payment_detail')->name('payment_detail');
     Route::get('/transaction/detail/{invoice}', 'transaction_detail')->name('transaction_detail');
@@ -160,4 +190,8 @@ Route::controller(WilayahController::class)->prefix('wilayah')->group(function()
     Route::get('kota/{id}', 'cities')->name('wilayah-kota');
     Route::get('kecamatan/{id}', 'districts')->name('wilayah-kecamatan');
     Route::get('desa/{id}', 'villages')->name('wilayah-desa');
+});
+
+Route::controller(CallbackController::class)->group(function(){
+    Route::post('callback/tokopay', 'tokopay')->name('tokopay-callback');
 });

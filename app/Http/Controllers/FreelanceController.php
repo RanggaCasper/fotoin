@@ -239,7 +239,7 @@ class FreelanceController extends Controller
 
     public function get_transaction(Request $request)
     {
-        // if ($request->ajax()) {
+        if ($request->ajax()) {
             $query = Transaction::select(['id', 'invoice', 'user_id', 'catalog_name', 'package_name', 'package_price', 'status', 'approved', 'created_at'])->with('user')->where('freelance_id', auth()->user()->id);
 
             return DataTables::of($query)
@@ -286,6 +286,9 @@ class FreelanceController extends Controller
                             case 'WAITING':
                                 $color = 'info';
                                 break;
+                            case 'REJECTED':
+                                $color = 'danger';
+                                break;
                         }
                         return '<h6 class="text-' . $color . '">' . $row->approved . '</h6>';
                     })
@@ -300,9 +303,9 @@ class FreelanceController extends Controller
                     ->rawColumns(['invoice','catalog_name','customer','status', 'approved', 'aksi'])
                     ->toJson();
 
-        // }
+        }
 
-        // abort(404);
+        abort(404);
     }
 
     public function approved_transaction(Request $request)

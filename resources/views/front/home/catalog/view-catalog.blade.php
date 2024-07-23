@@ -421,7 +421,7 @@
                         <p>{{ $catalog->user->freelance->about }}</p>
                     </div>
                     <a href="{{ route('view_message') }}?id={{ $catalog->user->id }}&text=Hallo Saya Tertarik Dengan : {{ $catalog->title_name   }}"
-                        class="btn btn-primary mb-0 w-100">Contact Me</a>
+                        class="btn btn-primary mb-0 w-100"><i class="ti ti-message"></i>Chat Freelance</a>
                 </div>
             </div>
         </div>

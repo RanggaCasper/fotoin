@@ -11,18 +11,17 @@
             processing: true,
             serverSide: false,
             responsive: true,
-            ajax: '{{ route("get_transaction_freelance") }}',
+            ajax: '{{ route("get_transaction_user") }}',
             columns: [
                 { data: 'no', name: 'no'},
                 { data: 'invoice', name: 'invoice'},
-                { data: 'customer', name: 'customer'},
+                { data: 'freelance', name: 'freelance'},
                 { data: 'catalog_name', name: 'catalog_name'},
                 { data: 'package_name', name: 'package_name'},
                 { data: 'package_price', name: 'package_price'},
                 { data: 'status', name: 'status'},
                 { data: 'approved', name: 'approved'},
                 { data: 'created_at', name: 'created_at'},
-                { data: 'aksi', name: 'aksi'},
             ],
             drawCallback: function() {
                 $('[data-toggle="tooltip"]').tooltip();
@@ -33,7 +32,7 @@
             table.column(1).search(this.value).draw();
         });
 
-        $('#filterCustomer').on('keyup change', function() {
+        $('#filterFreelance').on('keyup change', function() {
             table.column(2).search(this.value).draw();
         });
 
@@ -56,29 +55,6 @@
         $('#filterPersetujuan').on('keyup change', function() {
             table.column(7).search(this.value).draw();
         });
-
-        $('#datatable').on('click', '.check', function() {
-            var id = $(this).data('id');
-            $.ajax({
-                url: '{{ route("approved_transaction_freelance") }}',
-                type: 'POST',
-                data: {
-                    transaction_id: id,
-                    _token: '{{ csrf_token() }}'
-                },
-                success: function(response) {
-                    if (response.success) {
-                        toastr.success(response.message);
-                        table.ajax.reload();
-                    } else {
-                        toastr.error(response.message);
-                    }
-                },
-                error: function(error) {
-                    toastr.error('Error occurred while approving the transaction.');
-                }
-            });
-        });
     });
 
 </script>
@@ -88,9 +64,6 @@
 <div class="dashboard-header">
     <div class="main-title">
         <h3>Manajemen Transaksi</h3>
-    </div>
-    <div class="head-info">
-        <a href="{{ route('view_calendar', ['user' => auth()->user()->username]) }}" class="btn btn-primary">Lihat Kalender</a>
     </div>
 </div>
 
@@ -107,8 +80,8 @@
                 <input class="form-control" id="filterInvoice" type="text" placeholder="Search Invoice">
             </div>
             <div class="col-md-3 mb-3">
-                <label for="filterCustomer">Customer</label>
-                <input class="form-control" id="filterCustomer" type="text" placeholder="Search Customer">
+                <label for="filterFreelance">Freelance</label>
+                <input class="form-control" id="filterFreelance" type="text" placeholder="Search Freelance">
             </div>
             <div class="col-md-3 mb-3">
                 <label for="filterKatalog">Katalog</label>
@@ -151,14 +124,13 @@
             <tr>
                 <th>No</th>
                 <th>Invoice</th>
-                <th>Customer</th>
+                <th>Freelance</th>
                 <th>Katalog</th>
                 <th>Paket</th>
                 <th>Harga</th>
                 <th>Status</th>
                 <th>Persetujuan</th>
                 <th>Tanggal Transaksi</th>
-                <th>Aksi</th>
             </tr>
         </thead>
         <tbody>

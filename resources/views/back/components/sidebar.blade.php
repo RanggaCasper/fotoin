@@ -24,10 +24,16 @@
             <div>Dashboard</div>
           </a>
         </li>
-        <li class="menu-item {{ request()->routeIs('view-admin') ? 'active' : '' }}">
-          <a href="{{ route('view-admin') }}" class="menu-link">
+        <li class="menu-item {{ request()->routeIs('view_admin') ? 'active' : '' }}">
+          <a href="{{ route('view_admin') }}" class="menu-link">
             <i class="menu-icon tf-icons ti ti-user"></i>
             <div>Kelola Admin</div>
+          </a>
+        </li>
+        <li class="menu-item {{ request()->routeIs('view_payment_channel') ? 'active' : '' }}">
+          <a href="{{ route('view_payment_channel') }}" class="menu-link">
+            <i class="menu-icon tf-icons ti ti-settings"></i>
+            <div>Method Pembayaran</div>
           </a>
         </li>
         <li class="menu-item {{ request()->routeIs('view-website-conf') ? 'active' : '' }}">
@@ -65,6 +71,12 @@
         <a href="{{ route('view_suspend') }}" class="menu-link">
           <i class="menu-icon tf-icons ti ti-user-cancel"></i>
           <div>Kelola Penanguhan</div>
+        </a>
+      </li>
+      <li class="menu-item {{ request()->routeIs('view_category') ? 'active' : '' }}">
+        <a href="{{ route('view_category') }}" class="menu-link">
+          <i class="menu-icon tf-icons ti ti-category-plus"></i>
+          <div>Kelola Kategori</div>
         </a>
       </li>
       @endif

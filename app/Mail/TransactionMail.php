@@ -64,11 +64,16 @@ class TransactionMail extends Mailable
 
     private function paymentSuccess()
     {
-        return $this->subject('Notifikasi Transaksi #' . $this->result['invoice'])
+        $transaction = Transaction::where('id', $this->result['transaction_id'])->first();
+        $user = User::find($transaction->user_id);
+        $channel = PaymentChannel::where('id', $this->result['payment_channel_id'])->first();
+        return $this->subject('Notifikasi Transaksi #' . $transaction['invoice'])
             ->view('mail.payment_success')
             ->with([
                 'result' => $this->result,
-                'user' => $this->user
+                'transaction' => $transaction,
+                'channel' => $channel,
+                'user' => $user
             ]);
     }
 

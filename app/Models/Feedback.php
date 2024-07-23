@@ -11,7 +11,7 @@ class Feedback extends Model
 
     protected $table = 'feedback_catalogs';
 
-    protected $fillable = ['rate','feedback','user_id','catalog_id'];
+    protected $fillable = ['rate','feedback','user_id','catalog_id','transaction_id'];
 
     public function user()
     {
@@ -22,6 +22,12 @@ class Feedback extends Model
     {
         return $this->belongsTo(Catalog::class);
     }
+
+    public function transaction()
+    {
+        return $this->belongsTo(Transaction::class);
+    }
+
 
     public $timestamps = true; 
 }

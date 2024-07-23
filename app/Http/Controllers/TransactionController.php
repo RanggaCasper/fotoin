@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Package;
 use App\Models\Payment;
+use App\Models\Feedback;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use App\Mail\TransactionMail;
@@ -17,7 +18,7 @@ class TransactionController extends Controller
     public function view_transaction(Request $request, $invoice)
     {
         $payments = PaymentChannel::get();
-        $transaction = Transaction::with('package', 'catalog', 'user')
+        $transaction = Transaction::with('package', 'catalog', 'user', 'feedbacks')
         ->where('invoice', $invoice)
         ->where(function($query) {
             $query->where('user_id', auth()->user()->id)
@@ -218,5 +219,33 @@ class TransactionController extends Controller
             return response()->json(['status' => false]);
         }
         abort(404);
+    }
+
+    public function create_feedback(Request $request)
+    {
+        $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'feedback' => 'required|string|max:255',
+            'catalog_id' => 'required|exists:catalogs,id',
+            'transaction_id' => 'required|exists:transactions,id',
+        ]);
+
+        $existingFeedback = Feedback::where('transaction_id', $request->transaction_id)
+                                    ->where('user_id', auth()->user()->id)
+                                    ->first();
+
+        if ($existingFeedback) {
+            return response()->json(['status' => false, 'message' => 'Anda sudah pernah memberikan feedback untuk transaksi ini.'], 400);
+        }
+
+        Feedback::create([
+            'rate' => $request->rating,
+            'feedback' => $request->feedback,
+            'user_id' => auth()->user()->id,
+            'catalog_id' => $request->catalog_id,
+            'transaction_id' => $request->transaction_id,
+        ]);
+
+        return response()->json(['status' => true, 'message' => 'Feedback berhasil disimpan.']);
     }
 }

@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Category;
 use App\Models\Freelance;
-use App\Models\SuspendRequest;
 use App\Models\SuspendUser;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Models\SuspendRequest;
 use Yajra\DataTables\DataTables;
+use Illuminate\Support\Facades\Storage;
 
 class AdminController extends Controller
 {
@@ -272,5 +275,140 @@ class AdminController extends Controller
                 ->make(true);
         }
 
+    }
+
+    public function view_category()
+    {
+        return view('back.admin.category.category');
+    }
+
+    public function get_category(Request $request)
+    {
+        if ($request->ajax()) {
+            $data = Category::get();
+            return DataTables::of($data)
+                ->addColumn('no', function ($row) {
+                    static $counter = 0;
+                    return ++$counter;
+                })
+                ->addColumn('icon', function($row) {
+                    return $row->icon;
+                })
+                ->addColumn('image', function($row) {
+                    return '<img class="img-fluid w-25" src="'.url($row->image).'" alt="Image">';
+                })
+                ->addColumn('aksi', function($row){
+                    return '<button class="btn btn-primary me-2 update" data-id="'.$row->id.'" data-bs-toggle="modal" data-bs-target="#update-modal"><i class="ti ti-edit"></i></button><button class="btn btn-danger delete" data-id="'.$row->id.'"><i class="ti ti-trash"></i></button>';
+                })
+                ->rawColumns(['aksi','image','icon'])
+                ->make(true);
+        }
+
+    }
+
+    public function get_category_id(Request $request,$id)
+    {
+        if ($request->ajax()) {
+            return response()->json(Category::find($id));
+        }
+
+        abort(404);
+    }
+
+    public function create_category(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'icon' => 'nullable',
+            'image' => 'nullable|image',
+        ]);
+
+        try {
+            $imagePath = null;
+            if ($request->hasFile('image')) {
+                $imagePath = $request->file('image')->storeAs('category_images', Str::uuid() . '.' . $request->file('image')->extension(), 'public');
+            }
+
+            $category = Category::create([
+                'name' => $request->name,
+                'icon' => $request->icon,
+                'image' => $imagePath ? Storage::url($imagePath) : null,
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Kategori berhasil dibuat.',
+                'data' => $category,
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Terjadi kesalahan saat membuat kategori.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function update_category(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'icon' => 'nullable',
+            'image' => 'nullable|image',
+        ]);
+
+        try {
+            $category = Category::findOrFail($id);
+
+            if ($request->hasFile('image')) {
+                if ($category->image) {
+                    Storage::disk('public')->delete(str_replace('/storage/', '', $category->image));
+                }
+                $imagePath = $request->file('image')->storeAs('category_images', Str::uuid() . '.' . $request->file('image')->extension(), 'public');
+                $category->image = Storage::url($imagePath);
+            }
+
+            $category->update([
+                'name' => $request->name,
+                'icon' => $request->icon,
+                'image' => $category->image,
+            ]);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Kategori berhasil diperbarui.',
+                'data' => $category,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Terjadi kesalahan saat memperbarui kategori.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function delete_category(Request $request, $id)
+    {
+        try {
+            $category = Category::findOrFail($id);
+
+            if ($category->image) {
+                Storage::disk('public')->delete(str_replace('/storage/', '', $category->image));
+            }
+
+            $category->delete();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Kategori berhasil dihapus.',
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Terjadi kesalahan saat menghapus kategori.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }
