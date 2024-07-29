@@ -9,18 +9,6 @@
     </div>
 
     <div class="row">
-        <div class="col-md-12 d-flex">
-            <div class="dash-earning flex-fill">
-                <div class="earning-info">
-                    <p>Saldo</p>
-                    <h3>Rp. {{ number_format(auth()->user()->balance,0,'','.') }}</h3>
-                    <h6>Saldo yang bisa ditarik.</h6>
-                </div>
-                <div class="earning-btn">
-                    <a href="user-wallet.html" class="btn btn-primary">Tarik Saldo</a>
-                </div>
-            </div>
-        </div>
         <div class="col-md-3 d-flex">
             <div class="dash-widget flex-fill">
                 <span class="dash-icon bg-primary">

@@ -3,13 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Profit;
 use App\Models\WebsiteConf;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\PaymentChannel;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 use App\Services\TokopayService;
 use Yajra\DataTables\DataTables;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -241,6 +244,44 @@ class AdminMasterController extends Controller
         ]);
     }
 
+    public function update_kontak(Request $request)
+    {
+        $data = [
+            'web_location' => $request->web_location,
+            'cs_phone' => $request->cs_phone,
+            'cs_email' => $request->cs_email,
+        ];
+        
+        foreach ($data as $confKey => $confValue) {
+            WebsiteConf::updateOrCreate(['conf_key' => $confKey], ['conf_value' => $confValue]);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Konfigurasi Kontak berhasil diupdate.',
+        ]);
+    }
+
+    public function update_web_profit(Request $request)
+    {
+        $request->validate([
+            'take_fee' => 'required|numeric|between:0,100',
+        ]);
+
+        $data = [
+            'take_fee' => $request->take_fee,
+        ];
+        
+        foreach ($data as $confKey => $confValue) {
+            WebsiteConf::updateOrCreate(['conf_key' => $confKey], ['conf_value' => $confValue]);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Konfigurasi Profit berhasil diupdate.',
+        ]);
+    }
+
     public function get_tokopay()
     {
         $tokopay = new TokopayService();
@@ -403,4 +444,79 @@ class AdminMasterController extends Controller
             ], 500);
         }
     }
+
+    public function view_profit()
+    {
+        return view('back.master.profit.profit');
+    }
+
+    public function get_profit(Request $request)
+    {
+        $startDate = $request->input('start_date', Carbon::now()->subDays(30)->format('Y-m-d'));
+        $endDate = $request->input('end_date', Carbon::now()->format('Y-m-d'));
+
+        $data = Profit::with('transaction', 'transaction.freelance', 'transaction.user')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->get();
+
+        return DataTables::of($data)
+            ->addColumn('no', function ($row) {
+                static $counter = 0;
+                return ++$counter;
+            })
+            ->addColumn('profit', function ($row) {
+                return number_format($row->profit, 0, ',', '.');
+            })
+            ->addColumn('transaction', function ($row) {
+                return $row->transaction->invoice;
+            })
+            ->addColumn('freelance', function ($row) {
+                return $row->transaction->freelance->username;
+            })
+            ->addColumn('client', function ($row) {
+                return $row->transaction->user->username;
+            })
+            ->addColumn('created_at', function ($row) {
+                return $row->created_at;
+            })
+            ->make(true);
+    }
+
+
+    public function profit_chart(Request $request)
+    {
+        $startDate = $request->input('start_date', Carbon::now()->subDays(30)->format('Y-m-d'));
+        $endDate = $request->input('end_date', Carbon::now()->format('Y-m-d'));
+
+        $profitData = Profit::select(DB::raw('DATE(created_at) as date'), DB::raw('SUM(profit) as total_profit'))
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->groupBy('date')
+            ->orderBy('date', 'ASC')
+            ->get()
+            ->toArray();
+
+        $processedData = [];
+        $currentDate = Carbon::createFromFormat('Y-m-d', $startDate);
+        $endDate = Carbon::createFromFormat('Y-m-d', $endDate);
+
+        while ($currentDate->lte($endDate)) {
+            $dateStr = $currentDate->format('Y-m-d');
+            $totalProfit = 0;
+            foreach ($profitData as $data) {
+                if ($data['date'] == $dateStr) {
+                    $totalProfit = $data['total_profit'];
+                    break;
+                }
+            }
+            $processedData[] = [
+                'x' => $dateStr,
+                'y' => $totalProfit
+            ];
+            $currentDate->addDay();
+        }
+
+        return response()->json($processedData);
+    }
+
+
 }

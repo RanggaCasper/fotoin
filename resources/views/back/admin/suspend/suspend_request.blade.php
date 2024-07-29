@@ -21,7 +21,6 @@
 
                     $('.btn-detail').on('click', function() {
                         var requestId = $(this).data('id');
-                        // Tambahkan logika untuk menampilkan detail permintaan suspend
                     });
 
                     $('.accept').on('click', function() {

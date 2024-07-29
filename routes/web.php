@@ -44,7 +44,7 @@ Route::controller(AuthController::class)->group(function(){
 });
 
 Route::controller(AuthController::class)->middleware(['auth', 'checkSuspend', 'unverified'])->group(function(){
-    Route::get('verify', 'verify_email')->name('verify-email');
+    Route::get('verify', 'verify_email')->name('verification.notice');
     Route::post('verify', 'verify')->name('verify');
 });
 
@@ -63,6 +63,8 @@ Route::controller(AdminMasterController::class)->prefix('master')->middleware(['
     Route::get('website-conf', 'view_website_conf')->name('view-website-conf');
     Route::put('update_website_conf', 'update_website_conf')->name('update_website_conf');
     Route::put('update_payment_gateway', 'update_payment_gateway')->name('update_payment_gateway');
+    Route::put('update_kontak', 'update_kontak')->name('update_kontak');
+    Route::put('update_web_profit', 'update_web_profit')->name('update_web_profit');
 
     Route::get('tokopay/get','get_tokopay')->name('get_tokopay');
 
@@ -76,10 +78,30 @@ Route::controller(AdminMasterController::class)->prefix('master')->middleware(['
         Route::get('/get/{id}', 'get_payment_channel_id')->name('get_payment_channel_id');
     });
 
+    Route::prefix('profit')->group(function(){
+        Route::get('', 'view_profit')->name('view_profit');
+        Route::get('/get', 'get_profit')->name('get_profit');
+        Route::get('/chart', 'profit_chart')->name('profit_chart');
+    });
 });
 
 Route::controller(AdminController::class)->prefix('admin')->middleware(['auth', 'checkSuspend', 'check:Admin', 'verified'])->group(function(){
     Route::get('/', 'dashboard')->name('dashboard-admin');
+    Route::get('/get/catalog_chart', 'catalog_chart')->name('catalog_chart');
+    Route::get('/get/transaction_chart', 'transaction_chart')->name('transaction_chart');
+
+    Route::prefix('data')->group(function(){
+        Route::get('/catalog', 'data_catalog')->name('data_catalog');
+        Route::get('/catalog/get', 'get_data_catalog')->name('get_data_catalog');
+        Route::get('/catalog/pdf', 'pdf_data_catalog')->name('pdf_data_catalog');
+    });
+
+    Route::prefix('withdraw')->group(function(){
+        Route::get('/', 'view_withdraw')->name('view_withdraw_admin');
+        Route::get('/get', 'get_withdraw')->name('get_withdraw_admin');
+        Route::post('/approve/{id}', 'withdraw_approve')->name('withdraw_approve');
+        Route::post('/reject/{id}', 'withdraw_reject')->name('withdraw_reject');
+    });
 
     Route::prefix('freelance')->group(function(){
         Route::get('validasi', 'view_validasi_freelance')->name('view-validasi-freelance');
@@ -115,16 +137,25 @@ Route::controller(AdminController::class)->prefix('admin')->middleware(['auth', 
 
 Route::controller(UserController::class)->prefix('user')->middleware(['auth', 'checkSuspend', 'check:User', 'verified'])->group(function(){
     Route::get('/', 'dashboard')->name('dashboard_user');
-    Route::get('transaction', 'view_transaction')->name('view_transaction_user');
-    Route::get('transaction/get', 'get_transaction')->name('get_transaction_user');
+
+    Route::prefix('transaction')->group(function(){
+        Route::get('/', 'view_transaction')->name('view_transaction_user');
+        Route::get('/get', 'get_transaction')->name('get_transaction_user');
+    });
+
+    Route::prefix('profile')->group(function(){
+        Route::get('/', 'view_profile')->name('view_profile_user');
+        Route::put('/', 'update_profile')->name('update_profile_user');
+    });
 });
 
 Route::controller(HomeController::class)->middleware('checkSuspend')->group(function(){
     Route::get('/', 'home')->name('home');
 
     Route::prefix('catalog')->group(function(){
-        Route::get('category/{category}', 'search_category')->name('search-category');
-        Route::get('search/{search}', 'search_catalog')->name('search-catalog');
+        Route::get('search/{search}', 'search')->name('search');
+        Route::get('get/{search}', 'get_catalog')->name('get_catalog');
+        Route::get('get/fillter', 'get_filtered_catalog')->name('get_filtered_catalog');
         
         Route::prefix('wishlist')->middleware(['auth', 'checkSuspend', 'verified'])->group(function(){
             Route::get('/', 'view_wishlist')->name('view-wishlist');
@@ -145,6 +176,7 @@ Route::controller(FreelanceController::class)->prefix('freelance')->middleware([
         Route::post('create', 'create_catalog')->name('create-catalog-freelance');
 
         Route::get('{id}/update','edit_catalog')->name('edit-catalog');
+        Route::put('{id}/update','update_catalog')->name('update_catalog_freelance');
     });
 
     Route::prefix('/transaction')->group(function(){
@@ -152,6 +184,18 @@ Route::controller(FreelanceController::class)->prefix('freelance')->middleware([
         Route::get('/get', 'get_transaction')->name('get_transaction_freelance');
 
         Route::post('/approved', 'approved_transaction')->name('approved_transaction_freelance');
+    });
+
+    Route::prefix('/withdraw')->group(function(){
+        Route::get('/', 'view_withdraw')->name('view_withdraw_freelance');
+        Route::get('/get', 'get_withdraw')->name('get_withdraw_freelance');
+
+        Route::post('/', 'withdraw_balance')->name('withdraw_balance_freelance');
+    });
+
+    Route::prefix('profile')->group(function(){
+        Route::get('/', 'view_profile')->name('view_profile_freelance');
+        Route::put('/', 'update_profile')->name('update_profile_freelance');
     });
     
     Route::get('calendar', 'calendar')->name('freelance-calendar');
@@ -172,12 +216,15 @@ Route::controller(TransactionController::class)->prefix('transaction')->middlewa
 
     Route::get('/payment/detail/{invoice}', 'payment_detail')->name('payment_detail');
     Route::get('/transaction/detail/{invoice}', 'transaction_detail')->name('transaction_detail');
+    Route::get('/transaction/timeline/{id}','transaction_timeline')->name('transaction_timeline');
+    Route::post('/transaction/timeline/{id}','create_transaction_timeline')->name('create_transaction_timeline');
 });
 
 Route::controller(MessageController::class)->prefix('message')->middleware(['auth', 'checkSuspend', 'verified'])->group(function(){
     Route::get('/', 'view_message')->name('view_message');
     Route::get('{user}', 'message_user')->name('message_user');
     Route::post('send', 'message_send')->name('message_send');
+    Route::post('/report_user', 'report_user')->name('report_user');
 });
 
 Route::controller(CalendarController::class)->prefix('calendar')->group(function(){

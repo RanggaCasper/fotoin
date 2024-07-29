@@ -6,13 +6,17 @@ use App\Models\Catalog;
 use App\Models\Package;
 use App\Models\Calendar;
 use App\Models\Category;
+use App\Models\Withdraw;
 use App\Models\Portofolio;
 use App\Models\Transaction;
+use App\Models\WebsiteConf;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class FreelanceController extends Controller
 {
@@ -24,7 +28,7 @@ class FreelanceController extends Controller
     public function catalog()
     {
         $catalogs = Catalog::with('user.freelance', 'feedback','category', 'packages', 'portofolios')->where('user_id', auth()->user()->id)->get();
-        // dd($catalogs);
+        
         return view('front.freelance.catalog.catalog', compact('catalogs'));
     }
 
@@ -39,7 +43,7 @@ class FreelanceController extends Controller
             'title_name' => 'required|string|max:255',
             'description' => 'required|string',
             'category' => 'required|exists:categorys,id',
-            'path_image.*.*' => 'required|file|mimes:jpeg,png,jpg,gif,svg,mp4,mov,avi|max:20480', // max 20MB
+            'path_image.*.*' => 'required|file|mimes:jpeg,png,jpg,gif,svg,mp4,mov,avi|max:20480', 
             'packages.*.package_name' => 'required|string|max:255',
             'packages.*.price' => 'required|numeric',
             'packages.*.package_description' => 'required|string',
@@ -104,9 +108,105 @@ class FreelanceController extends Controller
     public function edit_catalog($id)
     {
         $catalog = Catalog::with('portofolios', 'packages')->findOrFail($id);
+        if ($catalog->user_id !== auth()->user()->id) {
+            return redirect()->route('catalog-freelance')->with('error', 'Anda tidak memiliki izin untuk mengedit katalog ini.');
+        }
         $categorys = Category::all();
         return view('front.freelance.catalog.update', compact('catalog', 'categorys'));
     }
+
+    public function update_catalog(Request $request, $id)
+    {
+        $request->validate([
+            'title_name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'category' => 'required|exists:categorys,id',
+            'path_image.*.*' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg,mp4,mov,avi|max:20480', 
+            'packages.*.package_name' => 'required|string|max:255',
+            'packages.*.price' => 'required|numeric',
+            'packages.*.package_description' => 'required|string',
+        ], [
+            'title_name.required' => 'Judul Katalog harus diisi.',
+            'title_name.string' => 'Judul Katalog harus berupa teks.',
+            'title_name.max' => 'Judul Katalog tidak boleh lebih dari 255 karakter.',
+            'description.required' => 'Deskripsi harus diisi.',
+            'description.string' => 'Deskripsi harus berupa teks.',
+            'category.required' => 'Kategori harus dipilih.',
+            'category.exists' => 'Kategori yang dipilih tidak valid.',
+            'path_image.*.*.file' => 'Setiap unggahan harus berupa file.',
+            'path_image.*.*.mimes' => 'File harus berupa gambar atau video dengan format: jpeg, png, jpg, gif, svg, mp4, mov, avi.',
+            'path_image.*.*.max' => 'File tidak boleh lebih dari 20MB.',
+            'packages.*.package_name.required' => 'Nama Paket harus diisi.',
+            'packages.*.package_name.string' => 'Nama Paket harus berupa teks.',
+            'packages.*.package_name.max' => 'Nama Paket tidak boleh lebih dari 255 karakter.',
+            'packages.*.price.required' => 'Harga Paket harus diisi.',
+            'packages.*.price.numeric' => 'Harga Paket harus berupa angka.',
+            'packages.*.package_description.required' => 'Deskripsi Paket harus diisi.',
+            'packages.*.package_description.string' => 'Deskripsi Paket harus berupa teks.',
+        ]);
+
+        
+        $catalog = Catalog::findOrFail($id);
+        if ($catalog->user_id !== auth()->user()->id) {
+            return redirect()->route('catalog-freelance')->with('error', 'Anda tidak memiliki izin untuk mengedit katalog ini.');
+        }
+        $catalog->update([
+            'title_name' => $request->title_name,
+            'description' => $request->description,
+            'slug' => Str::slug($request->title_name),
+            'category_id' => $request->category,
+        ]);
+
+        if ($catalog) {
+            if ($request->has('path_image')) {
+                foreach ($request->path_image as $key => $files) {
+                    foreach ($files as $file) {
+                        if ($file instanceof UploadedFile) {
+                            $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+                            $path = $file->storeAs('portofolio', $filename, 'public');
+                            Portofolio::create([
+                                'path_image' => $path,
+                                'catalog_id' => $catalog->id,
+                            ]);
+                        }
+                    }
+                }
+            }
+
+            
+            $existingPackageIds = $catalog->packages()->pluck('id')->toArray();
+            $newPackageIds = [];
+            
+            foreach ($request->packages as $item) {
+                if (isset($item['id'])) {
+                    $package = Package::findOrFail($item['id']);
+                    $package->update([
+                        'package_name' => $item['package_name'],
+                        'price' => $item['price'],
+                        'description' => $item['package_description'],
+                    ]);
+                    $newPackageIds[] = $item['id'];
+                } else {
+                    $newPackage = Package::create([
+                        'package_name' => $item['package_name'],
+                        'price' => $item['price'],
+                        'description' => $item['package_description'],
+                        'catalog_id' => $catalog->id,
+                    ]);
+                    $newPackageIds[] = $newPackage->id;
+                }
+            }
+
+            
+            $packagesToDelete = array_diff($existingPackageIds, $newPackageIds);
+            Package::destroy($packagesToDelete);
+
+            toastr()->success('Katalog berhasil diperbarui.');
+        }
+
+        return redirect()->route('catalog-freelance')->with('success', 'Katalog berhasil diperbarui.');
+    }
+
 
     public function calendar()
     {
@@ -240,7 +340,10 @@ class FreelanceController extends Controller
     public function get_transaction(Request $request)
     {
         if ($request->ajax()) {
-            $query = Transaction::select(['id', 'invoice', 'user_id', 'catalog_name', 'package_name', 'package_price', 'status', 'approved', 'created_at'])->with('user')->where('freelance_id', auth()->user()->id);
+            $query = Transaction::select(['id', 'invoice', 'user_id', 'catalog_name', 'package_name', 'package_price', 'status', 'approved', 'created_at'])
+                    ->with('user')
+                    ->where('freelance_id', auth()->user()->id)
+                    ->orderByRaw("CASE WHEN status = 'PENDING' THEN 1 ELSE 2 END, created_at DESC");
 
             return DataTables::of($query)
                     ->addColumn('no', function ($row) {
@@ -302,11 +405,11 @@ class FreelanceController extends Controller
                     })
                     ->rawColumns(['invoice','catalog_name','customer','status', 'approved', 'aksi'])
                     ->toJson();
-
         }
 
         abort(404);
     }
+
 
     public function approved_transaction(Request $request)
     {
@@ -328,5 +431,144 @@ class FreelanceController extends Controller
         }
     
         return response()->json(['success' => false, 'message' => 'Data tidak ditemukan.'], 404);
+    }
+
+    public function view_withdraw()
+    {
+        return view('front.freelance.withdraw.withdraw');
+    }
+
+    public function get_withdraw(Request $request)
+    {
+        if ($request->ajax()) {
+            $query = Withdraw::select(['id', 'rekening', 'no_rekening', 'transfer', 'fee', 'status', 'user_id', 'created_at'])
+                    ->with('user')
+                    ->where('user_id', auth()->user()->id)
+                    ->orderByRaw("CASE WHEN status = 'PENDING' THEN 1 ELSE 2 END, created_at DESC");
+    
+            return DataTables::of($query)
+                    ->addColumn('no', function ($row) {
+                        static $counter = 0;
+                        return ++$counter;
+                    })
+                    ->addColumn('rekening', function ($row) {
+                        return $row->rekening;
+                    })
+                    ->addColumn('no_rekening', function ($row) {
+                        return $row->no_rekening;
+                    })
+                    ->addColumn('transfer', function ($row) {
+                        return 'Rp. '.number_format($row->transfer, 0, ',', '.');
+                    })
+                    ->addColumn('fee', function ($row) {
+                        return 'Rp. '.number_format($row->fee, 0, ',', '.');
+                    })
+                    ->addColumn('status', function ($row) {
+                        $color = '';
+                        switch ($row->status) {
+                            case 'COMPLETED':
+                                $color = 'success';
+                                break;
+                            case 'CANCLED':
+                                $color = 'danger';
+                                break;
+                            case 'PENDING':
+                                $color = 'warning';
+                                break;
+                        }
+                        return '<h6 class="text-' . $color . '">' . $row->status . '</h6>';
+                    })
+                    ->addColumn('created_at', function ($row) {
+                        return $row->created_at;
+                    })
+                    ->rawColumns(['status', 'user'])
+                    ->toJson();
+        }
+    
+        abort(404);
+    }    
+
+    public function withdraw_balance(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'transfer' => 'required|numeric|min:100000|max:25000000',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+            ]);
+        }
+
+        $user = auth()->user();
+        $freelance = $user->freelance;
+        $fee = WebsiteConf::where('conf_key', 'take_fee_withdraw')->first()->conf_value ?? 0;
+
+        $totalDeduction = $request->transfer + $fee;
+
+        if ($user->balance < $totalDeduction) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Saldo tidak mencukupi untuk penarikan termasuk biaya.',
+            ]);
+        }
+
+        $withdraw = new Withdraw();
+        $withdraw->rekening = $freelance->jenis_rekening;
+        $withdraw->no_rekening = $freelance->no_rekening;
+        $withdraw->transfer = $request->transfer;
+        $withdraw->fee = $fee;
+        $withdraw->status = 'PENDING';
+        $withdraw->user_id = $user->id;
+        $withdraw->save();
+
+        $user->balance -= $totalDeduction;
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Penarikan berhasil diajukan.',
+        ]);
+    }
+
+    public function view_profile()
+    {
+        return view('front.freelance.profile.profile');
+    }
+
+    public function update_profile(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required',
+            'profile_image' => 'nullable|image|mimes:jpg,png,jpeg|max:5120',
+            'password' => 'nullable|string|min:8|confirmed',
+        ]);
+
+        $user = auth()->user();
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            toastr()->error('Password saat ini salah.');
+            return redirect()->back();
+        }
+
+        if ($request->hasFile('profile_image')) {
+            $image = $request->file('profile_image');
+            $imageName = time().'.'.$image->extension();
+            $image->move(public_path('images/profile'), $imageName);
+            $user->profile_image = '/images/profile/'.$imageName;
+        }
+
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
+        }
+
+        if($user->save()){
+            toastr()->success('Profile berhasil diupdate.');
+            return redirect()->back();
+        } else {
+            toastr()->error('Terjadi kesalahan saat mengupdate profil.');
+            return redirect()->back();
+        }
     }
 }

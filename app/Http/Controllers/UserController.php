@@ -6,6 +6,7 @@ use App\Models\Transaction;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -22,7 +23,10 @@ class UserController extends Controller
     public function get_transaction(Request $request)
     {
         if($request->ajax()){
-            $query = Transaction::select(['id', 'invoice', 'freelance_id', 'catalog_name', 'package_name', 'package_price', 'status', 'approved', 'created_at'])->with('freelance')->where('user_id', auth()->user()->id);
+            $query = Transaction::select(['id', 'invoice', 'freelance_id', 'catalog_name', 'package_name', 'package_price', 'status', 'approved', 'created_at'])
+                    ->with('freelance')
+                    ->where('user_id', auth()->user()->id)
+                    ->orderByRaw("CASE WHEN status = 'PENDING' THEN 1 ELSE 2 END, created_at DESC");
 
             return DataTables::of($query)
                     ->addColumn('no', function ($row) {
@@ -83,4 +87,45 @@ class UserController extends Controller
 
         abort(404);
     }
+
+    public function view_profile()
+    {
+        return view('front.user.profile.profile');
+    }
+
+    public function update_profile(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'nullable',
+            'profile_image' => 'nullable|image|mimes:jpg,png,jpeg|max:5120',
+            'password' => 'nullable|string|min:8|confirmed',
+        ]);
+
+        $user = auth()->user();
+
+        if ($request->filled('current_password') && !Hash::check($request->current_password, $user->password)) {
+            toastr()->error('Password saat ini salah.');
+            return redirect()->back();
+        }
+
+        if ($request->hasFile('profile_image')) {
+            $image = $request->file('profile_image');
+            $imageName = time().'.'.$image->extension();
+            $image->move(public_path('images/profile'), $imageName);
+            $user->profile_image = '/images/profile/'.$imageName;
+        }
+
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
+        }
+
+        if($user->save()){
+            toastr()->success('Profile berhasil diupdate.');
+        } else {
+            toastr()->error('Terjadi kesalahan saat mengupdate profil.');
+        }
+
+        return redirect()->back();
+    }
+
 }

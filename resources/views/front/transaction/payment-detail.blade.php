@@ -11,7 +11,15 @@
 @if ($payment->status === "UNPAID")    
     <h6>Bayar Dengan <b>{{ $payment->payment_channel->name }}</b></h6>
     <p>Silahkan lakukan pembayaran dengan <b>{{ $payment->payment_channel->name }}</b>. @if ($payment->qr_link != null) (Klik QRIS Untuk Memperbesar Gambar). @endif Lakukan pembayaran sesuai dengan total yang tertera di halaman invoice ini.</p>
-    <img src="{{ $payment->qr_link }}" class="img-fluid w-50 mb-3" alt="QRIS">
+    @if ($payment->qr_link != null)
+        <img src="{{ $payment->qr_link }}" class="img-fluid w-50 mb-3" alt="QRIS">
+    @endif
+    @if ($payment->nomor_va != null)
+        <input type="text" class="form-control mb-3" value="{{ $payment->nomor_va }}" disabled>
+    @endif
+    @if ($payment->checkout_url != null)
+        <a href="$payment->checkout_url" class="btn btn-primary mb-3">Bayar Pesanan!</a>
+    @endif
 @endif
 @if ($payment->status === "PAID")
 <div class="d-flex justify-content-center align-items-center flex-column mb-3">

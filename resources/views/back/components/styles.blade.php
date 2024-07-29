@@ -2,6 +2,7 @@
 <link rel="stylesheet" href="{{ asset('assets/vendor/fonts/fontawesome.css') }}" />
 {{-- <link rel="stylesheet" href="{{ asset('assets/vendor/fonts/tabler-icons.css') }}" /> --}}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/apexcharts">
 <link rel="stylesheet" href="{{ asset('assets/vendor/fonts/flag-icons.css') }}" />
 
 <!-- Core CSS -->

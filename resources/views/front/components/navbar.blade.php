@@ -33,12 +33,26 @@
                                 $categorys = Category::get();
                             @endphp
                             @foreach ($categorys as $category)
-                                <li><a href="{{ route('search-category', ['category' => $category->name])  }}">{{ $category->name }}</a></li>
+                                <li><a href="{{ route('search', ['search' => $category->name])  }}">{{ $category->name }}</a></li>
                             @endforeach
                         </ul>
                     </li>
-                    <li class="nav-item"><a href="index.html" class="nav-link">Tentang Kami</a></li>
-                    <li class="nav-item"><a href="index.html" class="nav-link">Kontak</a></li>
+                    @auth    
+                        @if(auth()->user()->role == 'Admin')
+                            <li><a href="{{ route('dashboard-admin') }}">Dashboard</a></li>
+                        @elseif(auth()->user()->role == 'Master')
+                            <li><a href="{{ route('dashboard-master') }}">Dashboard</a></li>
+                        @elseif(auth()->user()->role == 'Freelance')
+                            <li><a href="{{ route('dashboard-freelance') }}">Dashboard</a></li>
+                        @else
+                            <li><a href="{{ route('dashboard_user') }}">Dashboard</a></li>
+                        @endif
+                    @else
+                        <li><a href="{{ route('dashboard_user') }}">Dashboard</a></li>
+                    @endauth
+                    <li class="nav-item"><a href="{{ route('home') }}#about" class="nav-link">Tentang Kami</a></li>
+                    <li class="nav-item"><a href="{{ route('home') }}#faq" class="nav-link">FAQ</a></li>
+                    <li class="nav-item"><a href="{{ route('home') }}#kontak" class="nav-link">Kontak</a></li>
                     @auth
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                             @csrf
@@ -65,32 +79,43 @@
                             <div class="user-item">
                                 <img src="{{ auth()->user()->profile_image ? asset(auth()->user()->profile_image) : 'https://caspertopup.com/images/avatars/default.jpg' }}" alt="Profile">
                                 <div class="user-name">
-                                    <h6>{{ auth()->user()->username }}</h6>
-                                    <p>{{ auth()->user()->role }}</p>
+                                    <h6>{{ auth()->user()->fullname }}</h6>
+                                    <p>{{ auth()->user()->username }}</p>
                                 </div>
                             </div>
-                            <a class="dropdown-item drop-line" href="user-dashboard.html">
-                                <img src="{{ asset('asset/img/icons/dashboard-icon-01.svg') }}" class="img-fluid" alt="img">Dashboard
-                            </a>
-                            <a class="dropdown-item" href="user-purchase.html">
-                                <img src="{{ asset('asset/img/icons/dashboard-icon-03.svg') }}" class="img-fluid" alt="img">My
-                                Purchase
-                            </a>
-                            <a class="dropdown-item" href="user-sales.html">
-                                <img src="{{ asset('asset/img/icons/dashboard-icon-04.svg') }}" class="img-fluid" alt="img">My
-                                Sales
-                            </a>
-                            <a class="dropdown-item" href="user-wallet.html">
-                                <img src="{{ asset('asset/img/icons/dashboard-icon-09.svg') }}" class="img-fluid" alt="img">My
-                                Wallet
-                            </a>
-                            <hr>
-                            <a class="dropdown-item" href="user-settings.html">
-                                <img src="{{ asset('asset/img/icons/settings-cog.svg') }}" class="img-fluid" alt="img">Settings
-                            </a>
-                            <a class="dropdown-item" href="user-profile.html">
-                                <img src="{{ asset('asset/img/icons/user-cog.svg') }}" class="img-fluid" alt="img">My Profile
-                            </a>
+                            @if (auth()->user()->role === "Freelance")
+                                <a class="dropdown-item drop-line" href="{{ route('dashboard-freelance') }}">
+                                    <i class="ti ti-home me-2"></i>Dashboard
+                                </a>
+                                <a class="dropdown-item" href="{{ route('view_message') }}">
+                                    <i class="ti ti-message me-2"></i>Message
+                                </a>
+                                <a class="dropdown-item" href="{{ route('catalog-freelance') }}">
+                                    <i class="ti ti-category-2 me-2"></i> Manajemen Katalog
+                                </a>
+                                <a class="dropdown-item" href="{{ route('view_withdraw_freelance') }}">
+                                    <i class="ti ti-credit-card-refund me-2"></i>Penarikan
+                                </a>
+                                <a class="dropdown-item" href="{{ route('freelance-calendar') }}">
+                                    <i class="ti ti-calendar-month me-2"></i>Manajemen Kalender
+                                </a>
+                                <a class="dropdown-item" href="{{ route('freelance-calendar') }}">
+                                    <i class="ti ti-shopping-cart me-2"></i>Manajemen Transaksi
+                                </a>
+                            @elseif (auth()->user()->role === "User")
+                                <a class="dropdown-item drop-line" href="{{ route('dashboard_user') }}">
+                                    <i class="ti ti-home me-2"></i>Dashboard
+                                </a>
+                                <a class="dropdown-item" href="{{ route('view_message') }}">
+                                    <i class="ti ti-message me-2"></i>Message
+                                </a>
+                                <a class="dropdown-item" href="{{ route('view_transaction_user') }}">
+                                    <i class="ti ti-shopping-cart me-2"></i>Transaksi
+                                </a>
+                                <a class="dropdown-item" href="{{ route('view-wishlist') }}">
+                                    <i class="ti ti-shopping-cart-heart me-2"></i>Wishlist
+                                </a>
+                            @endif
                             <hr>
                             <a class="dropdown-item log-out" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                 <img src="{{ asset('asset/img/icons/logout.svg') }}" class="img-fluid" alt="img">Logout

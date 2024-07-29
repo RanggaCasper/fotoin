@@ -118,7 +118,12 @@
 
         $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (event) {
             const targetId = $(event.target).data('bs-target').substring(1); // Remove the leading #
-            $('#inp-paket').val(targetId);
+            const nama_paket = $(event.target).data('name');
+            const harga_paket = $(event.target).text().trim();
+            
+            $('#modal-nama-paket').text(nama_paket);
+            $('#modal-harga-paket').text(harga_paket);
+            $('#id_paket').val(targetId);
         });
 
         $('#submit-btn').on('click', function() {
@@ -130,7 +135,8 @@
                 method: 'POST',
                 data: {
                     _token: '{{ csrf_token() }}',
-                    package_id: $('#inp-paket').val()
+                    package_id: $('#id_paket').val(),
+                    booked_at: $('#booked_at').val()
                 },
                 success: function(response) {
                     if (response.success) {
@@ -144,7 +150,7 @@
                     toastr.error('Gagal membuat transaksi.','Oops!');
                 },
                 complete: function() {
-                    $('#submit-btn').prop('disabled', false).html('<i class="feather-shopping-cart"></i> Pesan Sekarang!');
+                    $('#submit-btn').prop('disabled', false).html('Pesan');
                 }
             });
         });
@@ -288,7 +294,7 @@
                                 <div class="review-wrap">
                                     <div class="review-user-info">
                                         <div class="review-img">
-                                            <img src="../../asset/img/user/user-01.jpg" alt="img">
+                                            <img src="{{ $feedback->user->profile_image }}" alt="img">
                                         </div>
                                         <div class="reviewer-info">
                                             <div class="reviewer-loc">
@@ -345,7 +351,7 @@
                         <ul class="nav nav-pills mb-3 nav-fill" role="tablist">
                             @foreach ($catalog->packages->sortBy('price') as $index => $package)
                                 <li class="nav-item" role="presentation">
-                                    <button type="button" class="nav-link {{ $index == 0 ? 'active' : '' }}" role="tab" data-bs-toggle="tab" data-bs-target="#{{ $package->id }}" aria-controls="{{ $package->id }}" aria-selected="{{ $index == 0 ? 'true' : 'false' }}">
+                                    <button type="button" class="nav-link {{ $index == 0 ? 'active' : '' }}" role="tab" data-bs-toggle="tab" data-name="{{ $package->package_name }}" data-bs-target="#{{ $package->id }}" aria-controls="{{ $package->id }}" aria-selected="{{ $index == 0 ? 'true' : 'false' }}">
                                         Rp. {{ number_format($package->price,0,',','.') }}
                                     </button>
                                 </li>
@@ -361,8 +367,7 @@
                         </div>
                     </div>                    
                     
-                    <input type="number" id="inp-paket" value="{{ $catalog->packages->sortBy('price')->first()->id }}" hidden>
-                    <button type="button" id="submit-btn" class="btn btn-primary w-100"><i class="feather-shopping-cart"></i> Pesan Sekarang!</button>
+                    <button type="button" data-bs-toggle="modal" data-bs-target="#order_details" class="btn btn-primary w-100"><i class="feather-shopping-cart"></i> Pesan Sekarang!</button>
 
                     <ul class="buy-items">
                         <li>
@@ -391,7 +396,7 @@
                 <div class="service-widget member-widget">
                     <div class="user-details">
                         <div class="user-img">
-                            <img src="../../asset/img/user/user-05.jpg" alt="img">
+                            <img src="{{ $catalog->user->profile_image }}" alt="img">
                         </div>
                         <div class="user-info">
                             <h5><span class="me-2">{{ $catalog->user->username }}</span> @if ($catalog->user->isOnline())<span class="badge badge-success"><i class="fa-solid fa-circle"></i> Online</span> @else <span class="badge bg-danger"><i class="fa-solid fa-circle"></i> Offline</span> @endif</h5>
@@ -421,7 +426,76 @@
                         <p>{{ $catalog->user->freelance->about }}</p>
                     </div>
                     <a href="{{ route('view_message') }}?id={{ $catalog->user->id }}&text=Hallo Saya Tertarik Dengan : {{ $catalog->title_name   }}"
-                        class="btn btn-primary mb-0 w-100"><i class="ti ti-message"></i>Chat Freelance</a>
+                        class="btn btn-primary mb-0 w-100 mb-3"><i class="ti ti-message"></i>Chat Freelance</a>
+                    <a href="{{ route('view_calendar', ['user' => $catalog->user->username]) }}"
+                        class="btn btn-primary mb-0 w-100"><i class="ti ti-calendar-week"></i>Lihat Activity</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal new-modal fade" id="order_details" data-keyboard="false" data-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detail Transaksi</h5>
+                <button type="button" class="close-btn" data-bs-dismiss="modal"><span>×</span></button>
+            </div>
+            <div class="modal-body service-modal">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="order-status">
+                            <div class="order-item">
+                                <div class="order-img">
+                                    <img src="{{ asset('storage/' . $catalog->portofolios->first()->path_image) }}" alt="img">
+                                </div>
+                                <div class="order-info">
+                                    <h5>{{ $catalog->title_name }}</h5>
+                                </div>
+                            </div>
+                            <h6 class="title">Freelance</h6>
+                            <div class="user-details">
+                                <div class="user-img">
+                                    <img src="{{ $catalog->user->profile_image }}" alt="img">
+                                </div>
+                                <div class="user-info">
+                                    <h5>{{ $catalog->user->username }}<span class="location">{{ $catalog->user->freelance->provinsi.', '.$catalog->user->freelance->kota }}</span></h5>
+                                    <p><i class="fa-solid fa-star"></i>Ratings {{ number_format($catalog->feedback->sum('rate') ?? 0, 1) }} ({{ $catalog->feedback->count() }} Reviews)</p>
+                                </div>
+                            </div>
+                            <div class="detail-table table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Paket</th>
+                                            <th>Harga</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td id="modal-nama-paket">{{ $catalog->packages->sortBy('price')->first()->package_name }}</td>
+                                            <td class="text-primary" id="modal-harga-paket">Rp. {{ number_format($catalog->packages->sortBy('price')->first()->price,0,',','.') }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <input type="number" id="id_paket" value="{{ $catalog->packages->sortBy('price')->first()->id }}" hidden>
+                            <label for="booked_at">Waktu Booking</label>
+                            <input type="datetime-local" id="booked_at" class="form-control mb-3">
+                            <div class="modal-btn">
+                                <div class="row gx-2">
+                                    <div class="col-6">
+                                        <a href="#" data-bs-dismiss="modal"
+                                            class="btn btn-secondary w-100 justify-content-center">Tutup</a>
+                                    </div>
+                                    <div class="col-6">
+                                        <button type="button" id="submit-btn" class="btn btn-primary w-100">Pesan</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

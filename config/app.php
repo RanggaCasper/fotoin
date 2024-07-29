@@ -187,6 +187,7 @@ return [
          */
         App\Providers\WebConfServiceProvider::class,
         Laravolt\Indonesia\ServiceProvider::class,
+        Barryvdh\DomPDF\ServiceProvider::class,
 
         /*
          * Application Service Providers...
@@ -212,7 +213,8 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         // 'ExampleClass' => App\Example\ExampleClass::class,
-        'Indonesia' => Laravolt\Indonesia\Facade::class
+        'PDF' => Barryvdh\DomPDF\Facade::class,
+        'Indonesia' => Laravolt\Indonesia\Facade::class,
     ])->toArray(),
 
 ];

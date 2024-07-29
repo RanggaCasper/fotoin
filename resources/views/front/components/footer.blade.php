@@ -8,7 +8,7 @@
             <div class="row">
                 <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
                     <div class="footer-widget">
-                        <a href="{{ route('home') }}">
+                        <a href="{{ route('home') }}"> 
                             <img src="{{ optional(app('web_conf')->where('conf_key', 'web_logo')->first())->conf_value }}" height="50" alt="logo">
                         </a>
                         <p>{{ optional(app('web_conf')->where('conf_key', 'web_footer')->first())->conf_value }}</p>
@@ -25,54 +25,84 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6">
+                <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6">
                     <div class="footer-widget">
-                        <h3>Our Company</h3>
+                        <h3>Menu</h3>
                         <ul class="menu-items">
-                            <li><a href="about-us.html">About Us</a></li>
-                            <li><a href="categories-2.html">Categories</a></li>
-                            <li><a href="add-gigs.html">Create Gigs</a></li>
-                            <li><a href="pricing.html">Pricing</a></li>
-                            <li><a href="faq.html">FAQ</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-xl-2 col-lg-2 col-md-6 col-sm-6">
-                    <div class="footer-widget">
-                        <h3>Dashboard</h3>
-                        <ul class="menu-items">
-                            <li><a href="user-purchase.html">Purchase</a></li>
-                            <li><a href="user-sales.html">Sales</a></li>
-                            <li><a href="user-payments.html">Payments</a></li>
-                            <li><a href="user-files.html">Files</a></li>
-                            <li><a href="user-wishlist.html">Wishlist</a></li>
+                            <li><a href="{{ route('home') }}">Beranda</a></li>
+                            @auth
+                                @if(auth()->user()->role == 'Admin')
+                                    <li><a href="{{ route('dashboard-admin') }}">Dashboard</a></li>
+                                @elseif(auth()->user()->role == 'Master')
+                                    <li><a href="{{ route('dashboard-master') }}">Dashboard</a></li>
+                                @elseif(auth()->user()->role == 'Freelance')
+                                    <li><a href="{{ route('dashboard-freelance') }}">Dashboard</a></li>
+                                @else
+                                    <li><a href="{{ route('dashboard_user') }}">Dashboard</a></li>
+                                @endif
+                            @else
+                                <li><a href="{{ route('dashboard_user') }}">Dashboard</a></li>
+                            @endauth
+                            <li><a href="{{ route('home') }}#kontak">Kontak</a></li>
+                            <li><a href="{{ route('home') }}#faq">FAQ</a></li>
                         </ul>
                     </div>
                 </div>
                 <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6">
                     <div class="footer-widget">
-                        <h3>Featured Categories</h3>
+                        <h3>Kategori</h3>
                         <div class="row">
                             <div class="col-md-6">
                                 <ul class="menu-items">
-                                    <li><a href="categories.html">Programming & Tech</a></li>
-                                    <li><a href="categories.html">Music & Audio</a></li>
-                                    <li><a href="categories.html">Lifestyle</a></li>
-                                    <li><a href="categories.html">Photography</a></li>
-                                    <li><a href="categories.html">Business</a></li>
+                                    @php
+                                        use App\Models\Category;
+                                        $categorys = Category::get();
+                                        $half = ceil($categorys->count() / 2);
+                                    @endphp
+                                    @foreach ($categorys->slice(0, $half) as $category)
+                                        <li><a href="{{ route('search', ['search' => $category->name]) }}">{{ $category->name }}</a></li>
+                                    @endforeach
                                 </ul>
                             </div>
                             <div class="col-md-6">
                                 <ul class="menu-items extra-menu">
-                                    <li><a href="categories.html">eBook Publishing</a></li>
-                                    <li><a href="categories.html">AI Artists</a></li>
-                                    <li><a href="categories.html">AI Services</a></li>
-                                    <li><a href="categories.html">Data</a></li>
-                                    <li><a href="categories.html">Consulting</a></li>
+                                    @foreach ($categorys->slice($half) as $category)
+                                        <li><a href="{{ route('search', ['search' => $category->name]) }}">{{ $category->name }}</a></li>
+                                    @endforeach
                                 </ul>
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+        <div class="contact-widget" id="kontak">
+            <div class="row align-items-center">
+                <div class="col-xl-9">
+                    <ul class="location-list">
+                        <li>
+                            <span><i class="feather-map-pin"></i></span>
+                            <div class="location-info">
+                                <h6>Address</h6>
+                                <p>{{ optional(app('web_conf')->where('conf_key', 'web_location')->first())->conf_value }}</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span><i class="feather-phone"></i></span>
+                            <div class="location-info">
+                                <h6>Phone</h6>
+                                <p>{{ optional(app('web_conf')->where('conf_key', 'cs_phone')->first())->conf_value }}</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span><i class="feather-mail"></i></span>
+                            <div class="location-info">
+                                <h6>Email</h6>
+                                <p>{{ optional(app('web_conf')->where('conf_key', 'cs_email')->first())->conf_value }}
+                                </p>
+                            </div>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -85,14 +115,14 @@
                         <p>Copyright © 2024 DreamGigs. All rights reserved.</p>
                     </div>
                 </div>
-                <div class="col-lg-6">
+                {{-- <div class="col-lg-6">
                     <div class="footer-bottom-links">
                         <ul>
                             <li><a href="privacy-policy.html">Privacy Policy</a></li>
                             <li><a href="terms-condition.html">Terms & Conditions</a></li>
                         </ul>
                     </div>
-                </div>
+                </div> --}}
             </div>
         </div>
     </div>

@@ -30,6 +30,12 @@
             <div>Kelola Admin</div>
           </a>
         </li>
+        <li class="menu-item {{ request()->routeIs('view_profit') ? 'active' : '' }}">
+          <a href="{{ route('view_profit') }}" class="menu-link">
+            <i class="menu-icon tf-icons ti ti-settings"></i>
+            <div>Profit Website</div>
+          </a>
+        </li>
         <li class="menu-item {{ request()->routeIs('view_payment_channel') ? 'active' : '' }}">
           <a href="{{ route('view_payment_channel') }}" class="menu-link">
             <i class="menu-icon tf-icons ti ti-settings"></i>
@@ -49,12 +55,18 @@
           <div>Dashboard</div>
         </a>
       </li>
-      <li class="menu-item {{ request()->routeIs('view-kelola-freelance') ? 'active' : '' }}">
+      <li class="menu-item {{ request()->routeIs('view_withdraw_admin') ? 'active' : '' }}">
+        <a href="{{ route('view_withdraw_admin') }}" class="menu-link">
+          <i class="menu-icon tf-icons ti ti-credit-card-pay"></i>
+          <div>Kelola Penarikan</div>
+        </a>
+      </li>
+      {{-- <li class="menu-item {{ request()->routeIs('view-kelola-freelance') ? 'active' : '' }}">
         <a href="{{ route('view-kelola-freelance') }}" class="menu-link">
           <i class="menu-icon tf-icons ti ti-user"></i>
           <div>Kelola Freelance</div>
         </a>
-      </li>
+      </li> --}}
       <li class="menu-item {{ request()->routeIs('view-validasi-freelance') ? 'active' : '' }}">
         <a href="{{ route('view-validasi-freelance') }}" class="menu-link">
           <i class="menu-icon tf-icons ti ti-user-check"></i>
@@ -77,6 +89,12 @@
         <a href="{{ route('view_category') }}" class="menu-link">
           <i class="menu-icon tf-icons ti ti-category-plus"></i>
           <div>Kelola Kategori</div>
+        </a>
+      </li>
+      <li class="menu-item {{ request()->routeIs('data_catalog') ? 'active' : '' }}">
+        <a href="{{ route('data_catalog') }}" class="menu-link">
+          <i class="menu-icon tf-icons ti ti-category-plus"></i>
+          <div>Data Katalog</div>
         </a>
       </li>
       @endif

@@ -151,7 +151,7 @@
 <div class="page-content">
     <div class="container">
         {{-- {{ route('update-catalog-freelance', $catalog->id) }} --}}
-        <form action="" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('update_catalog_freelance', $catalog->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             <div class="row">

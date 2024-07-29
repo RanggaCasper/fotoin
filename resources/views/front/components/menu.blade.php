@@ -6,13 +6,20 @@
             </span>
             <div class="user-information">
                 <div>
-                    <h6>{{ auth()->user()->username }}</h6>
+                    <h6>{{ auth()->user()->fullname }}</h6>
                     <ul>
-                        <li>USA</li>
-                        <li><i class="fa-solid fa-star"></i> 5.0 (45)</li>
+                        @if(auth()->user()->role === "Freelance")
+                            <li>Rp. {{ number_format(auth()->user()->balance, 0,',','.') }}</li>
+                        @else
+                            <li>{{ auth()->user()->created_at }}</li>
+                        @endif
                     </ul>
                 </div>
-                <a href="#" class="user-edit"><i class="fa-solid fa-user-pen"></i></a>
+                @if(auth()->user()->role === "Freelance")
+                    <a href="{{ route('view_profile_freelance') }}" class="user-edit"><i class="fa-solid fa-user-pen"></i></a>
+                @else
+                    <a href="{{ route('view_profile_user') }}" class="user-edit"><i class="fa-solid fa-user-pen"></i></a>
+                @endif
             </div>
         </div>
         <div class="user-body">
@@ -25,13 +32,18 @@
                             </a>
                         </li>
                         <li>
+                            <a href="{{ route('view_message') }}">
+                                <i class="ti ti-message me-1"></i>Message
+                            </a>
+                        </li>
+                        <li>
                             <a href="{{ route('catalog-freelance') }}" @class(['active' => request()->routeIs('catalog-freelance')])>
                                 <i class="ti ti-category-2 me-1"></i> Manajemen Katalog
                             </a>
                         </li>
                         <li>
-                            <a href="{{ route('view_message') }}">
-                                <i class="ti ti-message me-1"></i>Message
+                            <a href="{{ route('view_withdraw_freelance') }}" @class(['active' => request()->routeIs('view_withdraw_freelance')])>
+                                <i class="ti ti-credit-card-refund me-1"></i>Penarikan
                             </a>
                         </li>
                         <li>
@@ -51,6 +63,11 @@
                             </a>
                         </li>
                         <li>
+                            <a href="{{ route('view_message') }}">
+                                <i class="ti ti-message me-1"></i>Message
+                            </a>
+                        </li>
+                        <li>
                             <a href="{{ route('view_transaction_user') }}" @class(['active' => request()->routeIs('view_transaction_user')])>
                                 <i class="ti ti-shopping-cart me-1"></i>Manajemen Transaksi
                             </a>
@@ -59,6 +76,11 @@
                     <li>
                         <a href="{{ route('view-wishlist') }}" @class(['active' => request()->routeIs('view-wishlist')])>
                             <i class="ti ti-shopping-cart-heart me-1"></i>Wishlist
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                            <i class="ti ti-logout me-1"></i>Keluar
                         </a>
                     </li>
                 @endauth

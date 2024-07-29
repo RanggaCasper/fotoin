@@ -2,21 +2,104 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\User;
+use App\Models\Catalog;
 use App\Models\Category;
+use App\Models\Withdraw;
+use Barryvdh\DomPDF\PDF;
 use App\Models\Freelance;
 use App\Models\SuspendUser;
+use App\Models\Transaction;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\SuspendRequest;
 use Yajra\DataTables\DataTables;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class AdminController extends Controller
 {
+    protected $pdf;
+
+    public function __construct(PDF $pdf)
+    {
+        $this->pdf = $pdf;
+    }
+
     public function dashboard()
     {
         return view('back.admin.dashboard');
+    }
+
+    public function catalog_chart(Request $request)
+    {
+        $startDate = $request->input('start_date', Carbon::now()->subYears(100)->format('Y-m-d'));
+        $endDate = $request->input('end_date', Carbon::now()->format('Y-m-d'));
+
+        $catalogData = Catalog::select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as total'))
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->groupBy('date')
+            ->orderBy('date', 'ASC')
+            ->get()
+            ->toArray();
+
+        $processedData = [];
+        $currentDate = Carbon::createFromFormat('Y-m-d', $startDate);
+        $endDate = Carbon::createFromFormat('Y-m-d', $endDate);
+
+        while ($currentDate->lte($endDate)) {
+            $dateStr = $currentDate->format('Y-m-d');
+            $total = 0;
+            foreach ($catalogData as $data) {
+                if ($data['date'] == $dateStr) {
+                    $total = $data['total'];
+                    break;
+                }
+            }
+            $processedData[] = [
+                'x' => $dateStr,
+                'y' => $total
+            ];
+            $currentDate->addDay();
+        }
+
+        return response()->json($processedData);
+    }
+
+    public function transaction_chart(Request $request)
+    {
+        $startDate = $request->input('start_date', Carbon::now()->subYears(100)->format('Y-m-d'));
+        $endDate = $request->input('end_date', Carbon::now()->format('Y-m-d'));
+
+        $transactionData = Transaction::select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as total'))
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->groupBy('date')
+            ->orderBy('date', 'ASC')
+            ->get()
+            ->toArray();
+
+        $processedData = [];
+        $currentDate = Carbon::createFromFormat('Y-m-d', $startDate);
+        $endDate = Carbon::createFromFormat('Y-m-d', $endDate);
+
+        while ($currentDate->lte($endDate)) {
+            $dateStr = $currentDate->format('Y-m-d');
+            $total = 0;
+            foreach ($transactionData as $data) {
+                if ($data['date'] == $dateStr) {
+                    $total = $data['total'];
+                    break;
+                }
+            }
+            $processedData[] = [
+                'x' => $dateStr,
+                'y' => $total
+            ];
+            $currentDate->addDay();
+        }
+
+        return response()->json($processedData);
     }
 
     public function view_validasi_freelance()
@@ -73,8 +156,77 @@ class AdminController extends Controller
             toastr()->success('Data berhasil diupdate.');
             return redirect()->back();
         }
-
     }
+
+    public function data_catalog()
+    {
+        $catalog = Catalog::get();
+        return view('back.admin.data.catalog', compact('catalog'));
+    }
+
+    public function get_data_catalog(Request $request)
+    {
+        if ($request->ajax()) {
+            $query = Catalog::with('user','packages')->get();
+
+            return DataTables::of($query)
+                ->addColumn('no', function ($row) {
+                    static $counter = 0;
+                    return ++$counter;
+                })
+                ->addColumn('freelance', function ($row) {
+                    return $row->user->username;
+                })
+                ->addColumn('package', function ($row) {
+                    return $row->packages->count();
+                })
+                ->addColumn('created_at', function ($row) {
+                    return $row->created_at;
+                })
+                ->toJson();
+        }
+
+        abort(404);
+    }
+
+    public function pdf_data_catalog(Request $request)
+    {
+        $startDate = $request->input('start_date', Carbon::now()->subDays(29)->format('Y-m-d'));
+        $endDate = $request->input('end_date', Carbon::now()->format('Y-m-d'));
+
+        $catalogData = Catalog::with('user')
+            ->select(
+                DB::raw('DATE(created_at) as date'),
+                DB::raw('MIN(title_name) as title_name'),
+                DB::raw('MIN(user_id) as user_id'),
+                DB::raw('SUM(count_views) as count_views'),
+                DB::raw('count(*) as total')
+            )
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->groupBy(DB::raw('DATE(created_at)'))
+            ->orderBy('date', 'ASC')
+            ->get();
+    
+        $freelancerLeaderboard = Catalog::with('user')
+            ->select('user_id', DB::raw('count(*) as total'))
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->groupBy('user_id')
+            ->orderBy('total', 'DESC')
+            ->take(5)
+            ->get();
+    
+        $catalogViewsLeaderboard = Catalog::with('user')
+            ->select('title_name', 'count_views')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->orderBy('count_views', 'DESC')
+            ->take(5)
+            ->get();
+
+        $pdf = $this->pdf->loadView('back.admin.data.pdf_catalog', compact('catalogData', 'startDate', 'endDate', 'freelancerLeaderboard', 'catalogViewsLeaderboard'));
+
+        return $pdf->download('catalog_report.pdf');
+    }
+
 
     public function view_kelola_freelance()
     {
@@ -257,7 +409,7 @@ class AdminController extends Controller
                     return $row->reported->username;
                 })
                 ->addColumn('proff', function($row) {
-                    return '<img class="img-fluid w-25" src="'.$row->proff.'" alt="Proff">';
+                    return '<img class="img-fluid" src="'.url('storage/'.$row->proff).'" alt="Proff">';
                 })
                 ->addColumn('created_at', function($row) {
                     return $row->created_at;
@@ -411,4 +563,124 @@ class AdminController extends Controller
             ], 500);
         }
     }
+
+    public function view_withdraw()
+    {
+        return view('back.admin.withdraw.withdraw');
+    }
+
+    public function get_withdraw(Request $request)
+    {
+        if ($request->ajax()) {
+            $query = Withdraw::with('user');
+
+            if ($request->status) {
+                $query->where('status', $request->status);
+            }
+
+            if ($request->user) {
+                $query->whereHas('user', function($q) use ($request) {
+                    $q->where('username', 'like', '%'.$request->user.'%');
+                });
+            }
+
+            if ($request->rekening) {
+                $query->where('rekening', 'like', '%'.$request->rekening.'%');
+            }
+
+            $data = $query->orderByRaw("CASE WHEN status = 'PENDING' THEN 1 ELSE 2 END, created_at DESC")->get();
+
+            return DataTables::of($data)
+                ->addColumn('no', function ($row) {
+                    static $counter = 0;
+                    return ++$counter;
+                })
+                ->addColumn('username', function($row){
+                    return $row->user->username;
+                })
+                ->addColumn('transfer', function($row){
+                    return 'Rp. '.number_format($row->transfer,0,',','.');
+                })
+                ->addColumn('fee', function($row){
+                    return 'Rp. '.number_format($row->fee,0,',','.');
+                })
+                ->addColumn('status', function($row){
+                    $badgeClass = '';
+                    switch ($row->status) {
+                        case 'COMPLETED':
+                            $badgeClass = 'bg-success';
+                            break;
+                        case 'CANCLED':
+                            $badgeClass = 'bg-danger';
+                            break;
+                        case 'PENDING':
+                            $badgeClass = 'bg-warning';
+                            break;
+                    }
+                    return '<span class="badge ' . $badgeClass . ' rounded-pill">' . $row->status . '</span>';
+                })
+                ->addColumn('action', function($row){
+                    if($row->status != "P"){
+                        return null;
+                    }
+                    $btn = '<button class="btn btn-success btn-sm approve me-1" data-id="'.$row->id.'">Approve</button>';
+                    $btn .= '<button class="btn btn-danger btn-sm reject" data-id="'.$row->id.'">Reject</button>';
+                    return $btn;
+                })
+                ->addColumn('created_at',function($row){
+                    return $row->created_at;
+                })
+                ->rawColumns(['status', 'action'])
+                ->make(true);
+        }
+        
+        abort(404);
+    }
+
+
+
+    public function withdraw_approve($id)
+    {
+        $withdraw = Withdraw::findOrFail($id);
+        if ($withdraw->status == 'PENDING') {
+            $withdraw->status = 'COMPLETED';
+            $withdraw->save();
+            return response()->json([
+                'success' => true,
+                'message' => 'Penarikan telah disetujui.',
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Penarikan tidak dapat disetujui.',
+            ]);
+        }
+
+    }
+
+    public function withdraw_reject($id)
+    {
+        $withdraw = Withdraw::findOrFail($id);
+
+        if ($withdraw->status == 'PENDING') {
+            // Kembalikan saldo pengguna
+            $user = User::findOrFail($withdraw->user_id);
+            $user->balance += $withdraw->transfer + $withdraw->fee;
+            $user->save();
+
+            $withdraw->status = 'CANCLED';
+            $withdraw->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Penarikan telah ditolak dan saldo dikembalikan.',
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Penarikan tidak dapat ditolak.',
+            ]);
+        }
+    }
+
 }

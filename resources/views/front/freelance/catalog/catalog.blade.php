@@ -79,12 +79,7 @@
                     </div>
                 </div>
                 <div class="d-flex gap-2 justify-content-end mt-2">
-                    <a href="" class="btn btn-sm btn-primary">Edit</a>
-                    <form action="" method="POST">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus katalog ini?')">Hapus</button>
-                    </form>
+                    <a href="{{ route('edit-catalog', ['id' => $catalog->id]) }}" class="btn btn-sm btn-primary">Edit</a>
                 </div>
             </div>
         </div>

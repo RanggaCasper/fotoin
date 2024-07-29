@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Message;
 use Illuminate\Http\Request;
+use App\Models\SuspendRequest;
 
 class MessageController extends Controller
 {
@@ -87,5 +88,22 @@ class MessageController extends Controller
         abort(404);
     }
 
-
+    public function report_user(Request $request)
+    {
+        $validated = $request->validate([
+            'reporter_id' => 'required|exists:users,id',
+            'reported_id' => 'required|exists:users,id',
+            'note' => 'required|string|max:255',
+            'proff' => 'nullable|image|max:2048',
+         ]);
+   
+         if ($request->hasFile('proff')) {
+            $path = $request->file('proff')->store('reports', 'public');
+            $validated['proff'] = $path;
+         }
+   
+         SuspendRequest::create($validated);
+   
+         return response()->json(['message' => 'Report submitted successfully'], 200);
+    }
 }

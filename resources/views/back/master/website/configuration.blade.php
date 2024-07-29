@@ -110,6 +110,86 @@
                     }
                 });
             });
+
+            $('#kontak-form').on('submit', function(e) {
+                e.preventDefault();
+                var form = $(this);
+                var formData = new FormData(form[0]);
+                $.ajax({
+                    url: form.attr('action'),
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        Swal.fire({
+                            icon: response.status ? 'success' : 'error',
+                            title: response.status ? 'Success!' : 'Error!',
+                            text: response.message,
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            tokopay();
+                        });
+                    },
+                    error: function(xhr) {
+                        var errors = xhr.responseJSON.errors;
+                        var errorMessage = 'Terjadi kesalahan saat menyimpan data.';
+                        if (errors) {
+                            var errorText = '';
+                            $.each(errors, function(key, value) {
+                                errorText += value[0] + '\n';
+                            });
+                            errorMessage = 'Error:\n' + errorText;
+                        }
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: errorMessage,
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                });
+            });
+
+            $('#profit-form').on('submit', function(e) {
+                e.preventDefault();
+                var form = $(this);
+                var formData = new FormData(form[0]);
+                $.ajax({
+                    url: form.attr('action'),
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        Swal.fire({
+                            icon: response.status ? 'success' : 'error',
+                            title: response.status ? 'Success!' : 'Error!',
+                            text: response.message,
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            tokopay();
+                        });
+                    },
+                    error: function(xhr) {
+                        var errors = xhr.responseJSON.errors;
+                        var errorMessage = 'Terjadi kesalahan saat menyimpan data.';
+                        if (errors) {
+                            var errorText = '';
+                            $.each(errors, function(key, value) {
+                                errorText += value[0] + '\n';
+                            });
+                            errorMessage = 'Error:\n' + errorText;
+                        }
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: errorMessage,
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                });
+            });
         });
 
 
@@ -170,7 +250,7 @@
         </div>
     </div>
     
-    <div class="card">
+    <div class="card mb-3">
         <div class="card-header">
             <h5>Konfigurasi Payment Gateway</h5>
             <div class="p-0 m-0">
@@ -191,6 +271,49 @@
                     <label for="tokopay_secret">SECRET KEY</label>
                     <input type="text" class="form-control" name="tokopay_secret" id="tokopay_secret">
                 </div>
+                <button type="submit" class="btn btn-primary col-12">Submit</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <h5>Konfigurasi Kontak</h5>
+        </div>
+        <div class="card-body">
+            <form id="kontak-form" action="{{ route('update_kontak') }}" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="mb-3">
+                    <label for="web_location">Lokasi</label>
+                    <input type="text" class="form-control" name="web_location" id="web_location" value="{{ optional(app('web_conf')->where('conf_key', 'web_location')->first())->conf_value }}">
+                </div>
+                <div class="mb-3">
+                    <label for="cs_phone">Nomor Ponsel CS</label>
+                    <input type="number" class="form-control" name="cs_phone" id="cs_phone" value="{{ optional(app('web_conf')->where('conf_key', 'cs_phone')->first())->conf_value }}">
+                </div>
+                <div class="mb-3">
+                    <label for="cs_email">Email CS</label>
+                    <input type="text" class="form-control" name="cs_email" id="cs_email" value="{{ optional(app('web_conf')->where('conf_key', 'cs_email')->first())->conf_value }}">
+                </div>
+                <button type="submit" class="btn btn-primary col-12">Submit</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5>Konfigurasi Profit</h5>
+        </div>
+        <div class="card-body">
+            <form id="profit-form" action="{{ route('update_web_profit') }}" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="mb-3">
+                    <label for="take_fee">Profit Persen</label>
+                    <input type="text" class="form-control" name="take_fee" id="take_fee" value="{{ optional(app('web_conf')->where('conf_key', 'take_fee')->first())->conf_value }}">
+                    <div class="text-danger small">* Profit diambil dengan persen.</div>
+                </div>                
                 <button type="submit" class="btn btn-primary col-12">Submit</button>
             </form>
         </div>

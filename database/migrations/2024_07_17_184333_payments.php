@@ -34,7 +34,7 @@ return new class extends Migration
             $table->timestamp('expired_at')->useCurrent();
             $table->timestamp('paid_at')->nullable();
             $table->double('price');
-            $table->double('fee');
+            $table->double('fee_payment');
             $table->double('total_price');
             $table->enum('status',['PAID','UNPAID','EXPIRED','FAILED']);
             $table->unsignedBigInteger('payment_channel_id');

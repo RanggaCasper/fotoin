@@ -17,7 +17,7 @@
                     <h6>Saldo yang bisa ditarik.</h6>
                 </div>
                 <div class="earning-btn">
-                    <a href="user-wallet.html" class="btn btn-primary">Tarik Saldo</a>
+                    <a href="{{ route('view_withdraw_freelance') }}" class="btn btn-primary">Tarik Saldo</a>
                 </div>
             </div>
         </div>

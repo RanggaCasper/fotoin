@@ -45,6 +45,66 @@
         border-radius: 10px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
+    .timeline-item {
+        display: flex;
+        margin-bottom: 20px;
+        position: relative;
+    }
+
+    .timeline-item .timeline-icon {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        margin-right: 20px;
+        margin-top: 5px;
+        position: relative;
+    }
+
+    .timeline-item .timeline-content {
+        flex: 1;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        position: relative;
+    }
+
+    .timeline-item .timeline-content::before {
+        content: '';
+        width: 6px;
+        height: 100%;
+        background-color: #ddd;
+        position: absolute;
+        left: -13px;
+        top: 0;
+    }
+
+    .timeline-item:last-child .timeline-content::before {
+        height: 50%;
+        top: 0;
+        bottom: auto;
+    }
+
+    .timeline-item .date {
+        font-size: 0.9em;
+        color: #999;
+        margin-bottom: 10px;
+    }
+
+    .timeline-item h3 {
+        margin: 0;
+        margin-bottom: 10px;
+        font-size: 1.2em;
+    }
+
+    .timeline-item p {
+        margin: 0;
+        margin-bottom: 10px;
+    }
+
+    .timeline-item a {
+        color: #007bff;
+        text-decoration: none;
+    }
 </style>
 @endpush
 
@@ -75,14 +135,31 @@
             url: '{{ route('transaction_detail', ['invoice' => $transaction->invoice]) }}',
             success: function(response) {
                 $('#card-detail').html(response.html);
+                fetch_timeline();
             },
             error: function(response) {
             }
         });
     }
     
+    function fetch_timeline(command) {
+        if(command === "refresh"){
+            toastr.success('Refresh berhasil.','Success');
+        }
+        $.ajax({
+            type: 'GET',
+            url: '{{ route('transaction_timeline', ['id' => $transaction->id]) }}',
+            success: function(response) {
+                $('#card-timeline').html(response.html);
+            },
+            error: function(response) {
+            }
+        });
+    }
+
     fetch_pembayaran();
     fetch_transaction();
+    fetch_timeline();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/luxon@2.1.1/build/global/luxon.min.js"></script>
 <script>
@@ -121,7 +198,7 @@
             });
         });
 
-        @if($transaction->status === "PROCESSING" && $payment->status === "PAID")
+        @if($transaction->status === "PROCESSING")
             @if(auth()->user()->id === $transaction->user_id)
                 $('#submit-btn-selesai').click(function() {
                     $('#submit-btn-selesai').prop('disabled', true);
@@ -159,10 +236,10 @@
 
     function method(id) {
         document.getElementById(id).checked = true;
-        var biayaLayanan = document.getElementById(id).getAttribute('data-biaya-layanan');
+        var biayaLayanan = document.getElementById(id).getAttribute('data-biaya-pembayaran');
         var total = document.getElementById(id).getAttribute('data-total');
 
-        document.getElementById('biaya-layanan').innerText = 'Rp. ' + biayaLayanan;
+        document.getElementById('biaya-pembayaran').innerText = 'Rp. ' + biayaLayanan;
         document.getElementById('total').innerText = 'Rp. ' + total;
 
         document.getElementById('payment_id').value = id;
@@ -226,6 +303,21 @@
                         
                     </div>
                 </div>
+                @if ($transaction->status === "PROCESSING" || $transaction->status === "COMPLETED")
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h4 class="m-0">
+                                TIMELINE PROGRESS
+                            </h4>
+                            <a onclick="fetch_timeline('refresh')" style="cursor: pointer;"><i class="feather-refresh-cw"></i></a>
+                        </div>
+                    </div>
+                    <div class="card-body" id="card-timeline">
+                        
+                    </div>
+                </div>
+                @endif
                 <div class="card">
                     <div class="card-header">
                         <div class="d-flex justify-content-between align-items-center">
@@ -253,7 +345,7 @@
                             <div class="border-top mb-3"></div>
                             <div class="d-flex justify-content-between">
                                 <h6>Biaya Layanan</h6>
-                                <h6 id="biaya-layanan">Rp. {{ number_format($payment->fee,0,',','.') }}</h6>
+                                <h6 id="biaya-pembayaran">Rp. {{ number_format($payment->fee,0,',','.') }}</h6>
                             </div>
                             <div class="border-top mb-3"></div>
                             <div class="d-flex justify-content-between mb-3">
@@ -263,8 +355,8 @@
                         @else
                             <div class="border-top mb-3"></div>
                             <div class="d-flex justify-content-between">
-                                <h6>Biaya Layanan</h6>
-                                <h6 id="biaya-layanan">Rp. 0</h6>
+                                <h6>Biaya Pembayaran</h6>
+                                <h6 id="biaya-pembayaran">Rp. 0</h6>
                             </div>
                             <div class="border-top mb-3"></div>
                             <div class="d-flex justify-content-between mb-3">
@@ -280,12 +372,12 @@
                         @if ($transaction->approved === "WAITING")
                             <button class="btn btn-primary w-100">Batalkan Pesanan</button>
                         @else
-                            @if (!$payment)
+                            @if ($payment)
                                 <input type="hidden" name="transaction_id" id="transaction_id" value="{{ $transaction->id }}">
                                 <input type="hidden" name="payment_id" id="payment_id">
                                 <button class="btn btn-primary w-100" id="submit-btn"><i class="feather-shopping-cart me-2"></i>Bayar Pesanan</button>
-                            @elseif ($transaction->status === "PROCESSING" && $payment->status === "PAID")
-                                @if(auth()->user()->id === $transaction->user_id)
+                            @elseif ($transaction->status === "PROCESSING")
+                                @if(auth()->user()->id === $transaction->user_id && $status_timeline)
                                     <button class="btn btn-primary w-100" id="submit-btn-selesai"><i class="feather-check me-2"></i>Pesanan Selesai</button>
                                 @endif
                             @endif

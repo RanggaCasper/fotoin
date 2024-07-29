@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('title_name');
             $table->longText('description');
             $table->longText('slug');
+            $table->enum('status', ['on','off'])->default('on');
             $table->unsignedBigInteger('count_views')->default(0);
             $table->unsignedBigInteger('category_id');
             $table->foreign('category_id')->references('id')->on('categorys');

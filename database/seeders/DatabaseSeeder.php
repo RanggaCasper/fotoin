@@ -150,6 +150,10 @@ class DatabaseSeeder extends Seeder
             ['conf_key' => 'web_footer'],
             ['conf_key' => 'tokopay_api'],
             ['conf_key' => 'tokopay_secret'],
+            ['conf_key' => 'web_location'],
+            ['conf_key' => 'cs_phone'],
+            ['conf_key' => 'cs_email'],
+            ['conf_key' => 'take_fee'],
         ]);
 
         $this->call([

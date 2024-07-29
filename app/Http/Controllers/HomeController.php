@@ -4,48 +4,56 @@ namespace App\Http\Controllers;
 
 use App\Models\Catalog;
 use App\Models\Category;
-use App\Models\Portofolio;
 use App\Models\Wishlist;
+use App\Models\Portofolio;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
 {
     public function home()
     {
-        $catalogs = Catalog::with('user.freelance','category', 'feedback', 'packages', 'portofolios','transactions')->get();
+        $catalogs = Catalog::with('user.freelance','category', 'feedback', 'packages', 'portofolios','transactions')->where('status','on')->get();
         $categorys = Category::withCount('catalogs')->get();
         return view('front.home.main', compact('catalogs','categorys'));
     }
 
-    public function search_catalog($search)
+    public function search(Request $request, $search)
     {
         if (!$search) {
             toastr()->error('Kata kunci pencarian tidak boleh kosong.');
             return redirect()->route('home');
         }
 
-        $catalogs = Catalog::with('user.freelance','category', 'feedback', 'packages', 'portofolios')->where('title_name', 'like', '%' . $search . '%')->get();
+        $catalogs = Catalog::with('user.freelance', 'category', 'feedback', 'packages', 'portofolios', 'transactions')
+            ->where('title_name', 'like', '%' . $search . '%')
+            ->where('status','on')
+            ->orWhereHas('category', function($query) use ($search) {
+                $query->where('name', 'like', '%' . $search . '%');
+            })
+            ->get();
+
         $categorys = Category::withCount('catalogs')->get();
-        return view('front.home.catalog.search-catalog', compact('catalogs','search','categorys'));
+
+        return view('front.home.catalog.search-catalog', compact('catalogs', 'search', 'categorys'));
     }
 
-    public function search_category($search)
+    public function get_catalog(Request $request, $search)
     {
-        $data = Category::where('name', $search)->first();
-        if($data){
-            $catalogs = Catalog::with('user.freelance', 'feedback','category', 'packages', 'portofolios', 'transactions')->where('category_id', $data->id)->get();
-            
-            $categorys = Category::withCount('catalogs')->get();
-            return view('front.home.catalog.search-catalog', compact('catalogs','search','categorys'));
-        }
+        $catalogs = Catalog::with('user.freelance', 'category', 'feedback', 'packages', 'portofolios')
+            ->where('title_name', 'like', '%' . $search . '%')
+            ->where('status','on')
+            ->orWhereHas('category', function($query) use ($search) {
+                $query->where('name', 'like', '%' . $search . '%');
+            })
+            ->get();
 
-        toastr()->error('Maaf kategori yang anda cari tidak ditemukan.');
-        return redirect()->route('home');
+        return view('front.home.catalog.get-catalog', compact('catalogs'))->render();
     }
 
     public function view_catalog(Request $request,$username,$slug)
     {
-        $catalog = Catalog::with('user.freelance', 'feedback.user' ,'category', 'packages', 'portofolios', 'transactions')->whereHas('user', function($query) use ($username) {
+        $catalog = Catalog::with('user.freelance', 'feedback.user' ,'category', 'packages', 'portofolios', 'transactions')->where('status','on')->whereHas('user', function($query) use ($username) {
             $query->where('username', $username);
         })->where('slug', $slug)->first();
 
@@ -69,10 +77,6 @@ class HomeController extends Controller
     {
         $user = auth()->user();
         $catalogs = $user->wishlist()->with('catalog', 'catalog.category', 'catalog.user', 'catalog.portofolios', 'catalog.feedback', 'catalog.packages', 'catalog.transactions')->get();
-        // foreach ($catalogs as $wishlistItem) {
-        //     $transactions = $wishlistItem->catalog;
-        //     dd($transactions); // Debug transaksi dari katalog
-        // }
         return view('front.home.wishlist.wishlist', compact('catalogs'));
     }
 

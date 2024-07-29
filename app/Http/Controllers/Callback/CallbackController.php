@@ -8,6 +8,7 @@ use App\Models\Transaction;
 use App\Models\WebsiteConf;
 use Illuminate\Http\Request;
 use App\Mail\TransactionMail;
+use App\Models\TransactionTimeline;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Response;
@@ -37,6 +38,14 @@ class CallbackController extends Controller
                         $payments->paid_at = now();
                         if($payments->save()){
                             $transaction = Transaction::where('id', $payments->transaction_id)->first();
+
+                            TransactionTimeline::create([
+                                'progress' => 'PENDING',
+                                'created_by' => 'SYSTEM',
+                                'description' => "Pembayaran berhasil pada " . now() . " WIB.",
+                                'transaction_id' => $transaction->id
+                            ]);
+
                             $transaction->status = "PROCESSING";
                             $transaction->note = "Pembayaran berhasil pada " . now() . " WIB.";
                             if($transaction->save()){

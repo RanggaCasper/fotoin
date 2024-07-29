@@ -24,12 +24,23 @@ return new class extends Migration
             $table->string('package_name');
             $table->double('package_price');
             $table->string('package_description');
+            $table->dateTime('booked_at');
             $table->unsignedBigInteger('catalog_id');
             $table->foreign('catalog_id')->references('id')->on('catalogs');
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
             $table->unsignedBigInteger('freelance_id');
             $table->foreign('freelance_id')->references('id')->on('users');
+            $table->timestamps();
+        });
+
+        Schema::create('transaction_timelines', function (Blueprint $table) {
+            $table->id();
+            $table->enum('progress', ['PENDING', 'IN_PROGRESS', 'COMPLETED', 'CANCELED'])->default('PENDING');
+            $table->enum('created_by', ['SYSTEM','CLIENT', 'FREELANCER'])->default('SYSTEM');
+            $table->text('description')->nullable();
+            $table->unsignedBigInteger('transaction_id');
+            $table->foreign('transaction_id')->references('id')->on('transactions');
             $table->timestamps();
         });
     }

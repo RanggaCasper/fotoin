@@ -2,14 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\User;
+use App\Models\Profit;
 use App\Models\Package;
 use App\Models\Payment;
+use App\Models\Calendar;
 use App\Models\Feedback;
 use App\Models\Transaction;
+use App\Models\WebsiteConf;
 use Illuminate\Http\Request;
 use App\Mail\TransactionMail;
 use App\Models\PaymentChannel;
+use App\Models\TransactionTimeline;
 use App\Services\TokopayService;
 use Illuminate\Support\Facades\Mail;
 
@@ -31,9 +36,10 @@ class TransactionController extends Controller
             return redirect()->back();
         }
         
+        $status_timeline = TransactionTimeline::where('transaction_id',$transaction->id)->where('progress','COMPLETED')->where('created_by','FREELANCER')->first();
         $payment = Payment::where('transaction_id',$transaction->id)->first();
         
-        return view('front.transaction.transaction', compact('transaction','invoice','payments', 'payment'));
+        return view('front.transaction.transaction', compact('transaction','invoice','payments','status_timeline','payment'));
     }
 
     public function create_transaction(Request $request)
@@ -53,6 +59,23 @@ class TransactionController extends Controller
                 return response()->json(['success' => false, 'message' => 'Tidak bisa melakukan order di katalog sendiri.']);
             }
 
+            if (!$request->booked_at) {
+                return response()->json(['success' => false, 'message' => 'Waktu booking harus di isi.']);
+            }
+
+            $activity = Calendar::where('user_id', $package->catalog->user_id);
+
+            $bookedAt = Carbon::parse($request->booked_at);
+
+            $conflict = $activity->where(function($query) use ($bookedAt) {
+                $query->where('start', '<=', $bookedAt)
+                    ->where('end', '>=', $bookedAt);
+            })->exists();
+
+            if ($conflict) {
+                return response()->json(['success' => false, 'message' => 'Freelance tidak ready di tanggal tersebut.']);
+            }
+
             $data = [
                 'invoice' => Transaction::generateInvoice(),
                 'note' => 'Menunggu Persetujuan Dari Freelance',
@@ -62,6 +85,7 @@ class TransactionController extends Controller
                 'catalog_image' => $package->catalog->portofolios->first()->path_image,
                 'package_name' => $package->package_name,
                 'package_price' => $package->price,
+                'booked_at' => $request->booked_at,
                 'package_description' => $package->description,
                 'catalog_id' => $package->catalog->id,
                 'user_id' => auth()->user()->id,
@@ -87,6 +111,8 @@ class TransactionController extends Controller
     public function update_transaction(Request $request, $invoice)
     {
         $transaction = Transaction::where('invoice', $invoice)->first();
+        $status_timeline = TransactionTimeline::where('transaction_id',$transaction->id)->where('progress','COMPLETED')->where('created_by','FREELANCER')->first();
+        
         if (!$transaction) {
             return response()->json(['status' => false, 'message' => 'Transaksi tidak ditemukan.'], 404);
         }
@@ -99,17 +125,30 @@ class TransactionController extends Controller
             return response()->json(['status' => false, 'message' => 'Transaksi status tidak processing.'], 400);
         }
 
+        if (!$status_timeline) {
+            return response()->json(['status' => false, 'message' => 'Freelance status tidak completed.'], 400);
+        }
+
         $note = 'Pesanan berhasil diselesaikan pada '.now().' WIB.';
 
         $transaction->status = 'COMPLETED';
         $transaction->note = $note;
         if($transaction->save()){
             Mail::to(auth()->user()->email)->send(new TransactionMail($transaction, 'transaction_success'));
-        };
+        }
 
         $freelance = User::find($transaction->freelance_id);
+        $web_fee_percentage = WebsiteConf::where('conf_key', 'take_fee')->first()->conf_value ?? 0;
+        $web_fee = ($web_fee_percentage / 100) * $transaction->package_price;
+
+        Profit::create([
+            'profit' => $web_fee,
+            'transaction_id' => $transaction->id
+        ]);
+        $balance = $freelance->balance;
+        $price = $transaction->package_price - $web_fee;
         if ($freelance) {
-            $freelance->balance += $transaction->package_price;
+            $freelance->balance = $balance + $price;
             $freelance->save();
         }
 
@@ -220,6 +259,54 @@ class TransactionController extends Controller
         }
         abort(404);
     }
+
+    public function transaction_timeline(Request $request, $id)
+    {
+        if($request->ajax()){
+            $transaction = Transaction::with('package', 'catalog', 'user')
+                ->where('id', $id)
+                ->where(function($query) {
+                    $query->where('user_id', auth()->user()->id)
+                          ->orWhere('freelance_id', auth()->user()->id);
+                })
+                ->first();
+            $timelines = TransactionTimeline::where('transaction_id', $id)->orderBy('created_at', 'asc')->get();
+
+            if($timelines){
+                return response()->json(['status' => true, 'html' => view('front.transaction.transaction_timeline', compact('timelines','transaction'))->render()]);
+            }
+    
+            return response()->json(['status' => false]);
+        }
+        abort(404);
+    }
+
+    public function create_transaction_timeline(Request $request,$id)
+    {
+        $request->validate([
+            'progress' => 'required|in:PENDING,IN_PROGRESS,COMPLETED,CANCELED',
+            'description' => 'nullable|string'
+        ]);
+
+        try {
+            $transaction = Transaction::findOrFail($id);
+            $created_by = "CLIENT";
+            if(auth()->user()->id === $transaction->freelance_id) {
+                $created_by = "FREELANCER";
+            }
+            TransactionTimeline::create([
+                'progress' => $request->progress,
+                'created_by' => $created_by,
+                'description' => $request->description,
+                'transaction_id' => $id
+            ]);
+    
+            return response()->json(['success' => true, 'message' => 'Timeline berhasil ditambahkan.']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Gagal membuat timeline.']);
+        }
+    }
+
 
     public function create_feedback(Request $request)
     {

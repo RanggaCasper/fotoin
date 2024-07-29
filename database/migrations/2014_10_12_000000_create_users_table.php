@@ -22,7 +22,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->enum('role', ['Master', 'Admin', 'User', 'Freelance']);
             $table->enum('gender', ['Laki - Laki','Perempuan']);
-            $table->string('profile_image')->nullable();
+            $table->string('profile_image')->nullable()->default('https://caspertopup.com/images/avatars/default.jpg');
             $table->timestamp('last_seen')->nullable();
             $table->rememberToken();
             $table->timestamps();

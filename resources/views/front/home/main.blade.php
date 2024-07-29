@@ -45,10 +45,6 @@
 </head>
 
 <body>
-    {{-- <div class="loader-main">
-        <span class="page-loader"></span>
-    </div> --}}
-
     <div class="main-wrapper">
 
         @include('front.components.navbar')
@@ -83,14 +79,6 @@
                                         </button>
                                     </div>
                                 </form>
-                            </div>
-                            <div class="popular-search">
-                                <h5>Popular Searches : </h5>
-                                <ul>
-                                    <li><a href="service-grid-sidebar.html">Online Mockup</a></li>
-                                    <li><a href="service-grid-sidebar.html">Carpentering</a></li>
-                                    <li><a href="service-grid-sidebar.html">Event Organiser</a></li>
-                                </ul>
                             </div>
                         </div>
                     </div>
@@ -351,7 +339,7 @@
                                     <p>{{ $category->catalogs_count }}</p>
                                 </div>
                                 <div class="category-overlay">
-                                    <a href="{{ route('search-category', ['category' => $category->name])  }}">
+                                    <a href="{{ route('search', ['search' => $category->name])  }}">
                                         <div class="category-overlay-img">
                                             <img src="{{ url($category->image) }}" class="img-fluid" alt="Service">
                                             <div class="category-overlay-content">
@@ -587,7 +575,7 @@
         </section>
 
 
-        <section class="explore-services-sec">
+        <section class="explore-services-sec" id="faq">
             <div class="section-bg">
                 <img src="asset/img/bg/section-bg-06.png" class="explore-bg1" alt="img">
             </div>
@@ -703,7 +691,7 @@
             event.preventDefault();
             var searchQuery = document.getElementById('search').value;
             if (searchQuery) {
-                var url = '{{ route("search-catalog", ["search" => "SEARCH_PLACEHOLDER"]) }}';
+                var url = '{{ route("search", ["search" => "SEARCH_PLACEHOLDER"]) }}';
                 url = url.replace('SEARCH_PLACEHOLDER', encodeURIComponent(searchQuery));
                 window.location.href = url;
             }

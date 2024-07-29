@@ -7,7 +7,7 @@
     <div class="container">
         <div class="row">
             <div class="banner-form">
-                <form id="searchForm">
+                <form id="search-form">
                     <div class="banner-search-list">
                         <div class="input-block border-0">
                             <label for="search">Cari</label>
@@ -20,15 +20,6 @@
                         </button>
                     </div>
                 </form>
-            </div>
-
-            <div class="popular-search">
-                <h5>Popular Searches : </h5>
-                <ul>
-                    <li><a href="service-grid-sidebar.html">Online Mockup</a></li>
-                    <li><a href="service-grid-sidebar.html">Carpentering</a></li>
-                    <li><a href="service-grid-sidebar.html">Event Organiser</a></li>
-                </ul>
             </div>
         </div>
     </div>
