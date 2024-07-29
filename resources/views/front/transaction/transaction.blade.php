@@ -208,11 +208,12 @@
                         type: 'PUT',
                         url: '{{ route('update_transaction', $transaction->invoice) }}',
                         data: {
-                            _token: '{{ csrf_token() }}'
+                            _token: '{{ csrf_token() }}',
+                            action: 'complete'
                         },
                         success: function(response) {
-                            if(response.status === false){
-                                toastr.error(response.message,'Oops!');
+                            if (response.status === false) {
+                                toastr.error(response.message, 'Oops!');
                                 $('#submit-btn-selesai').prop('disabled', false);
                                 $('#submit-btn-selesai').html('<i class="feather-shopping-cart me-2"></i>Bayar Pesanan');
                             } else {
@@ -221,12 +222,48 @@
                                 $('#transaction_id').remove();
                                 fetch_pembayaran();
                                 fetch_transaction();
-                                toastr.success(response.message,'Success!');
+                                toastr.success(response.message, 'Success!');
                             }
                         },
                         error: function(response) {
                             $('#submit-btn-selesai').prop('disabled', false);
                             $('#submit-btn-selesai').html('<i class="feather-shopping-cart me-2"></i>Bayar Pesanan');
+                        }
+                    });
+                });
+            @endif
+        @elseif($transaction->status === "PENDING")
+            @if(auth()->user()->id === $transaction->user_id)
+                $('#submit-btn-batal').click(function() {
+                    console.log('pok');
+                    var button = $(this);
+
+                    button.prop('disabled', true);
+                    button.html('<span id="loadingSpinner" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Loading...');
+
+                    $.ajax({
+                        type: 'PUT',
+                        url: '{{ route('update_transaction', $transaction->invoice) }}',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            action: 'cancel'
+                        },
+                        success: function(response) {
+                            if (response.status === false) {
+                                toastr.error(response.message, 'Oops!');
+                                button.prop('disabled', false);
+                                button.html('Batalkan Pesanan');
+                            } else {
+                                button.remove();
+                                fetch_pembayaran();
+                                fetch_transaction();
+                                toastr.success(response.message, 'Success!');
+                            }
+                        },
+                        error: function(response) {
+                            toastr.error('Terjadi kesalahan saat membatalkan pesanan.', 'Oops!');
+                            button.prop('disabled', false);
+                            button.html('Batalkan Pesanan');
                         }
                     });
                 });
@@ -370,7 +407,7 @@
                             <a href="{{ route('view_message') }}?id={{ $transaction->user_id }}&text=Hallo {{ $transaction->user->username }}," class="btn btn-outline-primary w-100 mb-1"><i class="feather-message-square me-2"></i>Chat Customer</a>
                         @endif
                         @if ($transaction->approved === "WAITING")
-                            <button class="btn btn-primary w-100">Batalkan Pesanan</button>
+                            <button class="btn btn-primary w-100" id="submit-btn-batal">Batalkan Pesanan</button>
                         @else
                             @if ($payment)
                                 <input type="hidden" name="transaction_id" id="transaction_id" value="{{ $transaction->id }}">

@@ -51,7 +51,7 @@ class UserController extends Controller
                             case 'COMPLETED':
                                 $color = 'success';
                                 break;
-                            case 'CANCELLED':
+                            case 'CANCLED':
                                 $color = 'danger';
                                 break;
                             case 'PENDING':

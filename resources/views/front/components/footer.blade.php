@@ -1,7 +1,7 @@
 <footer class="footer">
     <div class="section-bg">
-        <img src="asset/img/bg/footer-bg-01.png" class="footer-bg-one" alt="img">
-        <img src="asset/img/bg/footer-bg-02.png" class="footer-bg-two" alt="img">
+        <img src="{{ asset('asset/img/bg/footer-bg-01.png') }}" class="footer-bg-one" alt="img">
+        <img src="{{ asset('asset/img/bg/footer-bg-02.png') }}" class="footer-bg-two" alt="img">
     </div>
     <div class="container">
         <div class="footer-top">
@@ -12,17 +12,6 @@
                             <img src="{{ optional(app('web_conf')->where('conf_key', 'web_logo')->first())->conf_value }}" height="50" alt="logo">
                         </a>
                         <p>{{ optional(app('web_conf')->where('conf_key', 'web_footer')->first())->conf_value }}</p>
-                        <div class="social-links">
-                            <ul>
-                                <li><a href="javascript:void(0);"><i class="fa-brands fa-facebook"></i></a></li>
-                                <li><a href="javascript:void(0);"><i class="fa-brands fa-x-twitter"></i></a>
-                                </li>
-                                <li><a href="javascript:void(0);"><i class="fa-brands fa-instagram"></i></a>
-                                </li>
-                                <li><a href="javascript:void(0);"><i class="fa-brands fa-google"></i></a></li>
-                                <li><a href="javascript:void(0);"><i class="fa-brands fa-youtube"></i></a></li>
-                            </ul>
-                        </div>
                     </div>
                 </div>
                 <div class="col-xl-4 col-lg-4 col-md-6 col-sm-6">
@@ -112,7 +101,7 @@
             <div class="row">
                 <div class="col-lg-6">
                     <div class="copy-right">
-                        <p>Copyright © 2024 DreamGigs. All rights reserved.</p>
+                        <p>Copyright © 2024 TRPL 4C. All rights reserved.</p>
                     </div>
                 </div>
                 {{-- <div class="col-lg-6">

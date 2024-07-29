@@ -20,7 +20,7 @@
     </div>
 </div>
 <div class="settings-card">
-    <form action="{{ route('update_profile_user') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('update_profile_freelance') }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('put')
         <div class="settings-card-body">
@@ -107,5 +107,62 @@
             </div>
         </div>
     </form>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+
+            <div class="col-md-12">
+                <div class="form-wrap">
+                    <label>NIK</label>
+                    <input type="text"  value="{{ $freelance->nik }}" class="form-control" disabled>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-wrap">
+                    <label>Provinsi</label>
+                    <input type="text"  value="{{ $freelance->provinsi }}" class="form-control" disabled>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-wrap">
+                    <label>Kota</label>
+                    <input type="text"  value="{{ $freelance->kota }}" class="form-control" disabled>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-wrap">
+                    <label>Kecamatan</label>
+                    <input type="text"  value="{{ $freelance->kecamatan }}" class="form-control" disabled>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-wrap">
+                    <label>Desa</label>
+                    <input type="text"  value="{{ $freelance->desa }}" class="form-control" disabled>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-wrap">
+                    <label>Alamat</label>
+                    <input type="text"  value="{{ $freelance->alamat }}" class="form-control" disabled>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-wrap">
+                    <label>Bank</label>
+                    <input type="text"  value="{{ $freelance->jenis_rekening }}" class="form-control" disabled>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-wrap">
+                    <label>No Rekening</label>
+                    <input type="text"  value="{{ $freelance->no_rekening }}" class="form-control" disabled>
+                </div>
+            </div>
+            <p class="text-danger">*Kontak CS untuk jika ingin mengupdate data.</p>
+        </div>
+    </div>
 </div>
 @endsection

@@ -1,5 +1,22 @@
 @extends('front.layouts.main')
 
+@section('meta')
+<meta name="description" content="{{ $catalog->description }}">
+<meta name="author" content="{{ optional(app('web_conf')->where('conf_key', 'web_author')->first())->conf_value }}">
+<meta name="keywords" content="{{ optional(app('web_conf')->where('conf_key', 'web_keywords')->first())->conf_value }}">
+
+<meta property="og:title" content="{{ $catalog->title_name }}">
+<meta property="og:description" content="{{ $catalog->description }}">
+<meta property="og:image" content="{{ asset('storage/' . $catalog->portofolios->first()->path_image) }}">
+<meta property="og:url" content="{{ route('view-catalog', ['username' => $catalog->user->username, 'slug' => $catalog->slug]) }}">
+<meta property="og:type" content="website">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ $catalog->title_name }}">
+<meta name="twitter:description" content="{{ $catalog->description }}">
+<meta name="twitter:image" content="{{ asset('storage/' . $catalog->portofolios->first()->path_image) }}">
+@endsection
+
 @push('styles')
     <style>
         @media (max-width: 768px) {
@@ -74,6 +91,18 @@
         });
     }
 
+    $(document).ready(function() {
+        var currentUrl = window.location.href;
+        $('#shareLink').val(currentUrl);
+
+        $('#copyButton').click(function() {
+            var shareLink = $('#shareLink');
+            shareLink.select();
+            document.execCommand('copy');
+            toastr.success('Link berhasil disalin ke clipboard!','Success!');
+            $(this).text('Copied!');
+        });
+    });
 
 
     $(document).ready(function () {
@@ -195,9 +224,34 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#"><span><i class="feather-share-2"></i></span>Share this gigs</a>
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#shareModal"><span><i class="feather-share-2"></i></span>Bagikan</a>
                     </li>
                 </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="shareModal" tabindex="-1" role="dialog" aria-labelledby="shareModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="shareModalLabel">Bagikan Katalog</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="order-item mb-3">
+                    <div class="order-img">
+                        <img src="{{ asset('storage/' . $catalog->portofolios->first()->path_image) }}" alt="img">
+                    </div>
+                    <div class="order-info">
+                        <h5>{{ $catalog->title_name }}</h5>
+                    </div>
+                </div>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="shareLink" readonly>
+                    <button class="btn btn-primary" type="button" id="copyButton">Copy Link</button>
+                </div>
             </div>
         </div>
     </div>
@@ -257,7 +311,7 @@
                         @foreach ($catalog->packages->sortBy('price') as $package)    
                         <li>
                             <div class="row align-items-center rounded">
-                                <div class="col-md-8">
+                                <div class="col-md-10">
                                     <div class="delivery-info">
                                         <h5>{{ $package->package_name }}</h5>
                                         <span>{{ $package->description }}</span>
@@ -266,12 +320,6 @@
                                 <div class="col-md-2">
                                     <div class="delivery-amt">
                                         <h6 class="amt">Rp. {{ number_format($package->price,0,',','.') }}</h6>
-                                    </div>
-                                </div>
-                                <div class="col-md-1">
-                                    <div class="delivery-add">
-                                        <a href="javascript:void(0);" class="btn btn-light-primary add-btn"><i
-                                                class="feather-plus-circle"></i> Pesan</a>
                                     </div>
                                 </div>
                             </div>
@@ -319,8 +367,6 @@
                                     </div>
                                     <div class="review-content">
                                         <p>{{ $feedback->feedback }}</p>
-                                        <a href="javascript:void(0);" class="reply-btn"><i
-                                                class="feather-corner-up-left"></i>Reply</a>
                                     </div>
                                 </div>
                             </li>
@@ -400,7 +446,7 @@
                         </div>
                         <div class="user-info">
                             <h5><span class="me-2">{{ $catalog->user->username }}</span> @if ($catalog->user->isOnline())<span class="badge badge-success"><i class="fa-solid fa-circle"></i> Online</span> @else <span class="badge bg-danger"><i class="fa-solid fa-circle"></i> Offline</span> @endif</h5>
-                            <p><i class="fa-solid fa-star"></i>Ratings {{ number_format($catalog->feedback->sum('rate') ?? 0, 1) }} ({{ $catalog->feedback->count() }} Reviews)</p>
+                            <p><i class="fa-solid fa-star"></i>Ratings {{ number_format( min(($feedback->count() > 0 ? $feedback->sum('rate') / $feedback->count() : 0),5),1)}}  ({{ $feedback->count() }} Reviews)</p>
                         </div>
                     </div>
                     <ul class="member-info">
@@ -415,10 +461,6 @@
                         <li>
                             Terakhir Login
                             <span>{{ $catalog->user->last_seen }}</span>
-                        </li>
-                        <li>
-                            Rata - Rata Pesan dibalas
-                            <span>About 8 hours</span>
                         </li>
                     </ul>
                     <div class="about-me">

@@ -33,68 +33,103 @@
                     $('#modal_kecamatan').text(data.kecamatan);
                     $('#modal_kota').text(data.kota);
                     $('#modal_kode_pos').text(data.kode_pos);
+                    $('#modal_jenis_rekening').text(data.jenis_rekening);
+                    $('#modal_no_rekening').text(data.no_rekening);
                     $('#modal_foto_ktp').attr('src', '{{ url('') }}/storage/'+data.foto_ktp);
                     $('#modal_foto_selfie').attr('src', '{{ url('') }}/storage/'+data.selfie_ktp);
-                    $('#modal_portofolio').attr('src', '{{ url('') }}/storage/'+data.selfie_ktp);
+                    $('#modal_portofolio').attr('src', '{{ url('') }}/storage/'+data.portofolio);
+                    $('#detail-modal').modal('show');
                 },
                 error: function(error) {
-                    
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Terjadi kesalahan, silahkan coba lagi!'
+                    });
                 }
             });
         });
-        
-    </script>
-    <script src="{{ asset('asset/js/nik_parse.min.js') }}"></script>
-    <script>
-        $('#datatable').on('click', '.detail', function() {
-            var id = $(this).data('id');
+
+        $('#form-update').on('submit', function(e) {
+            e.preventDefault();
+            var form = $(this);
+            var url = form.attr('action');
+
             $.ajax({
-                url: '{{ route("get-freelance-id", ["id" => ":id"]) }}'.replace(':id', id),
-                type: 'GET',
-                success: function(data) {
-                    $('#form-update').attr('action', '{{ route("update-validasi-freelance", ["id" => ":id"]) }}'.replace(':id', id));
-                    $('#modal_username').text(data.user.username);
-                    $('#modal_fullname').text(data.user.fullname);
-                    $('#modal_nik').text(data.nik);
-                    $('#modal_alamat').text(data.alamat);
-                    $('#modal_provinsi').text(data.provinsi);
-                    $('#modal_desa').text(data.desa);
-                    $('#modal_kecamatan').text(data.kecamatan);
-                    $('#modal_kota').text(data.kota);
-                    $('#modal_kode_pos').text(data.kode_pos);
-                    $('#modal_foto_ktp').attr('src', '{{ url('') }}/storage/'+data.foto_ktp);
-                    $('#modal_foto_selfie').attr('src', '{{ url('') }}/storage/'+data.selfie_ktp);
-                    $('#modal_portofolio').attr('src', '{{ url('') }}/storage/'+data.selfie_ktp);
-                    
-                    cekNik(data, function(result) {
-                        fetch_data(result, data);
+                type: "POST",
+                url: url,
+                data: form.serialize(),
+                success: function(response) {
+                    $('#detail-modal').modal('hide');
+                    $('#datatable').DataTable().ajax.reload();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil',
+                        text: response.message
                     });
                 },
-                error: function(error) {
-                    // Handle error
+                error: function(response) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Terjadi kesalahan, silahkan coba lagi!'
+                    });
                 }
             });
         });
 
-        function cekNik(data, callback) {
-            nikParse(data.nik, function(result) {
-                callback(result);
-                console.log(result);
-            });
-        }
+        $('#btn-tolak').on('click', function() {
+            var form = $('#form-update');
+            var url = form.attr('action').replace('approve', 'reject');
+            var note_register = $('#note_register').val();
+            var id = form.attr('action').split('/').pop();
 
-        function fetch_data(result, data) {
-            var fields = ['nik', 'kecamatan', 'provinsi', 'kota'];
+            if (note_register.trim() === '') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Alasan penolakan harus diisi.'
+                });
+                return;
+            }
 
-            fields.forEach(function(field) {
-                var element = $('#modal_' + field);
-                if (data[field] === result.data[field]) {
-                    element.addClass('text-success').removeClass('text-danger');
-                } else {
-                    element.removeClass('text-success').addClass('text-danger');
+            Swal.fire({
+                title: 'Anda yakin ingin menolak freelance ini?',
+                text: "Anda tidak bisa mengembalikan keputusan ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, tolak!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: "PUT",
+                        url: url,
+                        data: {
+                            note_register: note_register,
+                            _token: $('input[name="_token"]').val()
+                        },
+                        success: function(response) {
+                            $('#detail-modal').modal('hide');
+                            $('#datatable').DataTable().ajax.reload();
+                            Swal.fire(
+                                'Ditolak!',
+                                response.message,
+                                'success'
+                            );
+                        },
+                        error: function(response) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: response.responseJSON.message
+                            });
+                        }
+                    });
                 }
             });
-        }
+        });
     </script>
 @endpush
 
@@ -205,6 +240,22 @@
                       </tr>
                       <tr>
                         <td class="text-nowrap fw-semibold">
+                          Bank
+                        </td>
+                        <td>
+                          <span id="modal_jenis_rekening">?</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="text-nowrap fw-semibold">
+                          No Rekening
+                        </td>
+                        <td>
+                          <span id="modal_no_rekening">?</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="text-nowrap fw-semibold">
                           Foto KTP
                         </td>
                         <td>
@@ -228,13 +279,16 @@
                         </td>
                       </tr>
                     </tbody>
-                  </table>
+                </table>
+                <div class="form-group mt-3">
+                    <label for="note_register">Alasan Penolakan</label>
+                    <textarea name="note_register" id="note_register" class="form-control" rows="3"></textarea>
+                </div>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-label-secondary waves-effect" data-bs-dismiss="modal">
-                Close
-              </button>
+              <button type="button" class="btn btn-label-secondary waves-effect" data-bs-dismiss="modal">Close</button>
               <button type="submit" class="btn btn-primary waves-effect waves-light">Terima</button>
+              <button type="button" class="btn btn-danger waves-effect waves-light" id="btn-tolak">Tolak</button>
             </div>
           </form>
         </div>

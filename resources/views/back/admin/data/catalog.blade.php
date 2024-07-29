@@ -20,6 +20,7 @@
                 { data: 'package', name: 'package' },
                 { data: 'count_views', name: 'count_views' },
                 { data: 'created_at', name: 'created_at' },
+                { data: 'aksi', name: 'aksi' },
             ]
         });
     });
@@ -88,6 +89,42 @@
             window.location.href = '{{ route('pdf_data_catalog') }}?start_date=' + startDate + '&end_date=' + endDate;
         });
     });
+
+    $(document).on('click', '.btn-toggle-status', function() {
+        var id = $(this).data('id');
+        var status = $(this).data('status');
+        var token = "{{ csrf_token() }}";
+
+        $.ajax({
+            url: "{{ route('toggle_status') }}",
+            type: 'POST',
+            data: {
+                _token: token,
+                id: id,
+                status: status
+            },
+            success: function(response) {
+                Swal.fire({
+                    title: 'Success!',
+                    text: response.success,
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $('#datatable').DataTable().ajax.reload();
+                    }
+                });
+            },
+            error: function(response) {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'An error occurred while changing the status.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
+    });
 </script>
 @endpush
 
@@ -142,6 +179,7 @@
                     <th>Jumlah Paket</th>
                     <th>Total Pengunjung</th>
                     <th>Tanggal Dibuat</th>
+                    <th>Aksi</th>
                 </tr>
             </thead>
         </table>

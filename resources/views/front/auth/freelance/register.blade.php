@@ -47,108 +47,270 @@
             <div class="col-lg-6">
                 <div class="login-wrapper">
                     <div class="login-content">
-                        <form method="POST" enctype="multipart/form-data">
-                            @csrf
-                            <div class="login-userset">
-                                <div class="login-logo">
-                                    <img src="{{ optional(app('web_conf')->where('conf_key', 'web_logo')->first())->conf_value }}" width="100" alt="img">
-                                </div>
-                                <div class="login-card">
-                                    <div class="login-heading mb-3">
-                                        <h3>Hi, {{ auth()->user()->username }}!</h3>
-                                        <p>Silahkan isi semua kolom dibawah ini.</p>
+                        @if ($freelance)
+                            @if ($freelance->status_register === "PENDING")
+                                <div class="login-userset">
+                                    <div class="login-logo">
+                                        <img src="{{ optional(app('web_conf')->where('conf_key', 'web_logo')->first())->conf_value }}" width="100" alt="img">
                                     </div>
-                                    @if ($errors->any())
-                                        <div class="alert alert-danger" role="alert">
-                                            <ul class="ms-3" style="list-style-type: disc;">
-                                                @foreach($errors->all() as $error)
-                                                    <li class="small">{{ $error }}</li>
-                                                @endforeach
-                                            </ul>
+                                    <div class="login-card">
+                                        <img src="{{ asset('undraw/process.svg') }}" class="img-fluid" alt="">
+                                        <h5 class="text-center mt-3">Pendaftaran sedang dalam proses validasi.</h5>
+                                    </div>
+                                </div>
+                            @elseif ($freelance->status_register === "REJECTED")
+                                <form method="POST" enctype="multipart/form-data">
+                                    @csrf
+                                    @method('put')
+                                    <div class="login-userset">
+                                        <div class="login-logo">
+                                            <img src="{{ optional(app('web_conf')->where('conf_key', 'web_logo')->first())->conf_value }}" width="100" alt="img">
                                         </div>
-                                    @endif
+                                        <div class="login-card">
+                                            <div class="login-heading mb-3">
+                                                <h3>Hi, {{ auth()->user()->username }}!</h3>
+                                                <p>Silahkan isi semua kolom dibawah ini.</p>
+                                            </div>
+                                            <div class="alert alert-danger" role="alert">
+                                                <p class="mb-0">Pendaftaran ditolak, alasan :</p>
+                                                <span>{{ $freelance->note_register }}</span>
+                                            </div>
+                                            @if ($errors->any())
+                                                <div class="alert alert-danger" role="alert">
+                                                    <ul class="ms-3" style="list-style-type: disc;">
+                                                        @foreach($errors->all() as $error)
+                                                            <li class="small">{{ $error }}</li>
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                            @endif
 
-                                    @if(session('error'))
-                                        <div class="alert alert-danger small">
-                                            {{ session('error') }}
-                                        </div>
-                                    @endif
-                                    
-                                    <div class="form-wrap">
-                                        <label class="col-form-label" for="nik">Nomor KTP (NIK)</label>
-                                        <input type="text" name="nik" id="nik" value="{{ old('nik') }}" class="form-control @error('nik') is-invalid @enderror" autofocus></input>
-                                    </div>
-                                    <div class="form-wrap">
-                                        <label class="col-form-label" for="about">Tentang Saya</label>
-                                        <textarea name="about" id="about" class="form-control @error('about') is-invalid @enderror" rows="6" placeholder="Deskripsikan tentang profesi anda">{{ old('about') }}</textarea>
-                                    </div>
-                                    <div class="form-wrap">
-                                        <label class="col-form-label" for="provinsi">Provinsi</label>
-                                        <select class="form-control @error('provinsi') is-invalid @enderror" name="provinsi" id="provinsi" required>
-                                            <option selected disabled>-- Pilih Salah Satu --</option>
-                                            @foreach ($provinsi as $item)
-                                                <option value="{{ $item->code ?? '' }}" {{ old('provinsi') == ($item->code ?? '') ? 'selected' : '' }}>
-                                                    {{ $item->name ?? '' }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-6">
+                                            @if(session('error'))
+                                                <div class="alert alert-danger small">
+                                                    {{ session('error') }}
+                                                </div>
+                                            @endif
+                                            
                                             <div class="form-wrap">
-                                                <label class="col-form-label" for="kota">Kabupaten / Kota</label>
-                                                <select class="form-control @error('kota') is-invalid @enderror" name="kota" id="kota" required>
-                                                    <option selected disabled>-- Pilih Salah Satu --</option>
-                                                </select>
+                                                <label class="col-form-label" for="nik">Nomor KTP (NIK)</label>
+                                                <input type="text" name="nik" id="nik" value="{{ $freelance->nik }}" class="form-control @error('nik') is-invalid @enderror" autofocus></input>
                                             </div>
-                                        </div>
-                                        <div class="col-6">
-                                            <div class="form-warp">
-                                                <label class="col-form-label" for="kecamatan">Kecamatan</label>
-                                                <select class="form-control @error('kecamatan') is-invalid @enderror" name="kecamatan" id="kecamatan" required>
-                                                    <option selected disabled>-- Pilih Salah Satu --</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-6">
-                                            <div class="form-warp">
-                                                <label class="col-form-label" for="desa">Desa</label>
-                                                <select class="form-control @error('desa') is-invalid @enderror" accpet="image" name="desa" id="desa" required>
-                                                    <option selected disabled>-- Pilih Salah Satu --</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-6">
                                             <div class="form-wrap">
-                                                <label class="col-form-label" for="kode_pos">Kode Pos</label>
-                                                <input type="number" name="kode_pos" id="kode_pos" value="{{ old('kode_pos') }}" class="form-control @error('kode_pos') is-invalid @enderror"></input>
+                                                <label class="col-form-label" for="about">Tentang Saya</label>
+                                                <textarea name="about" id="about" class="form-control @error('about') is-invalid @enderror" rows="6" placeholder="Deskripsikan tentang profesi anda">{{ $freelance->about }}</textarea>
                                             </div>
+                                            <div class="form-wrap">
+                                                <label class="col-form-label" for="provinsi">Provinsi</label>
+                                                <select class="form-control @error('provinsi') is-invalid @enderror" name="provinsi" id="provinsi" required>
+                                                    <option selected disabled>-- Pilih Salah Satu --</option>
+                                                    @foreach ($provinsi as $item)
+                                                        <option value="{{ $item->code ?? '' }}" {{ $freelance->provinsi == ($item->code ?? '') ? 'selected' : '' }}>
+                                                            {{ $item->name ?? '' }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <div class="form-wrap">
+                                                        <label class="col-form-label" for="kota">Kabupaten / Kota</label>
+                                                        <select class="form-control @error('kota') is-invalid @enderror" name="kota" id="kota" required>
+                                                            <option selected disabled>-- Pilih Salah Satu --</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="form-warp">
+                                                        <label class="col-form-label" for="kecamatan">Kecamatan</label>
+                                                        <select class="form-control @error('kecamatan') is-invalid @enderror" name="kecamatan" id="kecamatan" required>
+                                                            <option selected disabled>-- Pilih Salah Satu --</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <div class="form-warp">
+                                                        <label class="col-form-label" for="desa">Desa</label>
+                                                        <select class="form-control @error('desa') is-invalid @enderror" accpet="image" name="desa" id="desa" required>
+                                                            <option selected disabled>-- Pilih Salah Satu --</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-6">
+                                                    <div class="form-wrap">
+                                                        <label class="col-form-label" for="kode_pos">Kode Pos</label>
+                                                        <input type="number" name="kode_pos" id="kode_pos" value="{{ $freelance->kode_pos }}" class="form-control @error('kode_pos') is-invalid @enderror"></input>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-wrap">
+                                                <label class="col-form-label" for="alamat">Alamat Lengkap</label>
+                                                <input type="text" name="alamat" id="alamat" value="{{ $freelance->alamat }}" class="form-control @error('alamat') is-invalid @enderror"></input>
+                                            </div>
+                                            <div class="form-wrap">
+                                                <label class="col-form-label" for="jenis_rekening">Bank</label>
+                                                <select class="form-control @error('jenis_rekening') is-invalid @enderror" accpet="image" name="jenis_rekening" id="jenis_rekening" required>
+                                                    <option disabled>-- Pilih Salah Satu --</option>
+                                                    <option value="BRI" {{ old('jenis_rekening', $freelance->jenis_rekening) == 'BRI' ? 'selected' : '' }}>BRI</option>
+                                                    <option value="BCA" {{ old('jenis_rekening', $freelance->jenis_rekening) == 'BCA' ? 'selected' : '' }}>BCA</option>
+                                                    <option value="BPD BALI" {{ old('jenis_rekening', $freelance->jenis_rekening) == 'BPD BALI' ? 'selected' : '' }}>BPD BALI</option>
+                                                    <option value="BNI" {{ old('jenis_rekening', $freelance->jenis_rekening) == 'BNI' ? 'selected' : '' }}>BNI</option>
+                                                    <option value="Mandiri" {{ old('jenis_rekening', $freelance->jenis_rekening) == 'Mandiri' ? 'selected' : '' }}>Mandiri</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-wrap">
+                                                <label class="col-form-label" for="no_rekening">No Rekening</label>
+                                                <input type="text" name="no_rekening" id="no_rekening" value="{{ $freelance->no_rekening }}" class="form-control @error('no_rekening') is-invalid @enderror"></input>
+                                            </div>
+                                            <div class="form-wrap">
+                                                <label class="col-form-label" for="foto_ktp">Foto KTP</label>
+                                                <span class="col-form-label text-primary" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#modal_foto_ktp">(?)</span>
+                                                <input type="file" name="foto_ktp" id="foto_ktp" value="{{ $freelance->foto_ktp }}" accept="image/*" class="form-control @error('foto_ktp') is-invalid @enderror"></input>
+                                            </div>
+                                            <div class="form-wrap">
+                                                <label class="col-form-label" for="selfie_ktp">Foto Selfi</label>
+                                                <span class="col-form-label text-primary" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#modal_foto_selfie">(?)</span>
+                                                <input type="file" name="selfie_ktp" id="selfie_ktp" value="{{ $freelance->selfie_ktp }}" accept="image/*" class="form-control @error('selfie_ktp') is-invalid @enderror"></input>
+                                            </div>
+                                            <div class="form-wrap">
+                                                <label class="col-form-label" for="portofolio">Portofolio</label>
+                                                <input type="file" name="portofolio" id="portofolio" value="{{ $freelance->portofolio }}" accept="image/*" class="form-control @error('portofolio') is-invalid @enderror"></input>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary">Update</button>
                                         </div>
                                     </div>
-                                    <div class="form-wrap">
-                                        <label class="col-form-label" for="alamat">Alamat Lengkap</label>
-                                        <input type="text" name="alamat" id="alamat" value="{{ old('alamat') }}" class="form-control @error('alamat') is-invalid @enderror"></input>
+                                </form>
+                            @else
+                                <div class="login-userset">
+                                    <div class="login-logo">
+                                        <img src="{{ optional(app('web_conf')->where('conf_key', 'web_logo')->first())->conf_value }}" width="100" alt="img">
                                     </div>
-                                    <div class="form-wrap">
-                                        <label class="col-form-label" for="foto_ktp">Foto KTP</label>
-                                        <span class="col-form-label text-primary" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#modal_foto_ktp">(?)</span>
-                                        <input type="file" name="foto_ktp" id="foto_ktp" value="{{ old('foto_ktp') }}" accept="image/*" class="form-control @error('foto_ktp') is-invalid @enderror"></input>
+                                    <div class="login-card">
+                                        <img src="{{ asset('undraw/success.svg') }}" class="img-fluid" alt="">
+                                        <h5 class="text-center mt-3">Pendaftaran berhasil.</h5>
                                     </div>
-                                    <div class="form-wrap">
-                                        <label class="col-form-label" for="selfie_ktp">Foto Selfi</label>
-                                        <span class="col-form-label text-primary" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#modal_foto_selfie">(?)</span>
-                                        <input type="file" name="selfie_ktp" id="selfie_ktp" value="{{ old('selfie_ktp') }}" accept="image/*" class="form-control @error('selfie_ktp') is-invalid @enderror"></input>
-                                    </div>
-                                    <div class="form-wrap">
-                                        <label class="col-form-label" for="portofolio">Portofolio</label>
-                                        <input type="file" name="portofolio" id="portofolio" value="{{ old('portofolio') }}" accept="image/*" class="form-control @error('portofolio') is-invalid @enderror"></input>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Daftar</button>
                                 </div>
-                            </div>
-                        </form>
+                            @endif
+                        @else
+                            <form method="POST" enctype="multipart/form-data">
+                                @csrf
+                                <div class="login-userset">
+                                    <div class="login-logo">
+                                        <img src="{{ optional(app('web_conf')->where('conf_key', 'web_logo')->first())->conf_value }}" width="100" alt="img">
+                                    </div>
+                                    <div class="login-card">
+                                        <div class="login-heading mb-3">
+                                            <h3>Hi, {{ auth()->user()->username }}!</h3>
+                                            <p>Silahkan isi semua kolom dibawah ini.</p>
+                                        </div>
+                                        @if ($errors->any())
+                                            <div class="alert alert-danger" role="alert">
+                                                <ul class="ms-3" style="list-style-type: disc;">
+                                                    @foreach($errors->all() as $error)
+                                                        <li class="small">{{ $error }}</li>
+                                                    @endforeach
+                                                </ul>
+                                            </div>
+                                        @endif
+
+                                        @if(session('error'))
+                                            <div class="alert alert-danger small">
+                                                {{ session('error') }}
+                                            </div>
+                                        @endif
+                                        
+                                        <div class="form-wrap">
+                                            <label class="col-form-label" for="nik">Nomor KTP (NIK)</label>
+                                            <input type="text" name="nik" id="nik" value="{{ old('nik') }}" class="form-control @error('nik') is-invalid @enderror" autofocus></input>
+                                        </div>
+                                        <div class="form-wrap">
+                                            <label class="col-form-label" for="about">Tentang Saya</label>
+                                            <textarea name="about" id="about" class="form-control @error('about') is-invalid @enderror" rows="6" placeholder="Deskripsikan tentang profesi anda">{{ old('about') }}</textarea>
+                                        </div>
+                                        <div class="form-wrap">
+                                            <label class="col-form-label" for="provinsi">Provinsi</label>
+                                            <select class="form-control @error('provinsi') is-invalid @enderror" name="provinsi" id="provinsi" required>
+                                                <option selected disabled>-- Pilih Salah Satu --</option>
+                                                @foreach ($provinsi as $item)
+                                                    <option value="{{ $item->code ?? '' }}" {{ old('provinsi') == ($item->code ?? '') ? 'selected' : '' }}>
+                                                        {{ $item->name ?? '' }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <div class="form-wrap">
+                                                    <label class="col-form-label" for="kota">Kabupaten / Kota</label>
+                                                    <select class="form-control @error('kota') is-invalid @enderror" name="kota" id="kota" required>
+                                                        <option selected disabled>-- Pilih Salah Satu --</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="form-warp">
+                                                    <label class="col-form-label" for="kecamatan">Kecamatan</label>
+                                                    <select class="form-control @error('kecamatan') is-invalid @enderror" name="kecamatan" id="kecamatan" required>
+                                                        <option selected disabled>-- Pilih Salah Satu --</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <div class="form-warp">
+                                                    <label class="col-form-label" for="desa">Desa</label>
+                                                    <select class="form-control @error('desa') is-invalid @enderror" accpet="image" name="desa" id="desa" required>
+                                                        <option selected disabled>-- Pilih Salah Satu --</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="form-wrap">
+                                                    <label class="col-form-label" for="kode_pos">Kode Pos</label>
+                                                    <input type="number" name="kode_pos" id="kode_pos" value="{{ old('kode_pos') }}" class="form-control @error('kode_pos') is-invalid @enderror"></input>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-wrap">
+                                            <label class="col-form-label" for="alamat">Alamat Lengkap</label>
+                                            <input type="text" name="alamat" id="alamat" value="{{ old('alamat') }}" class="form-control @error('alamat') is-invalid @enderror"></input>
+                                        </div>
+                                        <div class="form-wrap">
+                                            <label class="col-form-label" for="jenis_rekening">Bank</label>
+                                            <select class="form-control @error('jenis_rekening') is-invalid @enderror" accpet="image" name="jenis_rekening" id="jenis_rekening" required>
+                                                <option selected disabled>-- Pilih Salah Satu --</option>
+                                                <option value="BRI">BRI</option>
+                                                <option value="BCA">BCA</option>
+                                                <option value="BPD BALI">BPD BALI</option>
+                                                <option value="BNI">BNI</option>
+                                                <option value="Mandiri">Mandiri</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-wrap">
+                                            <label class="col-form-label" for="no_rekening">No Rekening</label>
+                                            <input type="text" name="no_rekening" id="no_rekening" value="{{ old('no_rekening') }}" class="form-control @error('no_rekening') is-invalid @enderror"></input>
+                                        </div>
+                                        <div class="form-wrap">
+                                            <label class="col-form-label" for="foto_ktp">Foto KTP</label>
+                                            <span class="col-form-label text-primary" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#modal_foto_ktp">(?)</span>
+                                            <input type="file" name="foto_ktp" id="foto_ktp" value="{{ old('foto_ktp') }}" accept="image/*" class="form-control @error('foto_ktp') is-invalid @enderror"></input>
+                                        </div>
+                                        <div class="form-wrap">
+                                            <label class="col-form-label" for="selfie_ktp">Foto Selfi</label>
+                                            <span class="col-form-label text-primary" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#modal_foto_selfie">(?)</span>
+                                            <input type="file" name="selfie_ktp" id="selfie_ktp" value="{{ old('selfie_ktp') }}" accept="image/*" class="form-control @error('selfie_ktp') is-invalid @enderror"></input>
+                                        </div>
+                                        <div class="form-wrap">
+                                            <label class="col-form-label" for="portofolio">Portofolio</label>
+                                            <input type="file" name="portofolio" id="portofolio" value="{{ old('portofolio') }}" accept="image/*" class="form-control @error('portofolio') is-invalid @enderror"></input>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Daftar</button>
+                                    </div>
+                                </div>
+                            </form>
+                        @endif
                     </div>
                 </div>
             </div>

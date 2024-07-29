@@ -111,7 +111,6 @@ class TransactionController extends Controller
     public function update_transaction(Request $request, $invoice)
     {
         $transaction = Transaction::where('invoice', $invoice)->first();
-        $status_timeline = TransactionTimeline::where('transaction_id',$transaction->id)->where('progress','COMPLETED')->where('created_by','FREELANCER')->first();
         
         if (!$transaction) {
             return response()->json(['status' => false, 'message' => 'Transaksi tidak ditemukan.'], 404);
@@ -121,6 +120,25 @@ class TransactionController extends Controller
             return response()->json(['status' => false, 'message' => 'Unauthorized.'], 403);
         }
 
+        $action = $request->input('action');
+
+        switch ($action) {
+            case 'complete':
+                return $this->completeTransaction($transaction);
+            case 'cancel':
+                return $this->cancelTransaction($transaction);
+            default:
+                return response()->json(['status' => false, 'message' => 'Aksi tidak valid.'], 400);
+        }
+    }
+
+    private function completeTransaction($transaction)
+    {
+        $status_timeline = TransactionTimeline::where('transaction_id', $transaction->id)
+            ->where('progress', 'COMPLETED')
+            ->where('created_by', 'FREELANCER')
+            ->first();
+
         if ($transaction->status !== 'PROCESSING') {
             return response()->json(['status' => false, 'message' => 'Transaksi status tidak processing.'], 400);
         }
@@ -129,11 +147,11 @@ class TransactionController extends Controller
             return response()->json(['status' => false, 'message' => 'Freelance status tidak completed.'], 400);
         }
 
-        $note = 'Pesanan berhasil diselesaikan pada '.now().' WIB.';
+        $note = 'Pesanan berhasil diselesaikan pada ' . now() . ' WIB.';
 
         $transaction->status = 'COMPLETED';
         $transaction->note = $note;
-        if($transaction->save()){
+        if ($transaction->save()) {
             Mail::to(auth()->user()->email)->send(new TransactionMail($transaction, 'transaction_success'));
         }
 
@@ -145,6 +163,7 @@ class TransactionController extends Controller
             'profit' => $web_fee,
             'transaction_id' => $transaction->id
         ]);
+
         $balance = $freelance->balance;
         $price = $transaction->package_price - $web_fee;
         if ($freelance) {
@@ -154,6 +173,23 @@ class TransactionController extends Controller
 
         return response()->json(['status' => true, 'message' => $note]);
     }
+
+    private function cancelTransaction($transaction)
+    {
+        if ($transaction->status !== 'PENDING') {
+            return response()->json(['status' => false, 'message' => 'Hanya pesanan dengan status PENDING yang bisa dibatalkan.'], 400);
+        }
+
+        $transaction->status = 'CANCLED';
+        $transaction->approved = 'REJECTED';
+        $transaction->note = 'Pesanan berhasil dibatalkan pada '.now();
+        if ($transaction->save()) {
+            Mail::to(auth()->user()->email)->send(new TransactionMail($transaction, 'transaction_failed'));
+        }
+
+        return response()->json(['status' => true, 'message' => 'Pesanan berhasil dibatalkan.']);
+    }
+
 
     public function create_payment(Request $request)
     {

@@ -266,10 +266,12 @@ class AdminMasterController extends Controller
     {
         $request->validate([
             'take_fee' => 'required|numeric|between:0,100',
+            'take_fee_withdraw' => 'required|numeric',
         ]);
 
         $data = [
             'take_fee' => $request->take_fee,
+            'take_fee_withdraw' => $request->take_fee_withdraw
         ];
         
         foreach ($data as $confKey => $confValue) {

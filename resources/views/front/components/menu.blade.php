@@ -56,6 +56,11 @@
                                 <i class="ti ti-shopping-cart me-1"></i>Manajemen Transaksi
                             </a>
                         </li>
+                        <li>
+                            <a href="{{ route('view_feedback_freelance') }}" @class(['active' => request()->routeIs('view_feedback_freelance')])>
+                                <i class="ti ti-star me-1"></i>Ulasan Pelanggan
+                            </a>
+                        </li>
                     @else
                         <li>
                             <a href="{{ route('dashboard_user') }}" @class(['active' => request()->routeIs('dashboard_user')])>

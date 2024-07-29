@@ -313,7 +313,12 @@
                     <label for="take_fee">Profit Persen</label>
                     <input type="text" class="form-control" name="take_fee" id="take_fee" value="{{ optional(app('web_conf')->where('conf_key', 'take_fee')->first())->conf_value }}">
                     <div class="text-danger small">* Profit diambil dengan persen.</div>
-                </div>                
+                </div>
+                <div class="mb-3">
+                    <label for="take_fee_withdraw">Biaya Penarikan</label>
+                    <input type="text" class="form-control" name="take_fee_withdraw" id="take_fee_withdraw" value="{{ optional(app('web_conf')->where('conf_key', 'take_fee_withdraw')->first())->conf_value }}">
+                    <div class="text-danger small">* Biaya Penarikan dalam nilai flat.</div>
+                </div>
                 <button type="submit" class="btn btn-primary col-12">Submit</button>
             </form>
         </div>

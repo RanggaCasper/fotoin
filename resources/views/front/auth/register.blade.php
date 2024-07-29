@@ -106,9 +106,18 @@
                                         <span class="form-icon">
                                             <i class="feather-mail"></i>
                                         </span>
-                                        <input type="email" name="email" value="{{ old('email') }}" class="form-control floating @error('email') is-invalid @enderror">
+                                        <input type="email" name="email" id="email" value="{{ old('email') }}" class="form-control floating @error('email') is-invalid @enderror">
                                         <label class="focus-label">Email</label>
                                     </div>
+                                    <div class="form-group form-focus gap-0">
+                                        <div class="input-group">
+                                            <input type="text" name="token" value="{{ old('token') }}" class="form-control @error('token') is-invalid @enderror">
+                                            <label class="focus-label">Token</label>
+                                            <div class="input-group-append">
+                                                <button id="send-token" class="btn btn-primary rounded-start-0">Kirim</button>
+                                            </div>
+                                        </div>
+                                    </div> 
                                     <div class="form-wrap form-focus pass-group">
                                         <span class="form-icon">
                                             <i class="toggle-password feather-eye-off"></i>
@@ -144,6 +153,31 @@
 
     @include('front.components.scripts')
     <script>
+         $('#send-token').on('click', function(event) {
+            event.preventDefault();
+
+            var button = $(this);
+            button.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Loading...');
+
+            $.ajax({
+                url: '{{ route("send_verify_token") }}',
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    email: $('#email').val(),
+                },
+                success: function(response) {
+                    button.prop('disabled', false).text('Kirim');
+                    toastr.success(response.message,'Success!');
+                },
+                error: function(xhr) {
+                    button.prop('disabled', false).text('Kirim');
+                    var errorMessage = xhr.responseJSON.message || 'Terjadi kesalahan saat mengirim token reset password. Silakan coba lagi.';
+                    toastr.error(errorMessage,'Oops!');
+                }
+            });
+        });
+
         $('#form-register').on('submit', function(event) {
             event.preventDefault();
 

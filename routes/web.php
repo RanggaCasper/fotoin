@@ -35,11 +35,13 @@ Route::controller(AuthController::class)->group(function(){
         Route::get('forgot', 'forgot')->name('forgot');
         Route::post('forgot', 'reset_password')->name('reset_password');
         Route::post('send_reset_token', 'send_reset_token')->name('send_reset_token');
+        Route::post('send_verify_token', 'send_verify_token')->name('send_verify_token');
     });
 
     Route::prefix('freelance')->middleware(['auth', 'checkSuspend', 'verified'])->group(function(){
         Route::get('register', 'register_freelance')->name('register-freelance');
         Route::post('register', 'proses_register_freelance')->name('proses-register-freelance');
+        Route::put('register', 'register_update_freelance')->name('register_update_freelance');
     });
 });
 
@@ -92,6 +94,7 @@ Route::controller(AdminController::class)->prefix('admin')->middleware(['auth', 
 
     Route::prefix('data')->group(function(){
         Route::get('/catalog', 'data_catalog')->name('data_catalog');
+        Route::post('/toggle_status', 'toggle_status')->name('toggle_status');
         Route::get('/catalog/get', 'get_data_catalog')->name('get_data_catalog');
         Route::get('/catalog/pdf', 'pdf_data_catalog')->name('pdf_data_catalog');
     });
@@ -104,8 +107,15 @@ Route::controller(AdminController::class)->prefix('admin')->middleware(['auth', 
     });
 
     Route::prefix('freelance')->group(function(){
+        Route::get('','view_freelance')->name('view_freelance');
+        Route::get('/get','get_freelance')->name('get_freelance');
+        Route::get('/edit/{id}', 'edit_freelance')->name('edit_freelance');
+        Route::put('/update/{id}', 'update_freelance')->name('update_freelance');
+        Route::delete('/delete/{id}', 'delete_freelance')->name('delete_freelance');
+
         Route::get('validasi', 'view_validasi_freelance')->name('view-validasi-freelance');
-        Route::put('validasi/{id}', 'update_validasi_freelance')->name('update-validasi-freelance');
+        Route::put('validasi/approve/{id}', 'update_validasi_freelance')->name('update-validasi-freelance');
+        Route::put('validasi/reject/{id}', 'reject_freelance')->name('reject_freelance');
         Route::get('get-validasi-freelance', 'get_validasi_freelance')->name('get-validasi-freelance');
         
         Route::get('kelola', 'view_kelola_freelance')->name('view-kelola-freelance');
@@ -115,6 +125,12 @@ Route::controller(AdminController::class)->prefix('admin')->middleware(['auth', 
     });
 
     Route::prefix('user')->group(function(){
+        Route::get('','view_user')->name('view_user');
+        Route::get('/get','get_user')->name('get_user');
+        Route::get('/edit/{id}', 'edit_user')->name('edit_user');
+        Route::put('/update/{id}', 'update_user')->name('update_user');
+        Route::delete('/delete/{id}', 'delete_user')->name('delete_user');
+
         Route::get('suspend', 'view_suspend')->name('view_suspend');
         Route::get('get_suspend', 'get_suspend')->name('get_suspend');
         Route::delete('unblock_user', 'unblock_user')->name('unblock_user');
@@ -184,6 +200,10 @@ Route::controller(FreelanceController::class)->prefix('freelance')->middleware([
         Route::get('/get', 'get_transaction')->name('get_transaction_freelance');
 
         Route::post('/approved', 'approved_transaction')->name('approved_transaction_freelance');
+    });
+
+    Route::prefix('/feedback')->group(function(){
+        Route::get('/', 'view_feedback')->name('view_feedback_freelance');
     });
 
     Route::prefix('/withdraw')->group(function(){

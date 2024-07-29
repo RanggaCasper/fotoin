@@ -6,7 +6,9 @@ use App\Models\Catalog;
 use App\Models\Package;
 use App\Models\Calendar;
 use App\Models\Category;
+use App\Models\Feedback;
 use App\Models\Withdraw;
+use App\Models\Freelance;
 use App\Models\Portofolio;
 use App\Models\Transaction;
 use App\Models\WebsiteConf;
@@ -22,7 +24,9 @@ class FreelanceController extends Controller
 {
     public function dashboard()
     {
-        return view('front.freelance.dashboard.dashboard');
+        $transaction = Transaction::where('freelance_id', auth()->user()->id)->get();
+        $catalog = Catalog::where('user_id', auth()->user()->id)->get();
+        return view('front.freelance.dashboard.dashboard', compact('transaction','catalog'));
     }
 
     public function catalog()
@@ -534,23 +538,18 @@ class FreelanceController extends Controller
 
     public function view_profile()
     {
-        return view('front.freelance.profile.profile');
+        $freelance = Freelance::where('user_id', auth()->user()->id)->first();
+        return view('front.freelance.profile.profile', compact('freelance'));
     }
 
     public function update_profile(Request $request)
     {
         $request->validate([
-            'current_password' => 'required',
             'profile_image' => 'nullable|image|mimes:jpg,png,jpeg|max:5120',
             'password' => 'nullable|string|min:8|confirmed',
         ]);
 
         $user = auth()->user();
-
-        if (!Hash::check($request->current_password, $user->password)) {
-            toastr()->error('Password saat ini salah.');
-            return redirect()->back();
-        }
 
         if ($request->hasFile('profile_image')) {
             $image = $request->file('profile_image');
@@ -560,6 +559,10 @@ class FreelanceController extends Controller
         }
 
         if ($request->filled('password')) {
+            if (!Hash::check($request->current_password, $user->password)) {
+                toastr()->error('Password saat ini salah.');
+                return redirect()->back();
+            }
             $user->password = Hash::make($request->password);
         }
 
@@ -571,4 +574,16 @@ class FreelanceController extends Controller
             return redirect()->back();
         }
     }
+
+    public function view_feedback()
+    {
+        $feedbacks = Feedback::whereHas('catalog', function ($query) {
+            $query->where('user_id', auth()->user()->id);
+        })->paginate(5);
+        $feedback_count = Feedback::with('transaction')->whereHas('catalog', function ($query) {
+            $query->where('user_id', auth()->user()->id);
+        })->count();
+        return view('front.freelance.feedback.feedback', compact('feedbacks','feedback_count'));
+    }
 }
+

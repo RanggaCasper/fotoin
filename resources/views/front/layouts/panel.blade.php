@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
     <title>{{ optional(app('web_conf')->where('conf_key', 'web_title')->first())->conf_value }}</title>
 
-    <link rel="shortcut icon" href="assets/img/favicon.png">
+    @yield('meta')
+
+    <link rel="icon" href="{{ optional(app('web_conf')->where('conf_key', 'web_icon')->first())->conf_value }}" type="image/png">
 
     @include('front.components.styles')
 </head>

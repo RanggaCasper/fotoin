@@ -4,7 +4,7 @@
     <div class="app-brand demo">
       <a href="index.html" class="app-brand-link">
         <img src="{{ optional(app('web_conf')->where('conf_key', 'web_logo')->first())->conf_value }}" width="36" alt="Logo">
-        <span class="app-brand-text demo menu-text fw-bold">{{ optional(app('web_conf')->where('conf_key', 'web_title')->first())->conf_value }}</span>
+        {{-- <span class="app-brand-text demo menu-text fw-bold">{{ optional(app('web_conf')->where('conf_key', 'web_title')->first())->conf_value }}</span> --}}
       </a>
 
       <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">
@@ -53,6 +53,18 @@
         <a href="{{ route('dashboard-admin') }}" class="menu-link">
           <i class="menu-icon tf-icons ti ti-smart-home"></i>
           <div>Dashboard</div>
+        </a>
+      </li>
+      <li class="menu-item {{ request()->routeIs('view_user') ? 'active' : '' }}">
+        <a href="{{ route('view_user') }}" class="menu-link">
+          <i class="menu-icon tf-icons ti ti-user"></i>
+          <div>Kelola User</div>
+        </a>
+      </li>
+      <li class="menu-item {{ request()->routeIs('view_freelance') ? 'active' : '' }}">
+        <a href="{{ route('view_freelance') }}" class="menu-link">
+          <i class="menu-icon tf-icons ti ti-users"></i>
+          <div>Kelola Freelance</div>
         </a>
       </li>
       <li class="menu-item {{ request()->routeIs('view_withdraw_admin') ? 'active' : '' }}">

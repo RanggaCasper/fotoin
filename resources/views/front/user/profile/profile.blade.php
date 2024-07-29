@@ -102,8 +102,8 @@
         </div>
         <div class="settings-card-footer">
             <div class="btn-item">
-                <button type="reset" class="btn btn-secondary">Cancel</button>
-                <button class="btn btn-primary" type="submit">Save Changes</button>
+                <button type="reset" class="btn btn-secondary">Reset</button>
+                <button class="btn btn-primary" type="submit">Submit</button>
             </div>
         </div>
     </form>

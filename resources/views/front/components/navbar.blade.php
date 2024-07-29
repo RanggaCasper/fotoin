@@ -19,7 +19,7 @@
             <div class="main-menu-wrapper">
                 <div class="menu-header">
                     <a href="index.html" class="menu-logo">
-                        <img src="{{ optional(app('web_conf')->where('conf_key', 'web_logo')->first())->conf_value }}" class="img-fluid" alt="Logo">
+                        <img src="{{ optional(app('web_conf')->where('conf_key', 'web_logo')->first())->conf_value }}" class="img-fluid w-25" alt="Logo">
                     </a>
                     <a id="menu_close" class="menu-close" href="#"> <i class="fas fa-times"></i></a>
                 </div>
@@ -50,13 +50,12 @@
                     @else
                         <li><a href="{{ route('dashboard_user') }}">Dashboard</a></li>
                     @endauth
-                    <li class="nav-item"><a href="{{ route('home') }}#about" class="nav-link">Tentang Kami</a></li>
                     <li class="nav-item"><a href="{{ route('home') }}#faq" class="nav-link">FAQ</a></li>
                     <li class="nav-item"><a href="{{ route('home') }}#kontak" class="nav-link">Kontak</a></li>
                     @auth
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                             @csrf
-                        </form>
+                    </form>
                         <li class="nav-item responsive-link"><a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Keluar</a></li>
                     @else
                         <li class="nav-item responsive-link"><a href="{{ route('register-freelance') }}" class="nav-link">Daftar Freelancer</a></li>

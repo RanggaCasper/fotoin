@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Catalog;
 use App\Models\Category;
+use App\Models\Feedback;
 use App\Models\Wishlist;
 use App\Models\Portofolio;
 use Illuminate\Http\Request;
@@ -70,7 +71,11 @@ class HomeController extends Controller
             $request->session()->push('viewed_catalogs', $catalog->id);
         }
 
-        return view('front.home.catalog.view-catalog', compact('catalog'));
+        $feedback = Feedback::with('transaction')->whereHas('catalog', function ($query) {
+            $query->where('user_id', auth()->user()->id);
+        })->get();
+
+        return view('front.home.catalog.view-catalog', compact('catalog','feedback'));
     }
 
     public function view_wishlist()

@@ -3,7 +3,7 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
-            // Initialize DataTable
+            
             var table = $('#datatable').DataTable({
                 processing: true,
                 serverSide: true,
@@ -63,15 +63,15 @@
                     url: '{{ route("get_admin_id", ["id" => ":id"]) }}'.replace(':id', id),
                     type: 'GET',
                     success: function(data) {
-                        // Set action URL untuk form update
+                        
                         $('#form-update').attr('action', '{{ route("update_admin", ["id" => ":id"]) }}'.replace(':id', id));
 
-                        // Menambahkan input method jika belum ada
+                        
                         if ($('input[name="_method"]').length === 0) {
                             $('#form-update').append('<input type="hidden" name="_method" value="PUT">');
                         }
 
-                        // Mengisi nilai-nilai input form dengan data dari server
+                        
                         $('#username').val(data.username);
                         $('#fullname').val(data.fullname);
                         $('#no_telp').val(data.no_telp);
@@ -80,7 +80,7 @@
                         $('#submit-button').text('Update');
                     },
                     error: function(xhr) {
-                        // Menangani error dari server
+                        
                         var errors = xhr.responseJSON.errors;
                         var errorMessage = 'Terjadi kesalahan saat menyimpan data.';
 

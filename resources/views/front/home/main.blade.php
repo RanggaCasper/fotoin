@@ -4,7 +4,25 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
-    <title>DreamGigs</title>
+    <title>{{ optional(app('web_conf')->where('conf_key', 'web_title')->first())->conf_value }}  - Marketplace Fotografer Profesional di Bali</title>
+    <meta name="description" content="{{ optional(app('web_conf')->where('conf_key', 'web_description')->first())->conf_value }}">
+    <meta name="author" content="{{ optional(app('web_conf')->where('conf_key', 'web_author')->first())->conf_value }}">
+    <meta name="keywords" content="{{ optional(app('web_conf')->where('conf_key', 'web_keywords')->first())->conf_value }}">
+    
+    <!-- Open Graph Meta Tags for better social media integration -->
+    <meta property="og:title" content="{{ optional(app('web_conf')->where('conf_key', 'web_title')->first())->conf_value }} - Marketplace Fotografer Profesional di Bali">
+    <meta property="og:description" content="{{ optional(app('web_conf')->where('conf_key', 'web_description')->first())->conf_value }}">
+    <meta property="og:image" content="{{ optional(app('web_conf')->where('conf_key', 'web_logo')->first())->conf_value }}">
+    <meta property="og:url" content="{{ url('') }}">
+    <meta property="og:type" content="{{ optional(app('web_conf')->where('conf_key', 'web_icon')->first())->conf_value }}">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ optional(app('web_conf')->where('conf_key', 'web_title')->first())->conf_value }} - Marketplace Fotografer Profesional di Bali">
+    <meta name="twitter:description" content="{{ optional(app('web_conf')->where('conf_key', 'web_description')->first())->conf_value }}">
+    <meta name="twitter:image" content="{{ optional(app('web_conf')->where('conf_key', 'web_logo')->first())->conf_value }}">
+    
+    <link rel="icon" href="{{ optional(app('web_conf')->where('conf_key', 'web_icon')->first())->conf_value }}" type="image/png">
 
     @include('front.components.styles')
     <style>
@@ -62,7 +80,7 @@
                     <div class="col-lg-8">
                         <div class="banner-content aos" data-aos="fade-up">
                             <div class="banner-head">
-                                <h1>Temukan freelancer fotografer di Fotoin!</h1>
+                                <h1>Temukan freelancer fotografer di {{ optional(app('web_conf')->where('conf_key', 'web_title')->first())->conf_value }}!</h1>
                                 <p>Kualitas foto profesional untuk setiap momen spesial Anda. Pesan sekarang! 📸</p>
                             </div>
                             <div class="banner-form">
@@ -384,7 +402,7 @@
                                 <img src="asset/img/icons/service-icon.svg" alt="icon">
                             </div>
                             <h3>Daftar Freelance</h3>
-                            <p>Menawarkan jasa Anda sebagai freelancer di Fotoin untuk menjangkau calon pembeli.</p>
+                            <p>Menawarkan jasa Anda sebagai freelancer di {{ optional(app('web_conf')->where('conf_key', 'web_title')->first())->conf_value }} untuk menjangkau calon pembeli.</p>
                             <a href="{{ route('register-freelance') }}" class="btn btn-primary">Daftar<i
                                     class="fa-solid fa-caret-right"></i></a>
                         </div>
@@ -398,7 +416,7 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="section-header aos" data-aos="fade-up">
-                            <h2><span>Ulasan</span> pelanggan Fotoin.</h2>
+                            <h2><span>Ulasan</span> pelanggan {{ optional(app('web_conf')->where('conf_key', 'web_title')->first())->conf_value }}.</h2>
                         </div>
                         <div class="testimonial-slider owl-carousel">
                             <div class="testimonial-item aos" data-aos="fade-up">
@@ -531,7 +549,7 @@
             <div class="container">
                 <div class="expert-header">
                     <div class="section-header aos" data-aos="fade-up">
-                        <h2><span>Apa</span> yang membuat Fotoin berbeda?</h2>
+                        <h2><span>Apa</span> yang membuat {{ optional(app('web_conf')->where('conf_key', 'web_title')->first())->conf_value }} berbeda?</h2>
                     </div>
                 </div>
                 <div class="expert-wrapper">
@@ -543,7 +561,7 @@
                                 </div>
                                 <div class="expert-info">
                                     <h4>Freelancer Professional</h4>
-                                    <p>Freelancer telah melalui proses seleksi dan verifikasi yang ketat di Fotoin, sehingga Anda dapat yakin akan kualitas dan profesionalisme layanan yang mereka tawarkan. </p>
+                                    <p>Freelancer telah melalui proses seleksi dan verifikasi yang ketat di {{ optional(app('web_conf')->where('conf_key', 'web_title')->first())->conf_value }}, sehingga Anda dapat yakin akan kualitas dan profesionalisme layanan yang mereka tawarkan. </p>
                                 </div>
                             </div>
                         </div>
@@ -587,82 +605,81 @@
                                 <div class="section-header">
                                     <h2><span>Your</span> Frequently Added Question’s</h2>
                                 </div>
-                                <p>Don’t find the answer? We can help you.</p>
-                                <a href="faq.html" class="btn btn-primary">Ask a Question<i
-                                        class="fa-solid fa-caret-right"></i></a>
                             </div>
                         </div>
                         <div class="col-lg-8">
                             <div class="faq-wrapper faq-lists">
                                 <div class="faq-card aos" data-aos="fade-up">
                                     <h4 class="faq-title">
-                                        <a class="collapsed" data-bs-toggle="collapse" href="#faqone"
-                                            aria-expanded="false">What are website development services?</a>
+                                        <a class="collapsed" data-bs-toggle="collapse" href="#faqone" aria-expanded="false">Apa itu {{ optional(app('web_conf')->where('conf_key', 'web_title')->first())->conf_value }}?</a>
                                     </h4>
                                     <div id="faqone" class="card-collapse collapse">
                                         <div class="faq-content">
-                                            <p>Whether you’re looking to launch, update, or overhaul your website, we
-                                                offers a talented pool of freelancers who turn ideas into action. From
-                                                personal brand pages to eCommerce stores and everything in between,
-                                                website development services cover virtually any use case, industry, and
-                                                niche. In turn, you can make every digital first impression count.</p>
+                                            <p>{{ optional(app('web_conf')->where('conf_key', 'web_title')->first())->conf_value }} adalah platform marketplace yang mempertemukan klien dengan fotografer profesional di Bali. Kami menyediakan layanan untuk berbagai kebutuhan fotografi, mulai dari acara pernikahan, sesi keluarga, hingga fotografi produk.</p>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="faq-card aos" data-aos="fade-up">
                                     <h4 class="faq-title">
-                                        <a class="collapsed" data-bs-toggle="collapse" href="#faqtwo"
-                                            aria-expanded="false">What are the stages of a project?</a>
+                                        <a class="collapsed" data-bs-toggle="collapse" href="#faqtwo" aria-expanded="false">Bagaimana cara memesan fotografer di {{ optional(app('web_conf')->where('conf_key', 'web_title')->first())->conf_value }}?</a>
                                     </h4>
                                     <div id="faqtwo" class="card-collapse collapse">
                                         <div class="faq-content">
-                                            <p>Yes! My service guarantees you 24/7 lifetime support for anything related
-                                                to your website. Whenever you encounter a problem, feel free to reach
-                                                out to me anytime.</p>
+                                            <p>Untuk memesan fotografer, Anda bisa mengikuti langkah-langkah berikut:
+                                                <ol>
+                                                    <li>Kunjungi website {{ optional(app('web_conf')->where('conf_key', 'web_title')->first())->conf_value }}.</li>
+                                                    <li>Cari fotografer yang sesuai dengan kebutuhan Anda.</li>
+                                                    <li>Pilih fotografer yang diinginkan dan cek ketersediaannya.</li>
+                                                    <li>Lakukan pemesanan dan pembayaran melalui platform kami.</li>
+                                                    <li>Konfirmasi pemesanan dan nikmati layanan fotografi Anda.</li>
+                                                </ol>
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="faq-card aos" data-aos="fade-up">
                                     <h4 class="faq-title">
-                                        <a class="collapsed" data-bs-toggle="collapse" href="#faqOne"
-                                            aria-expanded="false">What types of service can I pick?</a>
+                                        <a class="collapsed" data-bs-toggle="collapse" href="#faqthree" aria-expanded="false">Apakah saya bisa memilih fotografer berdasarkan portofolio?</a>
                                     </h4>
-                                    <div id="faqOne" class="card-collapse collapse">
+                                    <div id="faqthree" class="card-collapse collapse">
                                         <div class="faq-content">
-                                            <p>Yes! My service guarantees you 24/7 lifetime support for anything related
-                                                to your website. Whenever you encounter a problem, feel free to reach
-                                                out to me anytime.</p>
+                                            <p>Ya, Anda bisa melihat portofolio fotografer sebelum memutuskan untuk memesan. Kami menyediakan informasi lengkap tentang karya dan pengalaman fotografer untuk membantu Anda membuat keputusan yang tepat.</p>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="faq-card aos" data-aos="fade-up">
                                     <h4 class="faq-title">
-                                        <a class="collapsed" data-bs-toggle="collapse" href="#faqfour"
-                                            aria-expanded="false">How much does it cost to develop a basic projects?</a>
+                                        <a class="collapsed" data-bs-toggle="collapse" href="#faqfour" aria-expanded="false">Bagaimana saya bisa membayar layanan fotografi?</a>
                                     </h4>
                                     <div id="faqfour" class="card-collapse collapse">
                                         <div class="faq-content">
-                                            <p>Yes! My service guarantees you 24/7 lifetime support for anything related
-                                                to your website. Whenever you encounter a problem, feel free to reach
-                                                out to me anytime.</p>
+                                            <p>Pembayaran dilakukan melalui platform {{ optional(app('web_conf')->where('conf_key', 'web_title')->first())->conf_value }}. Kami menerima berbagai metode pembayaran, termasuk transfer bank, kartu kredit, dan pembayaran digital.</p>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="faq-card aos" data-aos="fade-up">
                                     <h4 class="faq-title">
-                                        <a class="collapsed" data-bs-toggle="collapse" href="#faqfive"
-                                            aria-expanded="false">What are the most popular development platforms?</a>
+                                        <a class="collapsed" data-bs-toggle="collapse" href="#faqeight" aria-expanded="false">Bagaimana cara menjadi fotografer di {{ optional(app('web_conf')->where('conf_key', 'web_title')->first())->conf_value }}?</a>
                                     </h4>
-                                    <div id="faqfive" class="card-collapse collapse">
+                                    <div id="faqeight" class="card-collapse collapse">
                                         <div class="faq-content">
-                                            <p>Yes! My service guarantees you 24/7 lifetime support for anything related
-                                                to your website. Whenever you encounter a problem, feel free to reach
-                                                out to me anytime.</p>
+                                            <p>Jika Anda seorang fotografer profesional dan ingin bergabung dengan {{ optional(app('web_conf')->where('conf_key', 'web_title')->first())->conf_value }}, Anda bisa mendaftar melalui halaman "Daftar Fotografer" di website kami. Setelah pendaftaran, tim kami akan melakukan verifikasi dan menghubungi Anda untuk langkah selanjutnya.</p>
                                         </div>
                                     </div>
                                 </div>
+                                <div class="faq-card aos" data-aos="fade-up">
+                                    <h4 class="faq-title">
+                                        <a class="collapsed" data-bs-toggle="collapse" href="#faqnine" aria-expanded="false">Apakah {{ optional(app('web_conf')->where('conf_key', 'web_title')->first())->conf_value }} menyediakan layanan edit foto?</a>
+                                    </h4>
+                                    <div id="faqnine" class="card-collapse collapse">
+                                        <div class="faq-content">
+                                            <p>Beberapa fotografer di {{ optional(app('web_conf')->where('conf_key', 'web_title')->first())->conf_value }} menawarkan layanan edit foto sebagai bagian dari paket mereka. Anda bisa memeriksa detail layanan yang disediakan oleh setiap fotografer untuk informasi lebih lanjut.</p>
+                                        </div>
+                                    </div>
+                                </div>  
                             </div>
                         </div>
+                        
                     </div>
                 </div>
             </div>

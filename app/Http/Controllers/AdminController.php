@@ -17,6 +17,7 @@ use App\Models\SuspendRequest;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class AdminController extends Controller
 {
@@ -148,15 +149,47 @@ class AdminController extends Controller
     {
         $freelance = Freelance::find($id);
         $freelance->status = "on";
+        $freelance->status_register = "APPROVED";
 
         $user = $freelance->user;
         $user->role = "Freelance";
 
         if($freelance->save() && $user->save()){
-            toastr()->success('Data berhasil diupdate.');
-            return redirect()->back();
+            return response()->json([
+            'status' => true,
+            'message' => 'Freelance berhasil divalidasi.',
+        ]);
         }
     }
+
+    public function reject_freelance(Request $request, $id)
+    {
+        $freelance = Freelance::findOrFail($id);
+
+        $validator = Validator::make($request->all(), [
+            'note_register' => 'required|string|max:255',
+        ], [
+            'note_register.required' => 'Kolom alasan penolakan harus diisi.',
+            'note_register.max' => 'Kolom alasan penolakan tidak boleh lebih dari 255 karakter.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => $validator->errors()->first(),
+            ], 422);
+        }
+
+        $freelance->status_register = 'REJECTED';
+        $freelance->note_register = $request->note_register;
+        $freelance->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Freelance berhasil ditolak.',
+        ]);
+    }
+
 
     public function data_catalog()
     {
@@ -167,7 +200,7 @@ class AdminController extends Controller
     public function get_data_catalog(Request $request)
     {
         if ($request->ajax()) {
-            $query = Catalog::with('user','packages')->get();
+            $query = Catalog::with('user', 'packages')->get();
 
             return DataTables::of($query)
                 ->addColumn('no', function ($row) {
@@ -183,11 +216,27 @@ class AdminController extends Controller
                 ->addColumn('created_at', function ($row) {
                     return $row->created_at;
                 })
+                ->addColumn('aksi', function ($row) {
+                    $buttonText = $row->status == 'on' ? 'Hidden' : 'Visible';
+                    $buttonClass = $row->status == 'on' ? 'btn-danger' : 'btn-success';
+                    return '<button class="btn '.$buttonClass.' btn-sm btn-toggle-status" data-id="'.$row->id.'" data-status="'.$row->status.'">'.$buttonText.'</button>';
+                })
+                ->rawColumns(['aksi'])
                 ->toJson();
         }
 
         abort(404);
     }
+
+    public function toggle_status(Request $request)
+    {
+        $catalog = Catalog::findOrFail($request->id);
+        $catalog->status = $catalog->status == 'on' ? 'off' : 'on';
+        $catalog->save();
+
+        return response()->json(['success' => 'Status changed successfully.']);
+    }
+
 
     public function pdf_data_catalog(Request $request)
     {
@@ -456,6 +505,7 @@ class AdminController extends Controller
                 ->make(true);
         }
 
+        abort(404);
     }
 
     public function get_category_id(Request $request,$id)
@@ -682,5 +732,181 @@ class AdminController extends Controller
             ]);
         }
     }
+
+    public function view_user()
+    {
+        return view('back.admin.user.user');
+    }
+
+    public function get_user(Request $request)
+    {
+        if ($request->ajax()) {
+            $data = User::where('role', 'User')->get();
+            return DataTables::of($data)
+                ->addColumn('no', function ($row) {
+                    static $counter = 0;
+                    return ++$counter;
+                })
+                ->addColumn('created_at', function ($row) {
+                    return $row->created_at;
+                })
+                ->addColumn('action', function ($row) {
+                    return '<button class="btn btn-sm btn-primary edit" data-id="'.$row->id.'"><i class="ti ti-edit"></i></button>
+                        <button class="btn btn-sm btn-danger delete" data-id="'.$row->id.'"><i class="ti ti-trash"></i></button>';
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+        }
+
+        abort(404);
+    }
+
+    public function edit_user($id)
+    {
+        $user = User::findOrFail($id);
+        return response()->json($user);
+    }
+
+    public function update_user(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+
+        $validator = Validator::make($request->all(), [
+            'username' => 'required|string|max:255|unique:users,username,' . $id,
+            'fullname' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $id,
+            'no_telp' => 'required|string|max:15|unique:users,no_telp,' . $id,
+            'gender' => 'required|string|in:Laki - Laki,Perempuan',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => $validator->errors()->first(),
+            ], 422);
+        }
+
+        $user->update($request->all());
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'User berhasil diupdate',
+        ]);
+    }
+
+
+    public function delete_user($id)
+    {
+        $user = User::findOrFail($id);
+        
+        if ($user->catalogs()->exists() || $user->freelance()->exists() || $user->wishlist()->exists()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Tidak bisa menghapus pengguna karena masih ada data terkait di tabel lain.',
+            ], 422);
+        }
+
+        $user->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'User berhasil dihapus',
+        ]);
+    }
+
+    public function view_freelance()
+    {
+        return view('back.admin.freelance.freelance');
+    }
+
+    public function get_freelance(Request $request)
+    {
+        if ($request->ajax()) {
+            $data = Freelance::with('user')->get();
+            return DataTables::of($data)
+                ->addColumn('no', function ($row) {
+                    static $counter = 0;
+                    return ++$counter;
+                })
+                ->addColumn('username', function ($row) {
+                    return $row->user->username;
+                })
+                ->addColumn('fullname', function ($row) {
+                    return $row->user->fullname;
+                })
+                ->addColumn('action', function ($row) {
+                    return '<button class="btn btn-sm btn-primary edit" data-id="'.$row->id.'"><i class="ti ti-edit"></i></button>
+                            <button class="btn btn-sm btn-danger delete" data-id="'.$row->id.'"><i class="ti ti-trash"></i></button>';
+                })
+                ->rawColumns(['action'])
+                ->make(true);
+        }
+
+        abort(404);
+    }
+
+    public function edit_freelance($id)
+    {
+        $freelance = Freelance::findOrFail($id);
+        return response()->json($freelance);
+    }
+
+    public function update_freelance(Request $request, $id)
+    {
+        $freelance = Freelance::findOrFail($id);
+
+        $validator = Validator::make($request->all(), [
+            'nik' => 'required|string|max:255',
+            'about' => 'required|string',
+            'alamat' => 'required|string|max:255',
+            'kode_pos' => 'required|string|max:10',
+            'provinsi' => 'required|string|max:255',
+            'kota' => 'required|string|max:255',
+            'kecamatan' => 'required|string|max:255',
+            'desa' => 'required|string|max:255',
+            'no_rekening' => 'required|string|max:255',
+            'jenis_rekening' => 'required|string|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => $validator->errors()->first(),
+            ], 422);
+        }
+
+        $freelance->update($request->all());
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Freelance berhasil diupdate',
+        ]);
+    }
+
+    public function delete_freelance($id)
+    {
+        $freelance = Freelance::findOrFail($id);
+        $user = $freelance->user;
+
+        if ($user->catalogs()->exists() || $user->wishlist()->exists()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Tidak bisa menghapus data freelance karena masih ada data terkait di tabel lain.',
+            ], 422);
+        }
+
+        $user = $freelance->user;
+
+        $freelance->delete();
+
+        $user->role = 'user';
+        $user->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Freelance berhasil dihapus dan role pengguna telah diubah menjadi user',
+        ]);
+    }
+
 
 }

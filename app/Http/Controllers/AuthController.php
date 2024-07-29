@@ -64,6 +64,40 @@ class AuthController extends Controller
         return view('front.auth.register');
     }
 
+    public function send_verify_token(Request $request)
+    {
+        $request->validate([
+            'email' => 'email|unique:users,email',
+        ], [
+            'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Email sudah terdaftar, silahkan gunakan email lainnya.',
+        ]);
+
+        try {
+            $data = EmailToken::updateOrCreate(
+                ['email' => $request->email],
+                [
+                    'token' => (new EmailToken())->generateToken(),
+                    'type' => 'verify',
+                    'expired_at' => now()->addMinutes(180),
+                ]
+            );
+
+            Mail::to($request->email)->send(new TokenEmail($data));
+
+            return response()->json([
+                'message' => 'Token verifikasi telah dikirim ke email Anda.',
+                'status' => true,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Terjadi kesalahan saat mengirim token reset password. Silakan coba lagi.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
     public function proses_register(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -98,6 +132,34 @@ class AuthController extends Controller
         }
 
         try {
+            $data = EmailToken::where('email', $request->email)
+                ->where('type', 'verify')
+                ->first();
+
+            if (!$data) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Token tidak valid.'
+                ], 400);
+            }
+
+            if ($data->token !== $request->token) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Token tidak valid.'
+                ], 400);
+            }
+
+            if ($data->expired_at < Carbon::now()) {
+                $data->delete();
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Token telah kadaluarsa.'
+                ], 400);
+            }
+
+            $data->delete();
+
             $user = User::create([
                 'username' => $request->username,
                 'fullname' => $request->fullname,
@@ -105,24 +167,15 @@ class AuthController extends Controller
                 'email' => $request->email,
                 'password' => bcrypt($request->password),
                 'role' => 'User',
+                'email_verified_at' => now()
             ]);
 
             if ($user) {
-                $emailToken = EmailToken::create([
-                    'email' => $request->email,
-                    'token' => (new EmailToken())->generateToken(),
-                    'type' => 'verify',
-                    'expired_at' => now()->addMinutes(180),
-                ]);
-
-                if ($emailToken) {
-                    Mail::to($request->email)->send(new TokenEmail($emailToken));
-                    return response()->json([
-                        'status' => true,
-                        'message' => 'Pendaftaran berhasil, silahkan cek email untuk verifikasi.',
-                        'redirect' => route('login')
-                    ], 201);
-                }
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Pendaftaran berhasil.',
+                    'redirect' => route('login')
+                ], 201);
             }
 
             return response()->json([
@@ -137,7 +190,6 @@ class AuthController extends Controller
             ], 500);
         }
     }
-
 
     public function forgot()
     {
@@ -242,7 +294,8 @@ class AuthController extends Controller
     public function register_freelance()
     {
         $provinsi = Provinsi::get();
-        return view('front.auth.freelance.register', compact('provinsi'));
+        $freelance = Freelance::where('user_id', auth()->user()->id)->first();
+        return view('front.auth.freelance.register', compact('provinsi', 'freelance'));
     }
 
     public function proses_register_freelance(Request $request)
@@ -256,6 +309,8 @@ class AuthController extends Controller
             'kecamatan' => 'required',
             'kode_pos' => 'required',
             'kota' => 'required',
+            'jenis_rekening' => 'required',
+            'no_rekening' => 'required',
             'foto_ktp' => 'required|image',
             'selfie_ktp' => 'required|image',
             'portofolio' => 'required|image',
@@ -271,6 +326,8 @@ class AuthController extends Controller
             'kota.required' => 'Kolom kota harus diisi.',
             'foto_ktp.required' => 'Kolom foto ktp harus diisi.',
             'foto_ktp.image' => 'Kolom foto ktp harus berisi gambar.',
+            'jenis_rekening.required' => 'Kolom jenis rekening harus diisi.',
+            'no_rekening.required' => 'Kolom no rekening harus diisi.',
             'selfie_ktp.required' => 'Kolom foto selfie harus diisi.',
             'selfie_ktp.image' => 'Kolom foto selfie harus berisi gambar.',
             'portofolio.required' => 'Kolom portofolio harus diisi.',
@@ -298,6 +355,8 @@ class AuthController extends Controller
             'about' => $request->about,
             'alamat' => $request->alamat,
             'kode_pos' => $request->kode_pos,
+            'jenis_rekening' => $request->jenis_rekening,
+            'no_rekening' => $request->no_rekening,
             'foto_ktp' => $fotoKTP,
             'selfie_ktp' => $selfieKTP,
             'portofolio' => $portofolio,
@@ -325,6 +384,96 @@ class AuthController extends Controller
         }
 
         toastr()->error('Proses pengajuan pendaftaran freelance gagal di proses.');
+        return redirect()->back();
+    }
+
+    public function register_update_freelance(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'nik' => 'required|unique:freelance,nik,' . auth()->user()->freelance->id,
+            'about' => 'required',
+            'alamat' => 'required',
+            'provinsi' => 'required',
+            'desa' => 'required',
+            'kecamatan' => 'required',
+            'kode_pos' => 'required',
+            'kota' => 'required',
+            'jenis_rekening' => 'required',
+            'no_rekening' => 'required',
+            'foto_ktp' => 'image|nullable',
+            'selfie_ktp' => 'image|nullable',
+            'portofolio' => 'image|nullable',
+        ], [
+            'nik.required' => 'Kolom nik harus diisi.',
+            'nik.unique' => 'Nik sudah terdaftar.',
+            'about.required' => 'Kolom tentang saya harus diisi.',
+            'alamat.required' => 'Kolom alamat harus diisi.',
+            'provinsi.required' => 'Kolom provinsi harus diisi.',
+            'desa.required' => 'Kolom desa harus diisi.',
+            'kecamatan.required' => 'Kolom kecamatan harus diisi.',
+            'kode_pos.required' => 'Kolom kode pos harus diisi.',
+            'kota.required' => 'Kolom kota harus diisi.',
+            'jenis_rekening.required' => 'Kolom jenis rekening harus diisi.',
+            'no_rekening.required' => 'Kolom no rekening harus diisi.',
+            'foto_ktp.image' => 'Kolom foto ktp harus berisi gambar.',
+            'selfie_ktp.image' => 'Kolom foto selfie harus berisi gambar.',
+            'portofolio.image' => 'Kolom portofolio harus berisi gambar.',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        $freelance = Freelance::where('user_id', auth()->user()->id)->first();
+
+        if (!$freelance) {
+            toastr()->error('Entri freelance tidak ditemukan.');
+            return redirect()->back();
+        }
+
+        if ($request->hasFile('foto_ktp')) {
+            $fotoKTP = $request->file('foto_ktp')->store('foto_ktp', 'public');
+            $freelance->foto_ktp = $fotoKTP;
+        }
+
+        if ($request->hasFile('selfie_ktp')) {
+            $selfieKTP = $request->file('selfie_ktp')->store('selfie_ktp', 'public');
+            $freelance->selfie_ktp = $selfieKTP;
+        }
+
+        if ($request->hasFile('portofolio')) {
+            $portofolio = $request->file('portofolio')->store('portofolio_pendaftaran', 'public');
+            $freelance->portofolio = $portofolio;
+        }
+
+        $freelance->nik = $request->nik;
+        $freelance->about = $request->about;
+        $freelance->alamat = $request->alamat;
+        $freelance->kode_pos = $request->kode_pos;
+        
+        function _wilayah($model, $field, $code) {
+            $data = $model::where('code', $code)->first();
+            if ($data) {
+                return $data->name;
+            }
+            return null;
+        }
+
+        $freelance->provinsi = _wilayah(Province::class, 'provinsi', $request->provinsi);
+        $freelance->kota = _wilayah(City::class, 'kota', $request->kota);
+        $freelance->kecamatan = _wilayah(District::class, 'kecamatan', $request->kecamatan);
+        $freelance->desa = _wilayah(Village::class, 'desa', $request->desa);
+
+        $freelance->status_register = "PENDING";
+
+        $freelance->save();
+
+        if($freelance){
+            toastr()->success('Data freelance berhasil diperbarui.');
+            return redirect()->back();
+        }
+
+        toastr()->error('Proses pembaruan data freelance gagal.');
         return redirect()->back();
     }
 
