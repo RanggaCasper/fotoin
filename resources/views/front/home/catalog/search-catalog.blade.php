@@ -59,7 +59,7 @@
             $('.img-slider').owlCarousel({
                 loop: true,
                 margin: 10,
-                nav: true,
+                nav: false,
                 items: 1
             });
         }

@@ -7,12 +7,14 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
     public function dashboard()
     {
-        return view('front.user.dashboard.dashboard');   
+        $transaction = Transaction::where('user_id', auth()->user()->id)->get();
+        return view('front.user.dashboard.dashboard', compact('transaction'));   
     }
 
     public function view_transaction()
@@ -96,7 +98,7 @@ class UserController extends Controller
     public function update_profile(Request $request)
     {
         $request->validate([
-            'current_password' => 'nullable',
+            'current_password' => 'nullable|string',
             'profile_image' => 'nullable|image|mimes:jpg,png,jpeg|max:5120',
             'password' => 'nullable|string|min:8|confirmed',
         ]);
@@ -109,10 +111,13 @@ class UserController extends Controller
         }
 
         if ($request->hasFile('profile_image')) {
+            if ($user->profile_image && Storage::disk('public')->exists($user->profile_image)) {
+                Storage::disk('public')->delete($user->profile_image);
+            }
+
             $image = $request->file('profile_image');
-            $imageName = time().'.'.$image->extension();
-            $image->move(public_path('images/profile'), $imageName);
-            $user->profile_image = '/images/profile/'.$imageName;
+            $imageName = $image->store('profile', 'public');
+            $user->profile_image = $imageName;
         }
 
         if ($request->filled('password')) {
@@ -127,5 +132,6 @@ class UserController extends Controller
 
         return redirect()->back();
     }
+
 
 }

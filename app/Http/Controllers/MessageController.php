@@ -50,7 +50,7 @@ class MessageController extends Controller
 
             $userData = [
                 'username' => $user->username,
-                'profile_image' => $user->profile_image ? asset($user->profile_image) : 'https://caspertopup.com/images/avatars/default.jpg',
+                'profile_image' => env('APP_URL') .'storage/'. $user->profile_image,
                 'role' => $user->role
             ];
 

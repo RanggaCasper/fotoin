@@ -72,14 +72,14 @@
                         <li>
                             <span><i class="feather-map-pin"></i></span>
                             <div class="location-info">
-                                <h6>Address</h6>
+                                <h6>Lokasi</h6>
                                 <p>{{ optional(app('web_conf')->where('conf_key', 'web_location')->first())->conf_value }}</p>
                             </div>
                         </li>
                         <li>
                             <span><i class="feather-phone"></i></span>
                             <div class="location-info">
-                                <h6>Phone</h6>
+                                <h6>No. Ponsel</h6>
                                 <p>{{ optional(app('web_conf')->where('conf_key', 'cs_phone')->first())->conf_value }}</p>
                             </div>
                         </li>

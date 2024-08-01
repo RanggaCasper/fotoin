@@ -26,7 +26,7 @@
         <div class="settings-card-body">
             <div class="img-upload-head">
                 <div class="profile-img">
-                    <img id="profileImagePreview" src="{{ auth()->user()->profile_image }}" alt="Profile Image">
+                    <img id="profileImagePreview" src="{{ Storage::url(auth()->user()->profile_image) }}" alt="Profile Image">
                 </div>
                 <div class="img-formate">
                     <p>Max file size is 5MB, Minimum dimension: 150x150 And Suitable files are

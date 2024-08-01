@@ -9,16 +9,16 @@
                         <span></span>
                     </span>
                 </a>
-                <a href="index.html" class="navbar-brand logo">
+                <a href="{{ route('home') }}" class="navbar-brand logo">
                     <img src="{{ optional(app('web_conf')->where('conf_key', 'web_logo')->first())->conf_value }}" class="img-fluid" alt="Logo">
                 </a>
-                <a href="index.html" class="navbar-brand logo-small">
+                <a href="{{ route('home') }}" class="navbar-brand logo-small">
                     <img src="{{ optional(app('web_conf')->where('conf_key', 'web_logo')->first())->conf_value }}" class="img-fluid" alt="Logo">
                 </a>
             </div>
             <div class="main-menu-wrapper">
                 <div class="menu-header">
-                    <a href="index.html" class="menu-logo">
+                    <a href="{{ route('home') }}" class="menu-logo">
                         <img src="{{ optional(app('web_conf')->where('conf_key', 'web_logo')->first())->conf_value }}" class="img-fluid w-25" alt="Logo">
                     </a>
                     <a id="menu_close" class="menu-close" href="#"> <i class="fas fa-times"></i></a>
@@ -69,14 +69,14 @@
                         <a href="#" class="nav-link toggle">
                             <span class="log-user dropdown-toggle">
                                 <span class="users-img">
-                                    <img class="rounded-circle" src="{{ auth()->user()->profile_image ? asset(auth()->user()->profile_image) : 'https://caspertopup.com/images/avatars/default.jpg' }}" alt="Profile">
+                                    <img src="{{ Storage::url(auth()->user()->profile_image) }}" alt="Profile Image">
                                 </span>
                                 <span class="user-text">{{ auth()->user()->username }}</span>
                             </span>
                         </a>
                         <div class="dropdown-menu list-group">
                             <div class="user-item">
-                                <img src="{{ auth()->user()->profile_image ? asset(auth()->user()->profile_image) : 'https://caspertopup.com/images/avatars/default.jpg' }}" alt="Profile">
+                                <img src="{{ Storage::url(auth()->user()->profile_image) }}" alt="Profile Image">
                                 <div class="user-name">
                                     <h6>{{ auth()->user()->fullname }}</h6>
                                     <p>{{ auth()->user()->username }}</p>

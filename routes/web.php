@@ -262,3 +262,25 @@ Route::controller(WilayahController::class)->prefix('wilayah')->group(function()
 Route::controller(CallbackController::class)->group(function(){
     Route::post('callback/tokopay', 'tokopay')->name('tokopay-callback');
 });
+
+// Untuk Storge Link
+// Route::get('link', function (){
+
+//     $target = $_SERVER['DOCUMENT_ROOT']."/../laravel/storage/app/public/";
+//     $link = $_SERVER['DOCUMENT_ROOT']."/storage";
+
+//     // Check if symlink or file already exists
+//     if (!file_exists($link) && !is_link($link)) {
+
+//         // Attempt to create symlink
+//         if (symlink($target, $link)) {
+//             echo "OK.";
+//         } else {
+//             echo "Gagal.";
+//         }
+
+//     } else {
+//         echo "Symlink atau file sudah ada.";
+//     }
+
+// });

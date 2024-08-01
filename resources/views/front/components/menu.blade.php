@@ -2,7 +2,7 @@
     <div class="user-sidebar">
         <div class="user-head">
             <span class="flex-shrink-0">
-                <img src="{{ auth()->user()->profile_image ? asset(auth()->user()->profile_image) : 'https://caspertopup.com/images/avatars/default.jpg' }}" class="img-fluid" alt="img">
+                <img src="{{ Storage::url(auth()->user()->profile_image) }}" alt="Profile Image">
             </span>
             <div class="user-information">
                 <div>

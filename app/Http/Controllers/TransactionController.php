@@ -58,6 +58,10 @@ class TransactionController extends Controller
             if (auth()->user()->id === $package->catalog->user_id) {
                 return response()->json(['success' => false, 'message' => 'Tidak bisa melakukan order di katalog sendiri.']);
             }
+            
+            if (auth()->user()->role != "User") {
+                return response()->json(['success' => false, 'message' => 'Hanya Role User yang bisa melakukan Transaksi.']);
+            }
 
             if (!$request->booked_at) {
                 return response()->json(['success' => false, 'message' => 'Waktu booking harus di isi.']);
@@ -223,7 +227,7 @@ class TransactionController extends Controller
           'expired_at' => now()->addHours(24),
           'status' => 'UNPAID',
           'price' => $transaction->package_price,
-          'fee' => $fee,
+          'fee_payment' => $fee,
           'total_price' => $price,
           'payment_channel_id' => $payment_channel->id,
           'transaction_id' => $transaction->id,

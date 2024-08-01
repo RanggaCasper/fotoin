@@ -11,7 +11,7 @@ class Payment extends Model
 
     protected $table = "payments";
 
-    protected $fillable = ['reference','checkout_url','nomor_va','qr_link','expired_at','paid_at','price','fee','total_price','status','payment_channel_id','transaction_id'];
+    protected $fillable = ['reference','checkout_url','nomor_va','qr_link','expired_at','paid_at','price','fee_payment','total_price','status','payment_channel_id','transaction_id'];
 
     public function payment_channel()
     {

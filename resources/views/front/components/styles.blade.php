@@ -1,5 +1,3 @@
-<link rel="shortcut icon" href="{{ asset('asset/img/favicon.png') }}">
-
 <link rel="stylesheet" href="{{ asset('asset/css/bootstrap.min.css') }}">
 
 <link rel="stylesheet" href="{{ asset('asset/plugins/fontawesome/css/fontawesome.min.css') }}">

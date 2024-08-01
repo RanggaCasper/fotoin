@@ -454,7 +454,7 @@ class AdminMasterController extends Controller
 
     public function get_profit(Request $request)
     {
-        $startDate = $request->input('start_date', Carbon::now()->subDays(30)->format('Y-m-d'));
+        $startDate = $request->input('start_date', Carbon::now()->format('Y-m-d'));
         $endDate = $request->input('end_date', Carbon::now()->format('Y-m-d'));
 
         $data = Profit::with('transaction', 'transaction.freelance', 'transaction.user')
@@ -467,7 +467,7 @@ class AdminMasterController extends Controller
                 return ++$counter;
             })
             ->addColumn('profit', function ($row) {
-                return number_format($row->profit, 0, ',', '.');
+                return 'Rp. '.number_format($row->profit, 0, ',', '.');
             })
             ->addColumn('transaction', function ($row) {
                 return $row->transaction->invoice;
@@ -487,7 +487,7 @@ class AdminMasterController extends Controller
 
     public function profit_chart(Request $request)
     {
-        $startDate = $request->input('start_date', Carbon::now()->subDays(30)->format('Y-m-d'));
+        $startDate = $request->input('start_date', Carbon::now()->format('Y-m-d'));
         $endDate = $request->input('end_date', Carbon::now()->format('Y-m-d'));
 
         $profitData = Profit::select(DB::raw('DATE(created_at) as date'), DB::raw('SUM(profit) as total_profit'))

@@ -118,7 +118,7 @@
                               <li class="chat-contact-list-item" data-user-id="{{ $message->id }}">
                                   <a class="d-flex align-items-center">
                                       <div class="flex-shrink-0 avatar avatar-online">
-                                          <img src="{{ $message->profile_image }}" id="img-{{ $message->id }}" alt="Avatar" class="rounded-circle" />
+                                          <img src="{{ url('').'/storage/'.$message->profile_image }}" id="img-{{ $message->id }}" alt="Avatar" class="rounded-circle" />
                                       </div>
                                       <h6 class="d-none" id="role">{{ $message->role }}</h6>
                                       <div class="chat-contact-info flex-grow-1 ms-2">

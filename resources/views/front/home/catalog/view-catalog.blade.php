@@ -7,7 +7,7 @@
 
 <meta property="og:title" content="{{ $catalog->title_name }}">
 <meta property="og:description" content="{{ $catalog->description }}">
-<meta property="og:image" content="{{ asset('storage/' . $catalog->portofolios->first()->path_image) }}">
+<meta property="og:image" content="{{ Storage::url($catalog->portofolios->first()->path_image) }}">
 <meta property="og:url" content="{{ route('view-catalog', ['username' => $catalog->user->username, 'slug' => $catalog->slug]) }}">
 <meta property="og:type" content="website">
 
@@ -342,11 +342,11 @@
                                 <div class="review-wrap">
                                     <div class="review-user-info">
                                         <div class="review-img">
-                                            <img src="{{ $feedback->user->profile_image }}" alt="img">
+                                            <img src="{{ Storage::url($feedback->user->profile_image) }}" alt="img">
                                         </div>
                                         <div class="reviewer-info">
                                             <div class="reviewer-loc">
-                                                <h6><a href="javascript:void(0);">{{ $feedback->user->username }}</a></h6>
+                                                <h6><a href="javascript:void(0);">{{ $feedback->user->fullname }}</a></h6>
                                             </div>
                                             <div class="reviewer-rating">
                                                 <div class="star-rate">
@@ -442,7 +442,7 @@
                 <div class="service-widget member-widget">
                     <div class="user-details">
                         <div class="user-img">
-                            <img src="{{ $catalog->user->profile_image }}" alt="img">
+                            <img src="{{ Storage::url($catalog->user->profile_image) }}" alt="img">
                         </div>
                         <div class="user-info">
                             <h5><span class="me-2">{{ $catalog->user->username }}</span> @if ($catalog->user->isOnline())<span class="badge badge-success"><i class="fa-solid fa-circle"></i> Online</span> @else <span class="badge bg-danger"><i class="fa-solid fa-circle"></i> Offline</span> @endif</h5>
@@ -499,11 +499,11 @@
                             <h6 class="title">Freelance</h6>
                             <div class="user-details">
                                 <div class="user-img">
-                                    <img src="{{ $catalog->user->profile_image }}" alt="img">
+                                    <img src="{{ Storage::url($catalog->user->profile_image) }}" alt="img">
                                 </div>
                                 <div class="user-info">
                                     <h5>{{ $catalog->user->username }}<span class="location">{{ $catalog->user->freelance->provinsi.', '.$catalog->user->freelance->kota }}</span></h5>
-                                    <p><i class="fa-solid fa-star"></i>Ratings {{ number_format($catalog->feedback->sum('rate') ?? 0, 1) }} ({{ $catalog->feedback->count() }} Reviews)</p>
+                                    <p><i class="fa-solid fa-star"></i>Ratings {{ number_format( min(($feedback->count() > 0 ? $feedback->sum('rate') / $feedback->count() : 0),5),1)}} ({{ $catalog->feedback->count() }} Reviews)</p>
                                 </div>
                             </div>
                             <div class="detail-table table-responsive">

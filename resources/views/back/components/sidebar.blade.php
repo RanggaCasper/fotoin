@@ -2,7 +2,7 @@
 
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
     <div class="app-brand demo">
-      <a href="index.html" class="app-brand-link">
+      <a href="{{ route('home') }}" class="app-brand-link">
         <img src="{{ optional(app('web_conf')->where('conf_key', 'web_logo')->first())->conf_value }}" width="36" alt="Logo">
         {{-- <span class="app-brand-text demo menu-text fw-bold">{{ optional(app('web_conf')->where('conf_key', 'web_title')->first())->conf_value }}</span> --}}
       </a>

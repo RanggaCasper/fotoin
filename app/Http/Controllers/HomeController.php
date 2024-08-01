@@ -71,9 +71,11 @@ class HomeController extends Controller
             $request->session()->push('viewed_catalogs', $catalog->id);
         }
 
-        $feedback = Feedback::with('transaction')->whereHas('catalog', function ($query) {
-            $query->where('user_id', auth()->user()->id);
-        })->get();
+        $feedback = Feedback::with('transaction')
+        ->whereHas('catalog', function ($query) use ($catalog) {
+            $query->where('user_id', $catalog->user_id);
+        })
+        ->get();
 
         return view('front.home.catalog.view-catalog', compact('catalog','feedback'));
     }

@@ -14,7 +14,7 @@
     <meta property="og:description" content="{{ optional(app('web_conf')->where('conf_key', 'web_description')->first())->conf_value }}">
     <meta property="og:image" content="{{ optional(app('web_conf')->where('conf_key', 'web_logo')->first())->conf_value }}">
     <meta property="og:url" content="{{ url('') }}">
-    <meta property="og:type" content="{{ optional(app('web_conf')->where('conf_key', 'web_icon')->first())->conf_value }}">
+    <meta property="og:type" content="website">
     
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
@@ -603,7 +603,7 @@
                         <div class="col-lg-4">
                             <div class="faq-heading aos" data-aos="fade-up">
                                 <div class="section-header">
-                                    <h2><span>Your</span> Frequently Added Question’s</h2>
+                                    <h2><span>Frequently</span> Asked Question’s</h2>
                                 </div>
                             </div>
                         </div>

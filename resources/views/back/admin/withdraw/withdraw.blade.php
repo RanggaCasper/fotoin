@@ -122,7 +122,7 @@
                     <option value="">All</option>
                     <option value="PENDING">PENDING</option>
                     <option value="COMPLETED">COMPLETED</option>
-                    <option value="CANCELLED">CANCELLED</option>
+                    <option value="CANCLED">CANCLED</option>
                 </select>
             </div>
             <div class="col-md-4">

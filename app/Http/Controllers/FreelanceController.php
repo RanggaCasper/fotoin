@@ -18,6 +18,7 @@ use Yajra\DataTables\DataTables;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class FreelanceController extends Controller
@@ -552,10 +553,14 @@ class FreelanceController extends Controller
         $user = auth()->user();
 
         if ($request->hasFile('profile_image')) {
+            // Hapus gambar lama jika ada
+            if ($user->profile_image && Storage::disk('public')->exists($user->profile_image)) {
+                Storage::disk('public')->delete($user->profile_image);
+            }
+
             $image = $request->file('profile_image');
-            $imageName = time().'.'.$image->extension();
-            $image->move(public_path('images/profile'), $imageName);
-            $user->profile_image = '/images/profile/'.$imageName;
+            $imageName = $image->store('profile', 'public');
+            $user->profile_image = $imageName;
         }
 
         if ($request->filled('password')) {
@@ -574,6 +579,7 @@ class FreelanceController extends Controller
             return redirect()->back();
         }
     }
+
 
     public function view_feedback()
     {

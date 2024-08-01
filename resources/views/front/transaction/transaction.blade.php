@@ -273,7 +273,7 @@
 
     function method(id) {
         document.getElementById(id).checked = true;
-        var biayaLayanan = document.getElementById(id).getAttribute('data-biaya-pembayaran');
+        var biayaLayanan = document.getElementById(id).getAttribute('data-biaya-layanan');
         var total = document.getElementById(id).getAttribute('data-total');
 
         document.getElementById('biaya-pembayaran').innerText = 'Rp. ' + biayaLayanan;
@@ -406,16 +406,19 @@
                         @else
                             <a href="{{ route('view_message') }}?id={{ $transaction->user_id }}&text=Hallo {{ $transaction->user->username }}," class="btn btn-outline-primary w-100 mb-1"><i class="feather-message-square me-2"></i>Chat Customer</a>
                         @endif
-                        @if ($transaction->approved === "WAITING")
-                            <button class="btn btn-primary w-100" id="submit-btn-batal">Batalkan Pesanan</button>
-                        @else
-                            @if ($payment)
-                                <input type="hidden" name="transaction_id" id="transaction_id" value="{{ $transaction->id }}">
-                                <input type="hidden" name="payment_id" id="payment_id">
-                                <button class="btn btn-primary w-100" id="submit-btn"><i class="feather-shopping-cart me-2"></i>Bayar Pesanan</button>
-                            @elseif ($transaction->status === "PROCESSING")
-                                @if(auth()->user()->id === $transaction->user_id && $status_timeline)
-                                    <button class="btn btn-primary w-100" id="submit-btn-selesai"><i class="feather-check me-2"></i>Pesanan Selesai</button>
+                        @if(auth()->user()->id === $transaction->user_id)
+                            @if ($transaction->approved === "WAITING")
+                                <button class="btn btn-primary w-100" id="submit-btn-batal">Batalkan Pesanan</button>
+                            @else
+                                @if($transaction->status === "PENDING")
+                                    <input type="hidden" name="transaction_id" id="transaction_id" value="{{ $transaction->id }}">
+                                    <input type="hidden" name="payment_id" id="payment_id">
+                                    <button class="btn btn-primary w-100" id="submit-btn"><i class="feather-shopping-cart me-2"></i>Bayar Pesanan</button>
+                                @endif
+                                @if($status_timeline)
+                                    @if($transaction->status != "COMPLETED")
+                                        <button class="btn btn-primary w-100" id="submit-btn-selesai"><i class="feather-check me-2"></i>Pesanan Selesai</button>
+                                    @endif
                                 @endif
                             @endif
                         @endif

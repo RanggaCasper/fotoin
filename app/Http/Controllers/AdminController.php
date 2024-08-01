@@ -670,7 +670,7 @@ class AdminController extends Controller
                     return '<span class="badge ' . $badgeClass . ' rounded-pill">' . $row->status . '</span>';
                 })
                 ->addColumn('action', function($row){
-                    if($row->status != "P"){
+                    if($row->status != "PENDING"){
                         return null;
                     }
                     $btn = '<button class="btn btn-success btn-sm approve me-1" data-id="'.$row->id.'">Approve</button>';

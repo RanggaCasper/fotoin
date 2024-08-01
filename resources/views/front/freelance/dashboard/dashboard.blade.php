@@ -27,7 +27,7 @@
                     <i class="ti ti-shopping-cart"></i>
                 </span>
                 <p>Jumlah Katalog</p>
-                <h3>{{ number_format($transaction->count(),0,',','.') }}</h3>
+                <h3>{{ number_format($catalog->count(),0,',','.') }}</h3>
             </div>
         </div>
         <div class="col-md-6 d-flex">
